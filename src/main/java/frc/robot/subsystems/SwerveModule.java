@@ -10,9 +10,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,7 +50,7 @@ public class SwerveModule
     {
         //TODO: do we want it to give us absolute position
         //return (steerEncoder.getPosition()*Math.PI/180)+cfg.steerAngleOffset;
-        return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
+        return -(steerEncoder.getPosition()*Math.PI/180) + cfg.steerAngleOffset;
     }
 
     public double getVelocity(){
@@ -59,25 +58,29 @@ public class SwerveModule
     }
 //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){
-        steeringAngle %= (2.0 * Math.PI);
-        if (steeringAngle < 0.0) 
-        {
-            steeringAngle += 2.0 * Math.PI;
-        }
-
-        double difference = steeringAngle - getSteeringAngle();
-        // Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
-        if (difference >= Math.PI) {
-            steeringAngle -= 2.0 * Math.PI;
-        } else if (difference < -Math.PI) {
-            steeringAngle += 2.0 * Math.PI;
-        }
-        difference = steeringAngle - getSteeringAngle(); // Recalculate difference
-
         SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
+        // steeringAngle %= (2.0 * Math.PI);
+        // if (steeringAngle < -Math.PI) 
+        // {
+        //     steeringAngle += 2.0 * Math.PI;
+        // }
+        // if (steeringAngle > Math.PI)
+        // {
+        //     steeringAngle -= 2.0 * Math.PI;
+        // }
+
+        // double difference = steeringAngle - getSteeringAngle();
+        // Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
+        // if (difference >= Math.PI) {
+        //     steeringAngle -= 2.0 * Math.PI;
+        // } else if (difference < -Math.PI) {
+        //     steeringAngle += 2.0 * Math.PI;
+        // }
+        // difference = steeringAngle - getSteeringAngle(); // Recalculate difference
+
         SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
-        SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
-        SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), getSteeringAngle());
+        // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
+        SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
 
 
         // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
@@ -89,17 +92,16 @@ public class SwerveModule
         }*/
 
         // Put the target angle back into the range [0, 2pi)
-        steeringAngle %= (2.0 * Math.PI);
-        if (steeringAngle < 0.0) {
-            steeringAngle += 2.0 * Math.PI;
-        }
+        // steeringAngle %= (2.0 * Math.PI);
+        // if (steeringAngle < 0.0) {
+        //     steeringAngle += 2.0 * Math.PI;
+        // }
 
         setDriveVelocity(driveVelocity);
         setSteerAngle(steeringAngle);
-        SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
-        SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
-        SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
-        SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), getSteeringAngle());
+        // SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
+        // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
+        // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
     }
     public void setDriveVelocity(double driveVelocity)
     {
