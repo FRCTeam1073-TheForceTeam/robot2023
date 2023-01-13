@@ -76,6 +76,16 @@ public class OI extends SubsystemBase
     public double getDriverRightY() {
         return MathUtil.clamp(2.0 * (driverController.getRawAxis(5) - (RIGHT_Y_MAX + RIGHT_Y_MIN) * 0.5) / (RIGHT_Y_MAX - RIGHT_Y_MIN) - RIGHT_Y_ZERO, -1, 1);
     }
+
+    public boolean getLeftBumper()
+    {
+        return driverController.getRawButton(5);
+    }
+
+    public boolean getRightBumper()
+    {
+        return driverController.getRawButton(6);
+    }
     
     
     

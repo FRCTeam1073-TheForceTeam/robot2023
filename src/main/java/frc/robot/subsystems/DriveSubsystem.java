@@ -140,7 +140,8 @@ public class DriveSubsystem extends SubsystemBase
     pigeonIMU.setFusedHeading(0);
   }
 
-  public void setChassisSpeeds(ChassisSpeeds speeds){
+  public void setChassisSpeeds(ChassisSpeeds speeds)
+  {
     chassisSpeeds = speeds;
   }
 

@@ -7,15 +7,21 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
+
+import javax.lang.model.util.ElementScanner14;
+
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
 
-public class TeleopDrive extends CommandBase {
+public class TeleopDrive extends CommandBase 
+{
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
+  public static double velocityMult;
+
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi) {
     addRequirements(ds);
@@ -30,11 +36,26 @@ public class TeleopDrive extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
+  public void execute() 
+  {
+    if (m_OI.getLeftBumper())
+    {
+      velocityMult = 0.15;
+    }
+    else if (m_OI.getRightBumper())
+    {
+      velocityMult = 0.8;
+    }
+    else
+    {
+      velocityMult = 0.35;
+    }
+
     //Vector<N2> vector = new Vector<N2>(Nat.N2()); //(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5);
     //vector.rotate(m_driveSubsystem.getHeading()); //rotates by degrees
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vector.x, vector.y, m_OI.getDriverRightX()); //rotation-oriented
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5, m_OI.getDriverRightX()); //debug
+    //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftX() * velocityMult, m_OI.getDriverLeftY() * velocityMult, m_OI.getDriverRightX() * velocityMult); //debug
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5, m_OI.getDriverRightX() * 0.5);
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
     m_driveSubsystem.setChassisSpeeds(chassisSpeeds);
     //m_driveSubsystem.setDebugSpeed(m_OI.getDriverLeftX());
