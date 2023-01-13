@@ -59,14 +59,15 @@ public class SwerveModule
 //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){
         SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
+
         // steeringAngle %= (2.0 * Math.PI);
         // if (steeringAngle < -Math.PI) 
         // {
-        //     steeringAngle += 2.0 * Math.PI;
+        //     steeringAngle += Math.PI;
         // }
         // if (steeringAngle > Math.PI)
         // {
-        //     steeringAngle -= 2.0 * Math.PI;
+        //     steeringAngle -= Math.PI;
         // }
 
         // double difference = steeringAngle - getSteeringAngle();
