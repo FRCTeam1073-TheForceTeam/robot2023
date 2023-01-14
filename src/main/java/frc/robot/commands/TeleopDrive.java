@@ -12,6 +12,7 @@ import javax.lang.model.util.ElementScanner14;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
@@ -67,7 +68,7 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftY) < .5){leftY = 0;}
     if(Math.abs(leftX) < .5){leftX = 0;}
     if(Math.abs(rightX) < .5){rightX = 0;}
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
+    // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle())
     {
       fieldCentric = !fieldCentric;
@@ -78,18 +79,18 @@ public class TeleopDrive extends CommandBase
     if (fieldCentric)
     {
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        m_OI.getDriverLeftY() * velocityMult,
-        m_OI.getDriverLeftX() * velocityMult, 
-        m_OI.getDriverRightX() * rotateMult,
-        Rotation2d.fromDegrees(0)); // get fused heading
+        leftY * velocityMult,
+        leftX * velocityMult, 
+        rightX * rotateMult,
+        Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
     else
     {
       ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-      chassisSpeeds.vxMetersPerSecond = m_OI.getDriverLeftY() * velocityMult; 
-      chassisSpeeds.vyMetersPerSecond = m_OI.getDriverLeftX() * velocityMult; 
-      chassisSpeeds.omegaRadiansPerSecond = m_OI.getDriverRightX() * rotateMult;
+      chassisSpeeds.vxMetersPerSecond = leftY * velocityMult; 
+      chassisSpeeds.vyMetersPerSecond = leftX * velocityMult; 
+      chassisSpeeds.omegaRadiansPerSecond = rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
     
