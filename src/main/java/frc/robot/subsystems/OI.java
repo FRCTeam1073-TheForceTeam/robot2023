@@ -86,6 +86,11 @@ public class OI extends SubsystemBase
     {
         return driverController.getRawButton(6);
     }
+
+    public boolean getFieldCentricToggle()
+    {
+        return driverController.getRawButtonPressed(7);
+    }
     
     public boolean getMenuButton()
     {
