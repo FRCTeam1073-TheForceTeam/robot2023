@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 
@@ -22,17 +23,17 @@ public class DriveSubsystem extends SubsystemBase
   private SwerveModule[] modules;
   private ChassisSpeeds chassisSpeeds;
   private boolean debug = false;
-  private PigeonIMU pigeonIMU;
+  private Pigeon2 pigeon2;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
   {
-    pigeonIMU = new PigeonIMU(9);
-    pigeonIMU.configFactoryDefault();
-    pigeonIMU.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 50);
-    pigeonIMU.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_10_SixDeg_Quat, 50);
-    pigeonIMU.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, 50);
-    pigeonIMU.setFusedHeading(0);
+    pigeon2 = new Pigeon2(9);
+    pigeon2.configFactoryDefault();
+    // pigeon2.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 50);
+    // pigeon2.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_10_SixDeg_Quat, 50);
+    // pigeon2.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, 50);
+    // pigeon2.setFusedHeading(0);
 
     // Make space for four swerve modules:
     modules = new SwerveModule[4];
@@ -101,13 +102,13 @@ public class DriveSubsystem extends SubsystemBase
   }
 
   //returns heading in degrees
-  public double getHeading(){
-    return pigeonIMU.getFusedHeading();
-  }
+  // public double getHeading(){
+  //   return pigeonIMU.getFusedHeading();
+  // }
 
-  public void zeroHeading(){
-    pigeonIMU.setFusedHeading(0);
-  }
+  // public void zeroHeading(){
+  //   pigeonIMU.setFusedHeading(0);
+  // }
 
   public void setChassisSpeeds(ChassisSpeeds speeds){
     chassisSpeeds = speeds;
@@ -146,25 +147,25 @@ public class DriveSubsystem extends SubsystemBase
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, 3.0);
-      states[0] = SwerveModuleState.optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = SwerveModuleState.optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = SwerveModuleState.optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = SwerveModuleState.optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+      // states[0] = SwerveModuleState.optimize(states[0], new Rotation2d(modules[0].getSteeringAngle()));
+      // states[1] = SwerveModuleState.optimize(states[1], new Rotation2d(modules[1].getSteeringAngle()));
+      // states[2] = SwerveModuleState.optimize(states[2], new Rotation2d(modules[2].getSteeringAngle()));
+      // states[3] = SwerveModuleState.optimize(states[3], new Rotation2d(modules[3].getSteeringAngle()));
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
     }
-    SmartDashboard.putNumber("Module 0 Angle", modules[0].getSteeringAngle());
-    SmartDashboard.putNumber("Module 1 Angle", modules[1].getSteeringAngle());
-    SmartDashboard.putNumber("Module 2 Angle", modules[2].getSteeringAngle());
-    SmartDashboard.putNumber("Module 3 Angle", modules[3].getSteeringAngle());
-    SmartDashboard.putNumber("Module 0 Velocity", modules[0].getVelocity());
-    SmartDashboard.putNumber("Module 1 Velocity", modules[1].getVelocity());
-    SmartDashboard.putNumber("Module 2 Velocity", modules[2].getVelocity());
-    SmartDashboard.putNumber("Module 3 Velocity", modules[3].getVelocity());
-    SmartDashboard.putNumber("Heading", getHeading());
+    // SmartDashboard.putNumber("Module 0 Angle", modules[0].getSteeringAngle());
+    // SmartDashboard.putNumber("Module 1 Angle", modules[1].getSteeringAngle());
+    // SmartDashboard.putNumber("Module 2 Angle", modules[2].getSteeringAngle());
+    // SmartDashboard.putNumber("Module 3 Angle", modules[3].getSteeringAngle());
+    // SmartDashboard.putNumber("Module 0 Velocity", modules[0].getVelocity());
+    // SmartDashboard.putNumber("Module 1 Velocity", modules[1].getVelocity());
+    // SmartDashboard.putNumber("Module 2 Velocity", modules[2].getVelocity());
+    // SmartDashboard.putNumber("Module 3 Velocity", modules[3].getVelocity());
+    // SmartDashboard.putNumber("Heading", getHeading());
   }
   public void setDebugSpeed(double speed){
     modules[0].setDriveVelocity(speed);

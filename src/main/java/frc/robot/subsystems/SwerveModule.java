@@ -50,7 +50,7 @@ public class SwerveModule
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
-        return -(steerEncoder.getPosition()*Math.PI/180) + cfg.steerAngleOffset;
+        return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
     }
 
     public double getVelocity(){
@@ -100,8 +100,8 @@ public class SwerveModule
         //     steeringAngle += 2.0 * Math.PI;
         // }
 
-        //setDriveVelocity(driveVelocity);
-        //setSteerAngle(steeringAngle);
+        setDriveVelocity(driveVelocity);
+        setSteerAngle(steeringAngle);
         // SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
         // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
@@ -112,7 +112,7 @@ public class SwerveModule
     }
     public void setSteerAngle(double steeringAngle)
     {
-        steerMotor.set(ControlMode.Position, (steeringAngle - cfg.steerAngleOffset) * cfg.tickPerRadian);
+        steerMotor.set(ControlMode.Position, (steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian);
     }
 
     public void setBrake(boolean brake){
@@ -131,7 +131,7 @@ public class SwerveModule
         steerMotor.configFactoryDefault();
         driveMotor.configFactoryDefault();
 
-        steerMotor.setInverted(false);
+        steerMotor.setInverted(true);
         driveMotor.setInverted(false);
 
         //steerMotor.setSafetyEnabled(false);

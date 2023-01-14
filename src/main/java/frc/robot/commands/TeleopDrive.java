@@ -34,7 +34,7 @@ public class TeleopDrive extends CommandBase {
     //Vector<N2> vector = new Vector<N2>(Nat.N2()); //(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5);
     //vector.rotate(m_driveSubsystem.getHeading()); //rotates by degrees
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vector.x, vector.y, m_OI.getDriverRightX()); //rotation-oriented
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5, m_OI.getDriverRightX()); //debug
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftY() * 0.5, m_OI.getDriverLeftX() * 0.5, m_OI.getDriverRightX()); //debug
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
     m_driveSubsystem.setChassisSpeeds(chassisSpeeds);
     //m_driveSubsystem.setDebugSpeed(m_OI.getDriverLeftX());
