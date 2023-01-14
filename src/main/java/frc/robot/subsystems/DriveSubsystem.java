@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,13 +27,17 @@ public class DriveSubsystem extends SubsystemBase
   private boolean debug = false;
   private Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
+  private double maximumLinearSpeed = 1.0;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
   {
     pigeon2 = new Pigeon2(9);
-    pigeon2.configFactoryDefault();
-    pigeon2.setYaw(0);
+    var error = pigeon2.configFactoryDefault();
+    if (error != ErrorCode.OK) {
+      System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
+    }
+    error = pigeon2.setYaw(0);
 
     // Make space for four swerve modules:
     modules = new SwerveModule[4];
@@ -93,33 +98,40 @@ public class DriveSubsystem extends SubsystemBase
       modules[3].position
     );
 
+    // Create odometry:
     odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions);
 
+    // Configure maximum linear speed for limiting:
+    maximumLinearSpeed = Preferences.getDouble("Drive.MaximumLinearSpeed", 3.5);
     // Initial chassis speeds are zero:
     chassisSpeeds = new ChassisSpeeds(0,0,0);
   }
 
   // Initialize preferences for this class:
   public static void initPreferences() {
-    Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879);
+    Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879); // Radians.
     Preferences.initDouble("Drive.Module1.SteerAngleOffset", 1.866);
     Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
     Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
+    Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
   }
 
-  //returns heading in degrees
-  public double getHeading(){
+  //Returns IMU heading in degrees
+  public double getHeading() {
     return pigeon2.getYaw();
   }
 
-  public void zeroHeading(){
+  // Reset IMU heading to zero degrees
+  public void zeroHeading() {
     pigeon2.setYaw(0);
   }
 
+  // Set the commanded chassis speeds for the drive subsystem.
   public void setChassisSpeeds(ChassisSpeeds speeds){
     chassisSpeeds = speeds;
   }
 
+  // Return the measured chassis speeds for the drive subsystem.
   public ChassisSpeeds getChassisSpeeds(){
     SwerveModuleState[] wheelStates = new SwerveModuleState[4];
     wheelStates[0] = new SwerveModuleState();
@@ -127,10 +139,10 @@ public class DriveSubsystem extends SubsystemBase
     wheelStates[2] = new SwerveModuleState();
     wheelStates[3] = new SwerveModuleState();
 
-    wheelStates[0].speedMetersPerSecond = modules[0].getVelocity();
-    wheelStates[1].speedMetersPerSecond = modules[1].getVelocity();
-    wheelStates[2].speedMetersPerSecond = modules[2].getVelocity();
-    wheelStates[3].speedMetersPerSecond = modules[3].getVelocity();
+    wheelStates[0].speedMetersPerSecond = modules[0].getDriveVelocity();
+    wheelStates[1].speedMetersPerSecond = modules[1].getDriveVelocity();
+    wheelStates[2].speedMetersPerSecond = modules[2].getDriveVelocity();
+    wheelStates[3].speedMetersPerSecond = modules[3].getDriveVelocity();
 
     wheelStates[0].angle = new Rotation2d(modules[0].getSteeringAngle());
     wheelStates[1].angle = new Rotation2d(modules[1].getSteeringAngle());
@@ -160,7 +172,7 @@ public class DriveSubsystem extends SubsystemBase
     if (! debug){
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
-      SwerveDriveKinematics.desaturateWheelSpeeds(states, 3.0);
+      SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
       states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
       states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
       states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
@@ -175,16 +187,7 @@ public class DriveSubsystem extends SubsystemBase
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
-    SmartDashboard.putNumber("Heading", this.getHeading());
-
-    // SmartDashboard.putNumber("Module 0 Angle", modules[0].getSteeringAngle());
-    // SmartDashboard.putNumber("Module 1 Angle", modules[1].getSteeringAngle());
-    // SmartDashboard.putNumber("Module 2 Angle", modules[2].getSteeringAngle());
-    // SmartDashboard.putNumber("Module 3 Angle", modules[3].getSteeringAngle());
-    // SmartDashboard.putNumber("Module 0 Velocity", modules[0].getVelocity());
-    // SmartDashboard.putNumber("Module 1 Velocity", modules[1].getVelocity());
-    // SmartDashboard.putNumber("Module 2 Velocity", modules[2].getVelocity());
-    // SmartDashboard.putNumber("Module 3 Velocity", modules[3].getVelocity());
+    SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
   }
   
   public void setDebugSpeed(double speed){

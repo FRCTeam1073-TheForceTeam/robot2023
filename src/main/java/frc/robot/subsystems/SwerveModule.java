@@ -49,23 +49,27 @@ public class SwerveModule
         setUpMotors();
     }
 
+    // Populate a SwerveModulePosition object from the state of this module.
     public void updatePosition(SwerveModulePosition position){
         position.angle = Rotation2d.fromRadians(getSteeringAngle());
         position.distanceMeters = getDriveEncoder();
     }
 
+    // Return steering sensor angle in radians. 0 = dead ahead on robot.
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
         return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
     }
 
+    // Return drive encoder in meters.
     public double getDriveEncoder()
     {
         return driveMotor.getSelectedSensorPosition() * cfg.tickPerMeter;
     }
 
-    public double getVelocity(){
+    // Return drive velocity in meters/second.
+    public double getDriveVelocity(){
         return driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
     
@@ -118,9 +122,11 @@ public class SwerveModule
         // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
     }
+
     public void setDriveVelocity(double driveVelocity)
     {
-        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter);
+        // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
+        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter / 10.0);
     }
     public void setSteerAngle(double steeringAngle)
     {
@@ -140,17 +146,24 @@ public class SwerveModule
 
     public void setUpMotors()
     {
-        steerMotor.configFactoryDefault();
-        driveMotor.configFactoryDefault();
+        var error = steerMotor.configFactoryDefault();
 
-        driveMotor.setSelectedSensorPosition(0);
+        if (error != ErrorCode.OK) {
+            System.out.print(String.format("Module %d STEER MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
+        }
 
+        error = driveMotor.configFactoryDefault();
+
+        if (error != ErrorCode.OK) {
+            System.out.println(String.format("Module %d DRIVE MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
+        }
+
+        // Set control direction of motors:
         steerMotor.setInverted(true);
         driveMotor.setInverted(false);
 
-        //steerMotor.setSafetyEnabled(false);
-        //driveMotor.setSafetyEnabled(false);
 
+        // Default to brakes off:
         steerMotor.setNeutralMode(NeutralMode.Coast);
         driveMotor.setNeutralMode(NeutralMode.Coast);
 
@@ -158,40 +171,37 @@ public class SwerveModule
         driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.driveCurrentLimit, cfg.driveCurrentThreshold, cfg.driveCurrentThresholdTime));
 
         //Set up talon for CAN encoder
-        ErrorCode error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
+        error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
         if(error != ErrorCode.OK)
         {
-            System.out.println("configRemoteFeedbackFilter didn't work: " + error);
+            System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         }
-        else
-        {
-            System.out.println("configRemoteFeedbackFilter worked");
-        }
+        
         error = steerMotor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
         if(error != ErrorCode.OK)
         {
-            System.out.println("configSelectedFeedbackSensor didn't work: " + error);
+            System.out.println(String.format("Module %d configSelectedFeedbackSensor failed: %s ", cfg.moduleNumber, error));
         }
-        else
-        {
-            System.out.println("configSelectedFeedbackSensor worked");
-        }
+        
         steerMotor.setSensorPhase(true);
 
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        driveMotor.setSelectedSensorPosition(0);
 
-
-
+        // PID Loop settings for steering position control:
         steerMotor.config_kP(0, cfg.steerP);
         steerMotor.config_kI(0, cfg.steerI);
         steerMotor.config_kD(0, cfg.steerD);
         steerMotor.config_kF(0, cfg.steerF);
+        steerMotor.configMaxIntegralAccumulator(0, cfg.steerMaxIntegrator);
         steerMotor.setIntegralAccumulator(0);
 
+        // PID Loop settings for drive velocity control:
         driveMotor.config_kP(0, cfg.driveP);
         driveMotor.config_kI(0, cfg.driveI);
         driveMotor.config_kD(0, cfg.driveD);
         driveMotor.config_kF(0, cfg.driveF);
+        driveMotor.configMaxIntegralAccumulator(0, cfg.driveMaxIntegrator);
         driveMotor.setIntegralAccumulator(0);
     }
 
