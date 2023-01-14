@@ -43,15 +43,15 @@ public class TeleopDrive extends CommandBase
   public void execute() 
   {
     if (m_OI.getLeftBumper()){
-      velocityMult = 0.15;
-      rotateMult = 0.25;
+      velocityMult = 0.1;
+      rotateMult = 0.17;
     }
     else if (m_OI.getRightBumper()){
-      velocityMult = 0.8;
+      velocityMult = 0.75;
       rotateMult = 1;
     }
     else{
-      velocityMult = 0.35;
+      velocityMult = 0.25;
       rotateMult = 0.5;
     }
 
@@ -65,9 +65,9 @@ public class TeleopDrive extends CommandBase
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
     double rightX = m_OI.getDriverRightX();
-    if(Math.abs(leftY) < .5){leftY = 0;}
-    if(Math.abs(leftX) < .5){leftX = 0;}
-    if(Math.abs(rightX) < .5){rightX = 0;}
+    if(Math.abs(leftY) < .35){leftY = 0;}
+    if(Math.abs(leftX) < .35){leftX = 0;}
+    if(Math.abs(rightX) < .35){rightX = 0;}
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle())
     {
