@@ -15,6 +15,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    // We must call this before creating the robot container: Sets up preferences.
+    RobotContainer.initPreferences();
+
+    // Create our robot container
     m_robotContainer = new RobotContainer();
   }
 

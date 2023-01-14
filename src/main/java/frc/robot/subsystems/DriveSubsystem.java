@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Preferences;
 
 public class DriveSubsystem extends SubsystemBase 
 {
@@ -33,102 +34,66 @@ public class DriveSubsystem extends SubsystemBase
     pigeonIMU.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, 50);
     pigeonIMU.setFusedHeading(0);
 
+    // Make space for four swerve modules:
     modules = new SwerveModule[4];
-    //front left
-    SwerveModuleConfig moduleConfig = new SwerveModuleConfig();
-    SwerveModuleIDConfig moduleIDConfig = new SwerveModuleIDConfig();
-    moduleIDConfig.driveMotorID = 43;
-    moduleIDConfig.steerMotorID = 28;
-    moduleIDConfig.steerEncoderID = 14;
-    moduleConfig.position = new Translation2d(-0.217, 0.217);
-    moduleConfig.tickPerMeter = 52257; // 
-    moduleConfig.driveP = 0.1; 
-    moduleConfig.driveI = 0; // placeholder value
-    moduleConfig.driveD = 0; // placeholder value
-    moduleConfig.driveF = 0; // placeholder value
 
-    moduleConfig.tickPerRadian = 4096.0/(2*Math.PI); // 4,096 ticks per rotation, converted to radians
-    moduleConfig.steerAngleOffset = 2.879;
-    moduleConfig.steerP = 0.8; 
-    moduleConfig.steerI = 0; // placeholder value
-    moduleConfig.steerD = 0; // placeholder value
-    moduleConfig.steerF = 0; // placeholder value
+    //front left
+    SwerveModuleIDConfig moduleIDConfig = new SwerveModuleIDConfig(43, 28, 14);
+    // moduleIDConfig.driveMotorID = 43; // moduleIDConfig.steerMotorID = 28; // moduleIDConfig.steerEncoderID = 14;
+
+    SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
+    moduleConfig.position = new Translation2d(-0.217, 0.217);
+    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module0.SteerAngleOffset", 2.879); //2.879;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
 
     //front right
-    moduleConfig = new SwerveModuleConfig();
-    moduleIDConfig = new SwerveModuleIDConfig();
-    moduleIDConfig.driveMotorID = 38;
-    moduleIDConfig.steerMotorID = 33;
-    moduleIDConfig.steerEncoderID = 11;
-    moduleConfig.position = new Translation2d(-0.217,-0.217);
-    moduleConfig.tickPerMeter = -52257; // TODO: figure out why we need to do this
-    moduleConfig.driveP = 0.1; 
-    moduleConfig.driveI = 0; // placeholder value
-    moduleConfig.driveD = 0; // placeholder value
-    moduleConfig.driveF = 0; // placeholder value
+    moduleIDConfig = new SwerveModuleIDConfig(38, 33, 11);
+    // moduleIDConfig.driveMotorID = 38; // moduleIDConfig.steerMotorID = 33; // moduleIDConfig.steerEncoderID = 11;
 
-    moduleConfig.tickPerRadian = 4096.0/(2*Math.PI); // 4,096 ticks per rotation, converted to radians
-    moduleConfig.steerAngleOffset = 1.866;
-    moduleConfig.steerP = 0.8; 
-    moduleConfig.steerI = 0; // placeholder value
-    moduleConfig.steerD = 0; // placeholder value
-    moduleConfig.steerF = 0; // placeholder value
+    moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
+    moduleConfig.position = new Translation2d(-0.217,-0.217);
+    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module1.SteerAngleOffset", 1.866); // 1.866;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
 
     //back left
-    moduleConfig = new SwerveModuleConfig();
-    moduleIDConfig = new SwerveModuleIDConfig();
-    moduleIDConfig.driveMotorID = 39;
-    moduleIDConfig.steerMotorID = 47;
-    moduleIDConfig.steerEncoderID = 12;
-    moduleConfig.position = new Translation2d(0.217, 0.217);
-    moduleConfig.tickPerMeter = 52257;
-    moduleConfig.driveP = 0.1; 
-    moduleConfig.driveI = 0; // placeholder value
-    moduleConfig.driveD = 0; // placeholder value
-    moduleConfig.driveF = 0; // placeholder value
+    moduleIDConfig = new SwerveModuleIDConfig(39, 47, 12);
+    // moduleIDConfig.driveMotorID = 39; // moduleIDConfig.steerMotorID = 47; // moduleIDConfig.steerEncoderID = 12;
 
-    moduleConfig.tickPerRadian = 4096.0/(2*Math.PI); // 4,096 ticks per rotation, converted to radians
-    moduleConfig.steerAngleOffset = 2.422; //1.109;
-    moduleConfig.steerP = 0.8; 
-    moduleConfig.steerI = 0; // placeholder value
-    moduleConfig.steerD = 0; // placeholder value
-    moduleConfig.steerF = 0; // placeholder value
+    moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
+    moduleConfig.position = new Translation2d(0.217, 0.217);
+    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module2.SteerAngleOffset", 2.422); // 2.422;
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
 
     //back right
-    moduleConfig = new SwerveModuleConfig();
-    moduleIDConfig = new SwerveModuleIDConfig();
-    moduleIDConfig.driveMotorID = 26;
-    moduleIDConfig.steerMotorID = 40;
-    moduleIDConfig.steerEncoderID = 10;
+    moduleIDConfig = new SwerveModuleIDConfig(26, 40, 10);
+    // moduleIDConfig.driveMotorID = 26; // moduleIDConfig.steerMotorID = 40; // moduleIDConfig.steerEncoderID = 10;
+    moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.position = new Translation2d(0.217,-0.217);
-    moduleConfig.tickPerMeter = -52257; //TODO: same thing as id 11
-    moduleConfig.driveP = 0.1; 
-    moduleConfig.driveI = 0; // placeholder value
-    moduleConfig.driveD = 0; // placeholder value
-    moduleConfig.driveF = 0; // placeholder value
-
-    moduleConfig.tickPerRadian = 4096.0/(2*Math.PI); // 4,096 ticks per rotation, converted to radians
-    moduleConfig.steerAngleOffset = 1.109; //2.422
-    moduleConfig.steerP = 0.8; 
-    moduleConfig.steerI = 0; // placeholder value
-    moduleConfig.steerD = 0; // placeholder value
-    moduleConfig.steerF = 0; // placeholder value
+    moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module3.SteerAngleOffset", 1.109); //1.109;
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
 
+    // Create our kinematics class
     kinematics = new SwerveDriveKinematics(
       modules[0].position,
       modules[1].position,
       modules[2].position,
       modules[3].position
     );
+
+    // Initial chassis speeds are zero:
     chassisSpeeds = new ChassisSpeeds(0,0,0);
+  }
+
+  // Initialize preferences for this class:
+  public static void initPreferences() {
+    Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879);
+    Preferences.initDouble("Drive.Module1.SteerAngleOffset", 1.866);
+    Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
+    Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
   }
 
   //returns heading in degrees

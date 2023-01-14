@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Preferences;
+
 
 /** Add your docs here. */
 public class SwerveModuleConfig 
@@ -30,6 +32,39 @@ public class SwerveModuleConfig
 
     public SwerveModuleConfig()
     {
+        tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 52257);
+        driveP = Preferences.getDouble("Drive.Drive.Kp", 0.1); 
+        driveI = Preferences.getDouble("Drive.Drive.Ki", 0.0);
+        driveD = Preferences.getDouble("Drive.Drive.Kd", 0.0);
+        driveF = Preferences.getDouble("Drive.Drive.Kf", 0.0);
+        driveCurrentLimit = Preferences.getDouble("Drive.Drive.CurrentLimit", 20);
+        driveCurrentThreshold = Preferences.getDouble("Drive.Drive.CurrentThreshold", 22);
 
+
+        tickPerRadian = Preferences.getDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI)); // 4,096 ticks per rotation, converted to radians
+        steerP = Preferences.getDouble("Drive.Steer.Kp", 0.8); 
+        steerI = Preferences.getDouble("Drive.Steer.Ki", 0.0);
+        steerD = Preferences.getDouble("Drive.Steer.Kd", 0.0);
+        steerF = Preferences.getDouble("Drive.Steer.Kf", 0.0);
+        steerCurrentLimit = Preferences.getDouble("Drive.Steer.CurrentLimit", 10);
+        steerCurrentThreshold = Preferences.getDouble("Drive.Steer.CurrentThreshold", 12);
+    }
+
+    public static void initPreferences() {
+        Preferences.initDouble("Drive.Drive.TickPerMeter", 52257);
+        Preferences.initDouble("Drive.Drive.Kp", 0.1);
+        Preferences.initDouble("Drive.Drive.Ki", 0.0);
+        Preferences.initDouble("Drive.Drive.Kd", 0.0);
+        Preferences.initDouble("Drive.Drive.Kf", 0.0);
+        Preferences.initDouble("Drive.Drive.CurrentLimit", 20);
+        Preferences.initDouble("Drive.Drive.CurrentThreshold", 22);
+    
+        Preferences.initDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI));
+        Preferences.initDouble("Drive.Steer.Kp", 0.8);
+        Preferences.initDouble("Drive.Steer.Ki", 0.0);
+        Preferences.initDouble("Drive.Steer.Kd", 0.0);
+        Preferences.initDouble("Drive.Steer.Kf", 0.0);
+        Preferences.initDouble("Drive.Steer.CurrentLimit", 10);
+        Preferences.initDouble("Drive.Steer.CurrentThreshold", 12);
     }
 }

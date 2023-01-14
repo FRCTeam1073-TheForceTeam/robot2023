@@ -46,6 +46,7 @@ public class SwerveModule
         setUpMotors();
     }
 
+
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
@@ -56,7 +57,8 @@ public class SwerveModule
     public double getVelocity(){
         return driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
-//*Wrapping code from sds example swerve library
+    
+    //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){
         SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
         // steeringAngle %= (2.0 * Math.PI);
