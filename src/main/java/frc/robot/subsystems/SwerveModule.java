@@ -50,7 +50,6 @@ public class SwerveModule
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
-        //return (steerEncoder.getPosition()*Math.PI/180)+cfg.steerAngleOffset;
         return -(steerEncoder.getPosition()*Math.PI/180) + cfg.steerAngleOffset;
     }
 
@@ -60,7 +59,10 @@ public class SwerveModule
     
     //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){
-        SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
+        SmartDashboard.putNumber(String.format(" Steer Angle %d", cfg.moduleNumber), steeringAngle);
+        SmartDashboard.putNumber(String.format(" Drive Velocity %d", cfg.moduleNumber), driveVelocity);
+        SmartDashboard.putNumber(String.format(" Encoder Angle %d", cfg.moduleNumber), getSteeringAngle());
+
         // steeringAngle %= (2.0 * Math.PI);
         // if (steeringAngle < -Math.PI) 
         // {
@@ -80,9 +82,8 @@ public class SwerveModule
         // }
         // difference = steeringAngle - getSteeringAngle(); // Recalculate difference
 
-        SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
-        SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
+        //SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
 
 
         // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
@@ -99,8 +100,8 @@ public class SwerveModule
         //     steeringAngle += 2.0 * Math.PI;
         // }
 
-        setDriveVelocity(driveVelocity);
-        setSteerAngle(steeringAngle);
+        //setDriveVelocity(driveVelocity);
+        //setSteerAngle(steeringAngle);
         // SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
         // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
@@ -114,6 +115,17 @@ public class SwerveModule
         steerMotor.set(ControlMode.Position, (steeringAngle - cfg.steerAngleOffset) * cfg.tickPerRadian);
     }
 
+    public void setBrake(boolean brake){
+        if(brake){
+            steerMotor.setNeutralMode(NeutralMode.Brake);
+            driveMotor.setNeutralMode(NeutralMode.Brake);
+        }
+        else{
+            steerMotor.setNeutralMode(NeutralMode.Coast);
+            driveMotor.setNeutralMode(NeutralMode.Coast);
+        }
+    }
+
     public void setUpMotors()
     {
         steerMotor.configFactoryDefault();
@@ -125,8 +137,8 @@ public class SwerveModule
         //steerMotor.setSafetyEnabled(false);
         //driveMotor.setSafetyEnabled(false);
 
-        steerMotor.setNeutralMode(NeutralMode.Brake);
-        driveMotor.setNeutralMode(NeutralMode.Brake);
+        steerMotor.setNeutralMode(NeutralMode.Coast);
+        driveMotor.setNeutralMode(NeutralMode.Coast);
 
         steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.steerCurrentLimit, cfg.steerCurrentThreshold, cfg.steerCurrentThresholdTime));
         driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.driveCurrentLimit, cfg.driveCurrentThreshold, cfg.driveCurrentThresholdTime));

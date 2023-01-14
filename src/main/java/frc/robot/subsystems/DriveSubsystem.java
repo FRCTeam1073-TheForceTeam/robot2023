@@ -25,7 +25,7 @@ public class DriveSubsystem extends SubsystemBase
   private PigeonIMU pigeonIMU;
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() 
+  public DriveSubsystem()
   {
     pigeonIMU = new PigeonIMU(9);
     pigeonIMU.configFactoryDefault();
@@ -42,7 +42,8 @@ public class DriveSubsystem extends SubsystemBase
     // moduleIDConfig.driveMotorID = 43; // moduleIDConfig.steerMotorID = 28; // moduleIDConfig.steerEncoderID = 14;
 
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
-    moduleConfig.position = new Translation2d(-0.217, 0.217);
+    moduleConfig.moduleNumber = 0;
+    moduleConfig.position = new Translation2d(0.217, 0.217);
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module0.SteerAngleOffset", 2.879); //2.879;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -52,7 +53,8 @@ public class DriveSubsystem extends SubsystemBase
     // moduleIDConfig.driveMotorID = 38; // moduleIDConfig.steerMotorID = 33; // moduleIDConfig.steerEncoderID = 11;
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
-    moduleConfig.position = new Translation2d(-0.217,-0.217);
+    moduleConfig.moduleNumber = 1;
+    moduleConfig.position = new Translation2d(0.217,-0.217);
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module1.SteerAngleOffset", 1.866); // 1.866;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -62,7 +64,8 @@ public class DriveSubsystem extends SubsystemBase
     // moduleIDConfig.driveMotorID = 39; // moduleIDConfig.steerMotorID = 47; // moduleIDConfig.steerEncoderID = 12;
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
-    moduleConfig.position = new Translation2d(0.217, 0.217);
+    moduleConfig.moduleNumber = 2;
+    moduleConfig.position = new Translation2d(-0.217, 0.217);
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module2.SteerAngleOffset", 2.422); // 2.422;
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -71,7 +74,8 @@ public class DriveSubsystem extends SubsystemBase
     moduleIDConfig = new SwerveModuleIDConfig(26, 40, 10);
     // moduleIDConfig.driveMotorID = 26; // moduleIDConfig.steerMotorID = 40; // moduleIDConfig.steerEncoderID = 10;
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
-    moduleConfig.position = new Translation2d(0.217,-0.217);
+    moduleConfig.moduleNumber = 3;
+    moduleConfig.position = new Translation2d(-0.217,-0.217);
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module3.SteerAngleOffset", 1.109); //1.109;
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -127,6 +131,13 @@ public class DriveSubsystem extends SubsystemBase
     wheelStates[3].angle = new Rotation2d(modules[3].getSteeringAngle());
 
     return kinematics.toChassisSpeeds(wheelStates);
+  }
+
+  public void setBrakes(boolean brakeOn){
+    modules[0].setBrake(brakeOn);
+    modules[1].setBrake(brakeOn);
+    modules[2].setBrake(brakeOn);
+    modules[3].setBrake(brakeOn);
   }
 
   @Override
