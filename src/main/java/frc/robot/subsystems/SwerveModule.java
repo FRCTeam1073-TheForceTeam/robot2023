@@ -15,6 +15,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.TeleopDrive;
 
 /** Add your docs here. 
  * 
@@ -66,11 +67,11 @@ public class SwerveModule
         // steeringAngle %= (2.0 * Math.PI);
         // if (steeringAngle < -Math.PI) 
         // {
-        //     steeringAngle += 2.0 * Math.PI;
+        //     steeringAngle += Math.PI;
         // }
         // if (steeringAngle > Math.PI)
         // {
-        //     steeringAngle -= 2.0 * Math.PI;
+        //     steeringAngle -= Math.PI;
         // }
 
         // double difference = steeringAngle - getSteeringAngle();
@@ -108,7 +109,7 @@ public class SwerveModule
     }
     public void setDriveVelocity(double driveVelocity)
     {
-        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter * 0.1);
+        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter * TeleopDrive.velocityMult);
     }
     public void setSteerAngle(double steeringAngle)
     {
