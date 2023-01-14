@@ -4,14 +4,7 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N2;
-
-import javax.lang.model.util.ElementScanner14;
-
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
@@ -38,23 +31,30 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute() 
   {
-    if (m_OI.getLeftBumper())
-    {
+    if (m_OI.getLeftBumper()){
       velocityMult = 0.15;
     }
-    else if (m_OI.getRightBumper())
-    {
+    else if (m_OI.getRightBumper()){
       velocityMult = 0.8;
     }
-    else
-    {
+    else{
       velocityMult = 0.35;
+    }
+
+    if(m_OI.getMenuButton()){
+      m_driveSubsystem.zeroHeading();
     }
 
     //Vector<N2> vector = new Vector<N2>(Nat.N2()); //(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5);
     //vector.rotate(m_driveSubsystem.getHeading()); //rotates by degrees
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vector.x, vector.y, m_OI.getDriverRightX()); //rotation-oriented
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftY() * 0.5, m_OI.getDriverLeftX() * 0.5, m_OI.getDriverRightX()); //debug
+    double leftY = m_OI.getDriverLeftY();
+    double leftX = m_OI.getDriverLeftX();
+    double rightX = m_OI.getDriverRightX();
+    if(Math.abs(leftY) < .5){leftY = 0;}
+    if(Math.abs(leftX) < .5){leftX = 0;}
+    if(Math.abs(rightX) < .5){rightX = 0;}
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
     m_driveSubsystem.setChassisSpeeds(chassisSpeeds);
     //m_driveSubsystem.setDebugSpeed(m_OI.getDriverLeftX());

@@ -13,7 +13,9 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.TeleopDrive;
 
@@ -47,11 +49,20 @@ public class SwerveModule
         setUpMotors();
     }
 
+    public void updatePosition(SwerveModulePosition position){
+        position.angle = Rotation2d.fromRadians(getSteeringAngle());
+        position.distanceMeters = getDriveEncoder();
+    }
 
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
         return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
+    }
+
+    public double getDriveEncoder()
+    {
+        return driveMotor.getSelectedSensorPosition() * cfg.tickPerMeter;
     }
 
     public double getVelocity(){
@@ -131,6 +142,8 @@ public class SwerveModule
     {
         steerMotor.configFactoryDefault();
         driveMotor.configFactoryDefault();
+
+        driveMotor.setSelectedSensorPosition(0);
 
         steerMotor.setInverted(true);
         driveMotor.setInverted(false);
