@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import javax.lang.model.util.ElementScanner14;
 
@@ -20,13 +21,16 @@ public class TeleopDrive extends CommandBase
 {
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
-  public static double velocityMult;
+  private double velocityMult;
+  private double rotateMult;
+  private boolean fieldCentric;
 
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi) {
     addRequirements(ds);
     m_driveSubsystem = ds;
     m_OI = oi;
+    fieldCentric = false;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -41,22 +45,46 @@ public class TeleopDrive extends CommandBase
     if (m_OI.getLeftBumper())
     {
       velocityMult = 0.15;
+      rotateMult = 0.25;
     }
     else if (m_OI.getRightBumper())
     {
       velocityMult = 0.8;
+      rotateMult = 1;
     }
     else
     {
       velocityMult = 0.35;
+      rotateMult = 0.5;
     }
 
-    //Vector<N2> vector = new Vector<N2>(Nat.N2()); //(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5);
-    //vector.rotate(m_driveSubsystem.getHeading()); //rotates by degrees
-    //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vector.x, vector.y, m_OI.getDriverRightX()); //rotation-oriented
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(m_OI.getDriverLeftY() * 0.5, m_OI.getDriverLeftX() * 0.5, m_OI.getDriverRightX()); //debug
+    if (m_OI.getFieldCentricToggle())
+    {
+      fieldCentric = !fieldCentric;
+    }
+
+    SmartDashboard.putBoolean("Field Centric", fieldCentric);
+
+    if (fieldCentric)
+    {
+      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        m_OI.getDriverLeftY() * velocityMult,
+        m_OI.getDriverLeftX() * velocityMult, 
+        m_OI.getDriverRightX() * rotateMult,
+        Rotation2d.fromDegrees(0)); // get fused heading
+      m_driveSubsystem.setChassisSpeeds(speeds);
+    }
+    else
+    {
+      ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+      chassisSpeeds.vxMetersPerSecond = m_OI.getDriverLeftY() * velocityMult; 
+      chassisSpeeds.vyMetersPerSecond = m_OI.getDriverLeftX() * velocityMult; 
+      chassisSpeeds.omegaRadiansPerSecond = m_OI.getDriverRightX() * rotateMult;
+      m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
+    }
+    
     //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
-    m_driveSubsystem.setChassisSpeeds(chassisSpeeds);
+    
     //m_driveSubsystem.setDebugSpeed(m_OI.getDriverLeftX());
     //m_driveSubsystem.setDebugAngle(m_OI.getDriverRightY() * 3); 
   }

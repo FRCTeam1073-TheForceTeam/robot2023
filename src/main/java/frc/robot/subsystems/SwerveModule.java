@@ -109,7 +109,7 @@ public class SwerveModule
     }
     public void setDriveVelocity(double driveVelocity)
     {
-        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter * TeleopDrive.velocityMult);
+        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter);
     }
     public void setSteerAngle(double steeringAngle)
     {
