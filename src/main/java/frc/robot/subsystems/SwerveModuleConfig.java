@@ -30,8 +30,8 @@ public class SwerveModuleConfig
     public double driveI = 0;
     public double driveD = 0;
     public double driveF = 0;
-    public double driveMaxIntegrator = 100.0;
-    public double steerMaxIntegrator = 100.0;    
+    public double driveMaxIntegrator = 400.0;
+    public double steerMaxIntegrator = 400.0;    
 
     public SwerveModuleConfig()
     {
@@ -40,7 +40,7 @@ public class SwerveModuleConfig
         driveI = Preferences.getDouble("Drive.Drive.Ki", 0.0);
         driveD = Preferences.getDouble("Drive.Drive.Kd", 0.0);
         driveF = Preferences.getDouble("Drive.Drive.Kf", 0.0);
-        driveMaxIntegrator = Preferences.getDouble("Drive.Drive.MaxIntegrator", 100.0);
+        driveMaxIntegrator = Preferences.getDouble("Drive.Drive.MaxIntegrator", 400.0);
         driveCurrentLimit = Preferences.getDouble("Drive.Drive.CurrentLimit", 20);
         driveCurrentThreshold = Preferences.getDouble("Drive.Drive.CurrentThreshold", 22);
 
@@ -50,7 +50,7 @@ public class SwerveModuleConfig
         steerI = Preferences.getDouble("Drive.Steer.Ki", 0.0);
         steerD = Preferences.getDouble("Drive.Steer.Kd", 0.0);
         steerF = Preferences.getDouble("Drive.Steer.Kf", 0.0);
-        steerMaxIntegrator = Preferences.getDouble("Drive.Steer.MaxIntegrator", 100.0);
+        steerMaxIntegrator = Preferences.getDouble("Drive.Steer.MaxIntegrator", 400.0);
         steerCurrentLimit = Preferences.getDouble("Drive.Steer.CurrentLimit", 10);
         steerCurrentThreshold = Preferences.getDouble("Drive.Steer.CurrentThreshold", 12);
     }
@@ -61,7 +61,7 @@ public class SwerveModuleConfig
         Preferences.initDouble("Drive.Drive.Ki", 0.0);
         Preferences.initDouble("Drive.Drive.Kd", 0.0);
         Preferences.initDouble("Drive.Drive.Kf", 0.0);
-        Preferences.initDouble("Drive.Drive.MaxIntegrator", 100.0);
+        Preferences.initDouble("Drive.Drive.MaxIntegrator", 400.0);
         Preferences.initDouble("Drive.Drive.CurrentLimit", 20);
         Preferences.initDouble("Drive.Drive.CurrentThreshold", 22);
     
@@ -70,7 +70,7 @@ public class SwerveModuleConfig
         Preferences.initDouble("Drive.Steer.Ki", 0.0);
         Preferences.initDouble("Drive.Steer.Kd", 0.0);
         Preferences.initDouble("Drive.Steer.Kf", 0.0);
-        Preferences.initDouble("Drive.Steer.MaxIntegrator", 100.0);
+        Preferences.initDouble("Drive.Steer.MaxIntegrator", 400.0);
         Preferences.initDouble("Drive.Steer.CurrentLimit", 10);
         Preferences.initDouble("Drive.Steer.CurrentThreshold", 12);
     }

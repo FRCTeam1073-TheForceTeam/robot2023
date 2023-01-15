@@ -21,9 +21,11 @@ public class TeleopDrive extends CommandBase
 {
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
-  private double velocityMult;
-  private double rotateMult;
   private boolean fieldCentric;
+
+  // Teleop drive velocity scaling:
+  private final static double maximumLinearVelocity = 3.5;   // Meters/second
+  private final static double maximumRotationVelocity = 4.0; // Radians/second
 
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi) {
@@ -42,32 +44,33 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute() 
   {
+    double velocityMult = maximumLinearVelocity;
+    double rotateMult = maximumRotationVelocity;
+
     if (m_OI.getLeftBumper()){
-      velocityMult = 0.1;
-      rotateMult = 0.17;
+      velocityMult *= 0.5; // 50% maximum speed
+      rotateMult *= 0.5;
     }
     else if (m_OI.getRightBumper()){
-      velocityMult = 0.75;
-      rotateMult = 1;
-    }
-    else{
-      velocityMult = 0.25;
-      rotateMult = 0.5;
+      velocityMult *= 1.0; // Maximum speed
+      rotateMult *= 1.0;
+    } else {
+      velocityMult *= 0.1;  // 10% maximum speed.
+      rotateMult *= 0.1;
     }
 
+    // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){
       m_driveSubsystem.zeroHeading();
     }
 
-    //Vector<N2> vector = new Vector<N2>(Nat.N2()); //(m_OI.getDriverLeftX() * 0.5, m_OI.getDriverLeftY() * 0.5);
-    //vector.rotate(m_driveSubsystem.getHeading()); //rotates by degrees
-    //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vector.x, vector.y, m_OI.getDriverRightX()); //rotation-oriented
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
     double rightX = m_OI.getDriverRightX();
     if(Math.abs(leftY) < .35){leftY = 0;}
     if(Math.abs(leftX) < .35){leftX = 0;}
     if(Math.abs(rightX) < .35){rightX = 0;}
+
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle())
     {
@@ -94,10 +97,6 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
     
-    //ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
-    
-    //m_driveSubsystem.setDebugSpeed(m_OI.getDriverLeftX());
-    //m_driveSubsystem.setDebugAngle(m_OI.getDriverRightY() * 3); 
   }
 
   // Called once the command ends or is interrupted.
