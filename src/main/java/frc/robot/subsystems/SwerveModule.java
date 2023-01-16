@@ -13,8 +13,11 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.TeleopDrive;
 
 /** Add your docs here. 
  * 
@@ -46,27 +49,44 @@ public class SwerveModule
         setUpMotors();
     }
 
+    // Populate a SwerveModulePosition object from the state of this module.
+    public void updatePosition(SwerveModulePosition position){
+        position.angle = Rotation2d.fromRadians(getSteeringAngle());
+        position.distanceMeters = getDriveEncoder();
+    }
+
+    // Return steering sensor angle in radians. 0 = dead ahead on robot.
     public double getSteeringAngle()
     {
         //TODO: do we want it to give us absolute position
-        //return (steerEncoder.getPosition()*Math.PI/180)+cfg.steerAngleOffset;
-        return -(steerEncoder.getPosition()*Math.PI/180) + cfg.steerAngleOffset;
+        return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
     }
 
-    public double getVelocity(){
+    // Return drive encoder in meters.
+    public double getDriveEncoder()
+    {
+        return driveMotor.getSelectedSensorPosition() * cfg.tickPerMeter;
+    }
+
+    // Return drive velocity in meters/second.
+    public double getDriveVelocity(){
         return driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
-//*Wrapping code from sds example swerve library
+    
+    //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){
-        SmartDashboard.putNumber(String.format(" Steer Angle %d", ids.steerEncoderID), steeringAngle);
+        SmartDashboard.putNumber(String.format(" Steer Angle %d", cfg.moduleNumber), steeringAngle);
+        SmartDashboard.putNumber(String.format(" Drive Velocity %d", cfg.moduleNumber), driveVelocity);
+        SmartDashboard.putNumber(String.format(" Encoder Angle %d", cfg.moduleNumber), getSteeringAngle());
+
         // steeringAngle %= (2.0 * Math.PI);
         // if (steeringAngle < -Math.PI) 
         // {
-        //     steeringAngle += 2.0 * Math.PI;
+        //     steeringAngle += Math.PI;
         // }
         // if (steeringAngle > Math.PI)
         // {
-        //     steeringAngle -= 2.0 * Math.PI;
+        //     steeringAngle -= Math.PI;
         // }
 
         // double difference = steeringAngle - getSteeringAngle();
@@ -78,9 +98,8 @@ public class SwerveModule
         // }
         // difference = steeringAngle - getSteeringAngle(); // Recalculate difference
 
-        SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
-        SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
+        //SmartDashboard.putNumber(String.format(" Steer Angle Result %d", ids.steerEncoderID), steeringAngle);
 
 
         // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
@@ -103,67 +122,86 @@ public class SwerveModule
         // SmartDashboard.putNumber(String.format(" Drive Velocity %d", ids.steerEncoderID), driveVelocity);
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
     }
+
     public void setDriveVelocity(double driveVelocity)
     {
-        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter * 0.1);
+        // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
+        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter / 10.0);
     }
     public void setSteerAngle(double steeringAngle)
     {
-        steerMotor.set(ControlMode.Position, (steeringAngle - cfg.steerAngleOffset) * cfg.tickPerRadian);
+        steerMotor.set(ControlMode.Position, (steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian);
+    }
+
+    public void setBrake(boolean brake){
+        if(brake){
+            steerMotor.setNeutralMode(NeutralMode.Brake);
+            driveMotor.setNeutralMode(NeutralMode.Brake);
+        }
+        else{
+            steerMotor.setNeutralMode(NeutralMode.Coast);
+            driveMotor.setNeutralMode(NeutralMode.Coast);
+        }
     }
 
     public void setUpMotors()
     {
-        steerMotor.configFactoryDefault();
-        driveMotor.configFactoryDefault();
+        var error = steerMotor.configFactoryDefault();
 
-        steerMotor.setInverted(false);
+        if (error != ErrorCode.OK) {
+            System.out.print(String.format("Module %d STEER MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
+        }
+
+        error = driveMotor.configFactoryDefault();
+
+        if (error != ErrorCode.OK) {
+            System.out.println(String.format("Module %d DRIVE MOTOR ERROR: %s", cfg.moduleNumber, error.toString()));
+        }
+
+        // Set control direction of motors:
+        steerMotor.setInverted(true);
         driveMotor.setInverted(false);
 
-        //steerMotor.setSafetyEnabled(false);
-        //driveMotor.setSafetyEnabled(false);
 
-        steerMotor.setNeutralMode(NeutralMode.Brake);
-        driveMotor.setNeutralMode(NeutralMode.Brake);
+        // Default to brakes off:
+        steerMotor.setNeutralMode(NeutralMode.Coast);
+        driveMotor.setNeutralMode(NeutralMode.Coast);
 
         steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.steerCurrentLimit, cfg.steerCurrentThreshold, cfg.steerCurrentThresholdTime));
         driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.driveCurrentLimit, cfg.driveCurrentThreshold, cfg.driveCurrentThresholdTime));
 
         //Set up talon for CAN encoder
-        ErrorCode error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
+        error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
         if(error != ErrorCode.OK)
         {
-            System.out.println("configRemoteFeedbackFilter didn't work: " + error);
+            System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         }
-        else
-        {
-            System.out.println("configRemoteFeedbackFilter worked");
-        }
+        
         error = steerMotor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
         if(error != ErrorCode.OK)
         {
-            System.out.println("configSelectedFeedbackSensor didn't work: " + error);
+            System.out.println(String.format("Module %d configSelectedFeedbackSensor failed: %s ", cfg.moduleNumber, error));
         }
-        else
-        {
-            System.out.println("configSelectedFeedbackSensor worked");
-        }
+        
         steerMotor.setSensorPhase(true);
 
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+        driveMotor.setSelectedSensorPosition(0);
 
-
-
+        // PID Loop settings for steering position control:
         steerMotor.config_kP(0, cfg.steerP);
         steerMotor.config_kI(0, cfg.steerI);
         steerMotor.config_kD(0, cfg.steerD);
         steerMotor.config_kF(0, cfg.steerF);
+        steerMotor.configMaxIntegralAccumulator(0, cfg.steerMaxIntegrator);
         steerMotor.setIntegralAccumulator(0);
 
+        // PID Loop settings for drive velocity control:
         driveMotor.config_kP(0, cfg.driveP);
         driveMotor.config_kI(0, cfg.driveI);
         driveMotor.config_kD(0, cfg.driveD);
         driveMotor.config_kF(0, cfg.driveF);
+        driveMotor.configMaxIntegralAccumulator(0, cfg.driveMaxIntegrator);
         driveMotor.setIntegralAccumulator(0);
     }
 
