@@ -65,12 +65,12 @@ public class SwerveModule
     // Return drive encoder in meters.
     public double getDriveEncoder()
     {
-        return driveMotor.getSelectedSensorPosition() * cfg.tickPerMeter;
+        return -driveMotor.getSelectedSensorPosition() / cfg.tickPerMeter;
     }
 
     // Return drive velocity in meters/second.
     public double getDriveVelocity(){
-        return driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
+        return -driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
     
     //*Wrapping code from sds example swerve library
