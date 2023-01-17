@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -99,6 +100,10 @@ public class DriveSubsystem extends SubsystemBase
     );
 
     // Create odometry:
+    modules[0].updatePosition(modulePositions[0]);
+    modules[1].updatePosition(modulePositions[1]);
+    modules[2].updatePosition(modulePositions[2]);
+    modules[3].updatePosition(modulePositions[3]);
     odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions);
 
     // Configure maximum linear speed for limiting:
@@ -165,6 +170,14 @@ public class DriveSubsystem extends SubsystemBase
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
+  }
+
+  public void resetOdometry(Pose2d where){
+    odometry.resetPosition(Rotation2d.fromDegrees(getHeading()), modulePositions, where);
+  }
+
+  public Pose2d getOdometry(){
+    return new Pose2d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(), Rotation2d.fromDegrees(getHeading()));
   }
 
   @Override
