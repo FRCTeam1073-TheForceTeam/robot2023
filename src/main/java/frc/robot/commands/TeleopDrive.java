@@ -5,15 +5,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import javax.lang.model.util.ElementScanner14;
-
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
 
@@ -22,13 +18,14 @@ public class TeleopDrive extends CommandBase
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
   private boolean fieldCentric;
+  private boolean parked;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
   /** Creates a new Teleop. */
-  public TeleopDrive(DriveSubsystem ds, OI oi) {
+  public TeleopDrive(DriveSubsystem ds, OI oi){
     addRequirements(ds);
     m_driveSubsystem = ds;
     m_OI = oi;
@@ -38,12 +35,11 @@ public class TeleopDrive extends CommandBase
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize(){}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() 
-  {
+  public void execute(){
     double velocityMult = maximumLinearVelocity;
     double rotateMult = maximumRotationVelocity;
 
@@ -64,6 +60,12 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.zeroHeading();
     }
 
+    if(m_OI.getAButton()){
+      Rotation2d zeroRotate = new Rotation2d();
+      Pose2d zero = new Pose2d(0.0, 0.0, zeroRotate);
+      m_driveSubsystem.resetOdometry(zero);
+    }
+
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
     double rightX = m_OI.getDriverRightX();
@@ -71,16 +73,21 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftX) < .35){leftX = 0;}
     if(Math.abs(rightX) < .35){rightX = 0;}
 
+    if(m_OI.getXButton()){
+      parked = !parked;
+    }
+
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
-    if (m_OI.getFieldCentricToggle())
-    {
+    if (m_OI.getFieldCentricToggle()){
       fieldCentric = !fieldCentric;
     }
 
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
 
-    if (fieldCentric)
-    {
+    if(parked){
+      m_driveSubsystem.parkingBrake();
+    }
+    else if (fieldCentric){
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         leftY * velocityMult,
         leftX * velocityMult, 
@@ -88,24 +95,22 @@ public class TeleopDrive extends CommandBase
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
-    else
-    {
+    else{
       ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
       chassisSpeeds.vxMetersPerSecond = leftY * velocityMult; 
       chassisSpeeds.vyMetersPerSecond = leftX * velocityMult; 
       chassisSpeeds.omegaRadiansPerSecond = rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
-    
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted){}
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
+  public boolean isFinished(){
     return false;
   }
 }
