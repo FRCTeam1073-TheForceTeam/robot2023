@@ -22,15 +22,15 @@ public class DriveToPoint extends CommandBase {
   Pose2d targetPose;
   DriveSubsystem drivetrain;
   ChassisSpeeds chassisSpeeds;
-  private final static double maximumLinearVelocity = .5;   // Meters/second
-  private final static double maximumRotationVelocity = .5; // Radians/second
-  private final static double minimumLinearVelocity = -.5;
-  private final static double minimumRotationVelocity = -.5;
+  private double maxLinearVelocity;   // Meters/second
+  private double maxRotationVelocity; // Radians/second
 
-  public DriveToPoint(DriveSubsystem ds, Pose2d targetPose2d) {
+  public DriveToPoint(DriveSubsystem ds, Pose2d targetPose2d, double maxSpeed, double maxRotate) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = ds;
     this.targetPose = targetPose2d;
+    maxLinearVelocity = maxSpeed;
+    maxRotationVelocity = maxRotate;
     addRequirements(ds);
   }
 
@@ -48,23 +48,24 @@ public class DriveToPoint extends CommandBase {
     double xVelocity = 0.8 * difference.getX();
     double yVelocity = 0.8 * difference.getY();
     double angularVelocity = 0.8 * difference.getRotation().getRadians();
-    if(xVelocity > maximumLinearVelocity){
-      xVelocity = maximumLinearVelocity;
+    //tests if velocities are within the maximum and sets them to the max if they exceed
+    if(xVelocity > maxLinearVelocity){
+      xVelocity = maxLinearVelocity;
     }
-    if(xVelocity < minimumLinearVelocity){
-      xVelocity = minimumLinearVelocity;
+    if(xVelocity < - maxLinearVelocity){
+      xVelocity = - maxLinearVelocity;
     }
-    if(yVelocity > maximumLinearVelocity){
-      yVelocity = maximumLinearVelocity;
+    if(yVelocity > maxLinearVelocity){
+      yVelocity = maxLinearVelocity;
     }
-    if(yVelocity < minimumLinearVelocity){
-      yVelocity = minimumLinearVelocity;
+    if(yVelocity < -maxLinearVelocity){
+      yVelocity = -maxLinearVelocity;
     }
-    if(angularVelocity > maximumRotationVelocity){
-      angularVelocity = maximumRotationVelocity;
+    if(angularVelocity > maxRotationVelocity){
+      angularVelocity = maxRotationVelocity;
     } 
-    if(angularVelocity < minimumRotationVelocity){
-      angularVelocity = minimumRotationVelocity;
+    if(angularVelocity < -maxRotationVelocity){
+      angularVelocity = -maxRotationVelocity;
     }
     
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
