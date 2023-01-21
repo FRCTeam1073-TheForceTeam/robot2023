@@ -202,6 +202,13 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
   }
+
+  public void parkingBrake(){
+    modules[0].setSteerAngle(Math.PI / 4);
+    modules[1].setSteerAngle(-Math.PI / 4);
+    modules[2].setSteerAngle(-Math.PI / 4);
+    modules[3].setSteerAngle(Math.PI / 4);
+  }
   
   public void setDebugSpeed(double speed){
     modules[0].setDriveVelocity(speed);
@@ -209,6 +216,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[2].setDriveVelocity(speed);
     modules[3].setDriveVelocity(speed);
   }
+
   public void setDebugAngle(double angle){
     SmartDashboard.putNumber("Debug Angle", angle);
 
