@@ -45,7 +45,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     //forward = x, backward = -x, left = y, right = -y
     return new SequentialCommandGroup(
-      new DriveToPoint(m_driveSubsystem, new Pose2d(1, -1, new Rotation2d(1)), .5, .5),
-      new DriveToPoint(m_driveSubsystem, new Pose2d(0, 0, new Rotation2d()), .5, .5)); //returns robot position and angle to zero
+      new DriveToPoint(m_driveSubsystem, new Pose2d(0, -3, new Rotation2d()), .5, .5)
+      //new DriveToPoint(m_driveSubsystem, new Pose2d(0, 0, new Rotation2d()), .5, .5)
+      ); //returns robot position and angle to zero
   }
 }

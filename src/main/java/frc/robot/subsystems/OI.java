@@ -102,8 +102,8 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(1);
     }
 
-    public void setRumble(double val){
-        //operatorController.setRumble(RumbleType.kLeftRumble, val);
-       // operatorController.setRumble(RumbleType.kRightRumble, val);
-    }
+    // public void setRumble(double val){
+    //     operatorController.setRumble(RumbleType.kLeftRumble, val);
+    //     operatorController.setRumble(RumbleType.kRightRumble, val);
+    // }
 }
