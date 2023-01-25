@@ -2,12 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Button;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class OI extends SubsystemBase
 {
@@ -97,11 +92,18 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(8);
     }
     
-    public void setRumble(double val){
-        //operatorController.setRumble(RumbleType.kLeftRumble, val);
-       // operatorController.setRumble(RumbleType.kRightRumble, val);
+    public boolean getXButton()
+    {
+        return driverController.getRawButtonPressed(3);
     }
-    
-   
-       
+
+    public boolean getAButton()
+    {
+        return driverController.getRawButton(1);
+    }
+
+    // public void setRumble(double val){
+    //     operatorController.setRumble(RumbleType.kLeftRumble, val);
+    //     operatorController.setRumble(RumbleType.kRightRumble, val);
+    // }
 }
