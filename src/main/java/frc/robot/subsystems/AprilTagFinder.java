@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,12 +30,13 @@ public class AprilTagFinder extends SubsystemBase {
   }
 
   // This method returns the position of the passed in AprilTag id relative to the Robot
-  public Transform2d getRelativePose(int id){
-    return new Transform2d();
+  public Pose3d getRelativePose(int id){
+    //getTagPose method in AprilTagFieldLayout
+    return new Pose3d();
   }
 
   //This method returns an array of all the visible AprilTag ids
-  public int[] getVisibleTags(){
+  public AprilTag[] getVisibleTags(){
     return null;
   }
 
