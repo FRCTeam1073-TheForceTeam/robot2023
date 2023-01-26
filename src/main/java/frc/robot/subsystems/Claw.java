@@ -15,6 +15,11 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  // Initialize preferences for this class:
+  public static void initPreferences() {
+  
+  }
+
   // This method will open the claw
   public void openClaw(){
 
@@ -35,5 +40,5 @@ public class Claw extends SubsystemBase {
 
   }
 
-  
+
 }

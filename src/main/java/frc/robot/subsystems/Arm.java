@@ -32,6 +32,11 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  // Initialize preferences for this class:
+  public static void initPreferences() {
+  
+  }
+
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
     return null;

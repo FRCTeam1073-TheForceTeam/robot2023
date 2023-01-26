@@ -33,6 +33,11 @@ public class Bling extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  // Initialize preferences for this class:
+  public static void initPreferences() {
+  
+  }
+
   public AddressableLEDBuffer getM_LEDBuffer() {
     return m_ledBuffer;
   }

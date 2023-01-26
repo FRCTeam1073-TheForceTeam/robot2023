@@ -46,6 +46,11 @@ public class RobotContainer {
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
+    AprilTagFinder.initPreferences();
+    Arm.initPreferences();
+    Claw.initPreferences();
+    Bling.initPreferences();
+
 
     // Initialize Preferences For Command Classes:
 

@@ -17,6 +17,11 @@ public class AprilTagFinder extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  // Initialize preferences for this class:
+  public static void initPreferences() {
+  
+  }
+
   // This method returns the position of the robot based on information from AprilTags
   public Pose2d getFieldPose(){
     return new Pose2d();
