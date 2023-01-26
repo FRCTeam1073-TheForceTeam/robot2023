@@ -8,9 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class AprilTag extends SubsystemBase {
+public class AprilTagFinder extends SubsystemBase {
   /** Creates a new AprilTag. */
-  public AprilTag() {}
+  public AprilTagFinder() {}
 
   @Override
   public void periodic() {
