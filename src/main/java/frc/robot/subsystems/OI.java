@@ -23,6 +23,11 @@ public class OI extends SubsystemBase
          zeroDriverController();
     }
 
+    public static void initPreferences() 
+    {
+  
+    }
+
     public void onEnable() {
         zeroDriverController();
     }

@@ -49,6 +49,11 @@ public class SwerveModule
         setUpMotors();
     }
 
+    public static void initPreferences() 
+    {
+  
+    }
+
     // Populate a SwerveModulePosition object from the state of this module.
     public void updatePosition(SwerveModulePosition position){
         position.angle = Rotation2d.fromRadians(getSteeringAngle());
