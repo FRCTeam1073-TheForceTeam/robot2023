@@ -15,6 +15,11 @@ public class Underglow extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
+  
+  public static void initPreferences() 
+  {
+  
+  }
 
   // This method sets the color
   public void setColor(Color8Bit color){

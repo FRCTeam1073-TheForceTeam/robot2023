@@ -16,7 +16,8 @@ public class Claw extends SubsystemBase {
   }
 
   // Initialize preferences for this class:
-  public static void initPreferences() {
+  public static void initPreferences() 
+  {
   
   }
 
