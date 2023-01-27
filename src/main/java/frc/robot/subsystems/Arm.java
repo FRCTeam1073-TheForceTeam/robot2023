@@ -4,17 +4,37 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Arm extends SubsystemBase {
+public class Arm extends SubsystemBase{
+  private TalonFX shoulderMotor, elbowMotor;
+  private CANCoder shoulderEncoder, elbowEncoder;
+
   public class JointPositions{
     double shoulder;
     double elbow;
+
+    public JointPositions(double shoulderAng, double elbowAng){
+      shoulder = shoulderAng;
+      elbow = elbowAng;
+    }
   }
 
   public class JointVelocities{
     double shoulder;
     double elbow;
+
+    public JointVelocities(double shoulderVel, double elbowVel){
+      shoulder = shoulderVel;
+      elbow = elbowVel;
+    }
   }
 
   public class CartesianPosition{
@@ -25,21 +45,52 @@ public class Arm extends SubsystemBase {
 
   /** Creates a new Arm. */
   //Set height limiter
-  public Arm() {}
+  public Arm(){
+    shoulderMotor = new TalonFX(0);
+    elbowMotor = new TalonFX(0);
+    shoulderEncoder = new CANCoder(0);
+    elbowEncoder = new CANCoder(0);
+    setUpMotor(shoulderMotor, shoulderEncoder);
+    setUpMotor(elbowMotor, elbowEncoder);
+
+    shoulderMotor.config_kP(0, 0);
+    shoulderMotor.config_kI(0, 0);
+    shoulderMotor.config_kD(0, 0);
+    shoulderMotor.config_kF(0, 0);
+    shoulderMotor.configMaxIntegralAccumulator(0, 0);
+    shoulderMotor.setIntegralAccumulator(0);
+
+    elbowMotor.config_kP(0, 0);
+    elbowMotor.config_kI(0, 0);
+    elbowMotor.config_kD(0, 0);
+    elbowMotor.config_kF(0, 0);
+    elbowMotor.configMaxIntegralAccumulator(0, 0);
+    elbowMotor.setIntegralAccumulator(0);
+  }
 
   @Override
-  public void periodic() {
+  public void periodic(){
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
+    SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
   }
 
   // Initialize preferences for this class:
-  public static void initPreferences() {
+  public static void initPreferences(){
   
+  }
+
+  public void setUpMotor(TalonFX motor, CANCoder encoder){
+    motor.configFactoryDefault();
+    motor.setNeutralMode(NeutralMode.Brake);
+    motor.configRemoteFeedbackFilter(encoder, 0);
+    motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
+    motor.setSensorPhase(true);
   }
 
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
-    return null;
+    return new JointPositions(shoulderMotor.getSelectedSensorPosition()/1000, elbowMotor.getSelectedSensorPosition()/1000);
   }
 
   // This method returns the maximum angles of joints
@@ -54,15 +105,17 @@ public class Arm extends SubsystemBase {
 
   // This method sets a target angle for joints
   public void setTargetAngle(JointPositions target){
-
+    shoulderMotor.set(ControlMode.Position, target.shoulder);
+    elbowMotor.set(ControlMode.Position, target.elbow);
   }
 
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
-
+    shoulderMotor.set(ControlMode.Velocity, speed.shoulder);
+    elbowMotor.set(ControlMode.Velocity, speed.elbow);
   }
 
-  // This method returns the position of clawgiven different joint angles
+  // This method returns the position of claw given different joint angles
   public CartesianPosition getCartesianPosition(JointPositions positions){
     return null;
   }

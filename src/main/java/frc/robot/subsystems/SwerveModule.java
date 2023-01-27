@@ -36,8 +36,7 @@ public class SwerveModule
     // private SwerveModuleIDConfig ids;
     private CANCoder steerEncoder;
     public Translation2d position;
-        //TODO: do we want it to give us absolute position
-
+    
     public SwerveModule(SwerveModuleConfig cfg, SwerveModuleIDConfig ids)
     {
         this.position = cfg.position;
