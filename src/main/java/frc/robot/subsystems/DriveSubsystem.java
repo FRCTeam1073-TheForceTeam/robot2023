@@ -126,6 +126,14 @@ public class DriveSubsystem extends SubsystemBase
     return pigeon2.getYaw();
   }
 
+  public double getPitch(){
+    return pigeon2.getPitch();
+  }
+
+  public double getRoll(){
+    return pigeon2.getRoll();
+  }
+
   // Reset IMU heading to zero degrees
   public void zeroHeading() {
     pigeon2.setYaw(0);
