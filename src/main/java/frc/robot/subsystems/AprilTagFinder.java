@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
 
 public class AprilTagFinder extends SubsystemBase {
   /** Creates a new AprilTag. */
@@ -36,7 +37,8 @@ public class AprilTagFinder extends SubsystemBase {
   }
 
   //This method returns an array of all the visible AprilTag ids
-  public AprilTag[] getVisibleTags(){
+  public ArrayList<AprilTag> getVisibleTags()
+  {
     return null;
   }
 
