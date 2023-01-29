@@ -28,6 +28,7 @@ public class DriveThroughTrajectory extends CommandBase {
   Pose2d endPose;
   Pose2d robotPose;
   ArrayList<Translation2d> wayPoints;
+  ArrayList<Pose2d> posePoints;
   TrajectoryConfig trajectoryCfg;
   Trajectory trajectory;
   double time;
@@ -46,6 +47,22 @@ public class DriveThroughTrajectory extends CommandBase {
     this.alpha = alpha;
     trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
     trajectory = TrajectoryGenerator.generateTrajectory(startPose, wayPoints, endPose, trajectoryCfg);
+    addRequirements(ds);
+  }
+
+  public DriveThroughTrajectory(DriveSubsystem ds, Pose2d start, ArrayList<Pose2d> posePointList, 
+  double maxVelocity, double maxAngularVelocity, double maxAcceleration, double alpha) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    drivetrain = ds;
+    startPose = start;
+    posePoints = new ArrayList<Pose2d>();
+    posePoints.add(start);
+    posePoints.addAll(posePointList);
+    this.maxVelocity = maxVelocity;
+    this.maxAngularVelocity = maxAngularVelocity;
+    this.alpha = alpha;
+    trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
+    trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
     addRequirements(ds);
   }
 
