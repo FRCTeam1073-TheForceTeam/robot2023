@@ -218,6 +218,9 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
+
+    SmartDashboard.putNumber("Pitch", getPitch());
+    SmartDashboard.putNumber("Roll", getRoll());
   }
 
   public void parkingBrake(){
