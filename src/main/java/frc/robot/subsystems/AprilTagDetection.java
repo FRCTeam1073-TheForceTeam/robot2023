@@ -11,9 +11,9 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 
-public class AprilTagFinder extends SubsystemBase {
+public class AprilTagDetection extends SubsystemBase {
   /** Creates a new AprilTag. */
-  public AprilTagFinder() {}
+  public AprilTagDetection() {}
 
   @Override
   public void periodic() {
