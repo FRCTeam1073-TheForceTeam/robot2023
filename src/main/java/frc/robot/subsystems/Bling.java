@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.RobotController;
@@ -36,6 +38,13 @@ public class Bling extends SubsystemBase {
   // Initialize preferences for this class:
   public static void initPreferences() {
   
+  }
+
+  public String getDiagnostics() {
+    ErrorCode error;
+    String result = new String();
+    //Check errors for all hardware
+    return result;
   }
 
   public AddressableLEDBuffer getM_LEDBuffer() {

@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class SwerveModule 
 {
     private SwerveModuleConfig cfg;
+    private SwerveModuleIDConfig idcfg;
     private TalonFX steerMotor, driveMotor;
     // private SwerveModuleIDConfig ids;
     private CANCoder steerEncoder;
@@ -42,6 +43,7 @@ public class SwerveModule
     {
         this.position = cfg.position;
         this.cfg = cfg;
+        this.idcfg = ids;
         // this.ids = ids;
         steerMotor = new TalonFX(ids.steerMotorID);
         driveMotor = new TalonFX(ids.driveMotorID);
@@ -53,6 +55,24 @@ public class SwerveModule
     {
   
     }
+
+    public String getDiagnostics() {
+        ErrorCode error;
+        String result = new String();
+        error = steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.steerCurrentLimit, cfg.steerCurrentThreshold, cfg.steerCurrentThresholdTime), 500);
+        if (error != ErrorCode.OK) {
+            result = String.format(" Module %d, steeringMotor %d, error", cfg.moduleNumber, idcfg.steerMotorID);
+        }
+        error = driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.driveCurrentLimit, cfg.driveCurrentThreshold, cfg.driveCurrentThresholdTime), 500);
+        if (error != ErrorCode.OK) {
+            result += String.format(" Module %d, driveMotor %d, error", cfg.moduleNumber, idcfg.driveMotorID);
+        }
+        error = steerEncoder.clearStickyFaults(500);
+        if (error != ErrorCode.OK) {
+            result += String.format(" Module %d, steerEncoder %d, error", cfg.moduleNumber, idcfg.steerEncoderID);
+        }
+        return result;
+      }
 
     // Populate a SwerveModulePosition object from the state of this module.
     public void updatePosition(SwerveModulePosition position){

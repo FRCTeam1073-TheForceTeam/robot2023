@@ -121,6 +121,15 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
   }
 
+  public String getDiagnostics() {
+    String result = modules[0].getDiagnostics();
+    result += modules[1].getDiagnostics();
+    result += modules[2].getDiagnostics();
+    result += modules[3].getDiagnostics();
+    //Check errors for all hardware
+    return result;
+  }
+
   //Returns IMU heading in degrees
   public double getHeading() {
     return pigeon2.getYaw();
