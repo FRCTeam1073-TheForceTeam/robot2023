@@ -17,7 +17,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.TeleopDrive;
 
 /** Add your docs here. 
  * 
@@ -34,19 +33,25 @@ public class SwerveModule
 {
     private SwerveModuleConfig cfg;
     private TalonFX steerMotor, driveMotor;
-    private SwerveModuleIDConfig ids;
+    // private SwerveModuleIDConfig ids;
     private CANCoder steerEncoder;
     public Translation2d position;
+        //TODO: do we want it to give us absolute position
 
     public SwerveModule(SwerveModuleConfig cfg, SwerveModuleIDConfig ids)
     {
         this.position = cfg.position;
         this.cfg = cfg;
-        this.ids = ids;
+        // this.ids = ids;
         steerMotor = new TalonFX(ids.steerMotorID);
         driveMotor = new TalonFX(ids.driveMotorID);
         steerEncoder = new CANCoder(ids.steerEncoderID);
         setUpMotors();
+    }
+
+    public static void initPreferences() 
+    {
+  
     }
 
     // Populate a SwerveModulePosition object from the state of this module.
@@ -58,7 +63,6 @@ public class SwerveModule
     // Return steering sensor angle in radians. 0 = dead ahead on robot.
     public double getSteeringAngle()
     {
-        //TODO: do we want it to give us absolute position
         return (steerEncoder.getPosition()*Math.PI/180) - cfg.steerAngleOffset;
     }
 
@@ -128,6 +132,8 @@ public class SwerveModule
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
         driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter / 10.0);
     }
+
+    //setSteerAngle in radians
     public void setSteerAngle(double steeringAngle)
     {
         steerMotor.set(ControlMode.Position, (steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian);
