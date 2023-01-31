@@ -61,35 +61,33 @@ public class AprilTagFinder extends SubsystemBase {
    * Gets how many error bits were corrected. Note: accepting large numbers of corrected errors
    * leads to greatly increased false positive rates. NOTE: As of this implementation, the detector
    * cannot detect tags with a hamming distance greater than 2.
-037   *
-038   * @return Hamming distance (number of corrected error bits)
-039   */
-040  public int getHamming() {
-041    return m_hamming;
-042  }
-043
-044  /**
-045   * Gets a measure of the quality of the binary decoding process: the average difference between
-046   * the intensity of a data bit versus the decision threshold. Higher numbers roughly indicate
-047   * better decodes. This is a reasonable measure of detection accuracy only for very small tags--
-048   * not effective for larger tags (where we could have sampled anywhere within a bit cell and still
-049   * gotten a good detection.)
-050   *
-051   * @return Decision margin
-052   */
-053  public float getDecisionMargin() {
-054    return m_decisionMargin;
-055  }
-056
-057  /**
-058   * Gets the 3x3 homography matrix describing the projection from an "ideal" tag (with corners at
-059   * (-1,1), (1,1), (1,-1), and (-1, -1)) to pixels in the image.
-060   *
-061   * @return Homography matrix data
-062   */
-063  @SuppressWarnings("PMD.MethodReturnsInternalArray")
-064  public double[] getHomography() {
-065    return m_homography;
+   *
+   * @return Hamming distance (number of corrected error bits)
+   */
+  public int getHamming() {
+    return m_hamming;
+  }
 
+  /**
+   * Gets a measure of the quality of the binary decoding process: the average difference between
+   * the intensity of a data bit versus the decision threshold. Higher numbers roughly indicate
+   * better decodes. This is a reasonable measure of detection accuracy only for very small tags--
+   * not effective for larger tags (where we could have sampled anywhere within a bit cell and still
+   * gotten a good detection.)
+   *
+   * @return Decision margin
+   */
+  public float getDecisionMargin() {
+    return m_decisionMargin;
+  }
 
+  /**
+   * Gets the 3x3 homography matrix describing the projection from an "ideal" tag (with corners at
+   * (-1,1), (1,1), (1,-1), and (-1, -1)) to pixels in the image.
+   *
+   * @return Homography matrix data
+   */
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
+  public double[] getHomography() {
+    return m_homography;
 }
