@@ -18,7 +18,7 @@ import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.subsystems.AprilTagDetection;
+import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.Claw;
