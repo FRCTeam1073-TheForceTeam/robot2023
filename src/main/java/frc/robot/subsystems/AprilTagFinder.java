@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -17,12 +18,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AprilTagFinder extends SubsystemBase {
-  /** Creates a new AprilTag. */
-  public AprilTagFinder() {}
+  
+  //Creates
+  private ArrayList<AprilTagDetection> detections;
+  private NetworkTable apriltagNetwork;
+  private NetworkTableEntry apriltagEntry;
 
+  /** Creates a new AprilTag. */
+  public AprilTagFinder() {
+    detections = new ArrayList<AprilTagDetection>() ;
+    apriltagNetwork = NetworkTable.getInstance().getTable("Vision");
+    apriltagEntry = apriltagNetwork.getEntry("Tags1");
+  }
+   
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    Number[]tagData = apriltagEntry.getNumberArray();
   }
 
   // Initialize preferences for this class:
@@ -47,19 +60,7 @@ public class AprilTagFinder extends SubsystemBase {
     return null;
   }
   
-  /*
-  *This method returns an array list of the 
-  *tag_id, tag.hamming, tag.goodness, tag.decision_margin
-  *
-  */
-
-  public ArrayList<Detections> getDetectedTags()
-  {
-
-    return ;
-  }
 
 
 
 }
-
