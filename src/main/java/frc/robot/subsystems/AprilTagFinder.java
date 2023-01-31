@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -27,7 +30,7 @@ public class AprilTagFinder extends SubsystemBase {
   /** Creates a new AprilTag. */
   public AprilTagFinder() {
     detections = new ArrayList<AprilTagDetection>() ;
-    apriltagNetwork = NetworkTable.getInstance().getTable("Vision");
+    apriltagNetwork = NetworkTableInstance.getDefault().getTable("Vision");
     apriltagEntry = apriltagNetwork.getEntry("Tags1");
   }
    
@@ -35,7 +38,34 @@ public class AprilTagFinder extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    Number[]tagData = apriltagEntry.getNumberArray();
+    Number[] tagData = apriltagEntry.getNumberArray(new Number[0]);
+    detections.clear();
+    int numTags = tagData.length/23;
+    for (int i = 0; i < numTags; i = i +1){
+      double[] homography = new double[9];
+      double[] corners = new double[8];
+      homography[0] = tagData[i*23 + 4].doubleValue();
+      homography[1] = tagData[i*23 + 5].doubleValue();
+      homography[2] = tagData[i*23 + 6].doubleValue();
+      homography[3] = tagData[i*23 + 7].doubleValue();
+      homography[4] = tagData[i*23 + 8].doubleValue();
+      homography[5] = tagData[i*23 + 9].doubleValue();
+      homography[6] = tagData[i*23 + 10].doubleValue();
+      homography[7] = tagData[i*23 + 11].doubleValue();
+      homography[8] = tagData[i*23 + 12].doubleValue();
+      corners[0] = tagData[i*23 + 15].doubleValue();
+      corners[1] = tagData[i*23 + 16].doubleValue();
+      corners[2] = tagData[i*23 + 17].doubleValue();
+      corners[3] = tagData[i*23 + 18].doubleValue();
+      corners[4] = tagData[i*23 + 19].doubleValue();
+      corners[5] = tagData[i*23 + 20].doubleValue();
+      corners[6] = tagData[i*23 + 21].doubleValue();
+      corners[7] = tagData[i*23 + 22].doubleValue();
+      AprilTagDetection detection = new AprilTagDetection("16h5", tagData[i*23 + 0].intValue(),
+      tagData[i*23 + 1].intValue(), tagData[i*23 + 2].floatValue(), homography, 
+      tagData[i*23 + 13].doubleValue(), tagData[i*23 + 14].doubleValue(), corners);
+      detections.add(detection);
+    }
   }
 
   // Initialize preferences for this class:
@@ -55,9 +85,9 @@ public class AprilTagFinder extends SubsystemBase {
   }
 
   //This method returns an array of all the visible AprilTag ids
-  public ArrayList<AprilTag> getVisibleTags()
+  public ArrayList<AprilTagDetection> getVisibleTags()
   {
-    return null;
+    return detections;
   }
   
 
