@@ -29,7 +29,7 @@ public class RobotContainer {
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_Bling = new Bling();
-  private final AprilTagDetection m_AprilTagDetection = new AprilTagDetection();
+  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();
@@ -47,7 +47,7 @@ public class RobotContainer {
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
-    AprilTagDetection.initPreferences();
+    AprilTagFinder.initPreferences();
     Arm.initPreferences();
     Claw.initPreferences();
     Bling.initPreferences();
