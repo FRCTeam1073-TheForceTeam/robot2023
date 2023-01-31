@@ -46,5 +46,20 @@ public class AprilTagFinder extends SubsystemBase {
   {
     return null;
   }
+  
+  /*
+  *This method returns an array list of the 
+  *tag_id, tag.hamming, tag.goodness, tag.decision_margin
+  *
+  */
+
+  public ArrayList<Detections> getDetectedTags()
+  {
+
+    return ;
+  }
+
+
+
 }
 
