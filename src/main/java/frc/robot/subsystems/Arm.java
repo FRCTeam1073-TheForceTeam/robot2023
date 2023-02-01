@@ -4,12 +4,16 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -41,6 +45,43 @@ public class Arm extends SubsystemBase{
     double x;
     double z;
     double pitch;
+  }
+
+  public class Spline{
+    public Spline(){
+
+    }
+  }
+
+  public class ArmTrajectory{
+
+    private JointPositions startPosition;
+    private JointPositions endPosition;
+    private ArrayList<JointPositions> waypoints;
+    private TrajectoryConfig trajectoryConfig;
+    private Spline shoulderTrajectory;
+    private Spline elbowTrajectory;
+
+    public ArmTrajectory(JointPositions startPosition, JointPositions endPosition, ArrayList<JointPositions> waypoints,
+    double maxVelocity, double maxAcceleration){
+      this.startPosition = startPosition;
+      this.endPosition = endPosition;
+      this.waypoints = waypoints;
+      trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
+      Spline shoulderTrajectory = new Spline();
+      Spline elbowTrajectory = new Spline();
+    }
+
+    
+
+    public JointPositions getTrajectoryAtTime(double time){
+      //placeholder for joint angles
+      JointPositions position = new JointPositions(0, 0);
+      //getAtX doesn't exist for spline yet
+      //position.shoulder = shoulderTrajectory.getAtX(time);
+      //position.elbow = elbowTrajectory.getAtX(time);
+      return position;
+    }
   }
 
   /** Creates a new Arm. */
