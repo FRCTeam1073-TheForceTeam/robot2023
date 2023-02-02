@@ -8,7 +8,9 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -180,6 +182,13 @@ public class DriveSubsystem extends SubsystemBase
     return new Pose2d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(), Rotation2d.fromDegrees(getHeading()));
   }
 
+  public Pose3d get3dOdometry(){
+    // return odometry position as a pose 3d
+    Pose2d odo = getOdometry();
+    //TODO: use internal roll and pitch methods later
+    return new Pose3d(odo.getX(), odo.getY(), 0.0, new Rotation3d(pigeon2.getRoll(), pigeon2.getPitch(), getHeading()));
+  }
+  
   @Override
   public void periodic(){
     if (! debug){

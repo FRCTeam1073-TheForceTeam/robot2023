@@ -7,11 +7,15 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagDetection;
+import edu.wpi.first.apriltag.AprilTagPoseEstimate;
+import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -26,12 +30,21 @@ public class AprilTagFinder extends SubsystemBase {
   private ArrayList<AprilTagDetection> detections;
   private NetworkTable apriltagNetwork;
   private NetworkTableEntry apriltagEntry;
+  private AprilTagPoseEstimator poseEstimator;
+  private ArrayList<AprilTag> tags;
+  private Transform3d cameraTransform;
+  private DriveSubsystem driveSubsystem;
 
   /** Creates a new AprilTag. */
-  public AprilTagFinder() {
-    detections = new ArrayList<AprilTagDetection>() ;
+  public AprilTagFinder(DriveSubsystem ds) {
+    driveSubsystem = ds;
+    detections = new ArrayList<AprilTagDetection>();
     apriltagNetwork = NetworkTableInstance.getDefault().getTable("Vision");
     apriltagEntry = apriltagNetwork.getEntry("Tags1");
+    AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 1000, 1000, 320, 240);
+    poseEstimator = new AprilTagPoseEstimator(config);
+    tags = new ArrayList<AprilTag>();
+    cameraTransform = new Transform3d(); //location of the camera in robot cordinates
   }
    
   
@@ -40,7 +53,10 @@ public class AprilTagFinder extends SubsystemBase {
     // This method will be called once per scheduler run
     Number[] tagData = apriltagEntry.getNumberArray(new Number[0]);
     detections.clear();
+    tags.clear();
     int numTags = tagData.length/23;
+    double closestDistance = 9999.0;
+    int closestTag = -1;
     for (int i = 0; i < numTags; i = i +1){
       double[] homography = new double[9];
       double[] corners = new double[8];
@@ -65,7 +81,25 @@ public class AprilTagFinder extends SubsystemBase {
       tagData[i*23 + 1].intValue(), tagData[i*23 + 2].floatValue(), homography, 
       tagData[i*23 + 13].doubleValue(), tagData[i*23 + 14].doubleValue(), corners);
       detections.add(detection);
+      Transform3d transform = poseEstimator.estimate(detection);
+      //Keep track of the closest tag
+      if (transform.getTranslation().getNorm() < closestDistance) {
+        closestDistance = transform.getTranslation().getNorm();
+        closestTag = detection.getId();
+      }
+      Pose3d pose = driveSubsystem.get3dOdometry();
+      pose = pose.plus(cameraTransform);
+      pose = pose.plus(transform);
+      tags.add(new AprilTag(detection.getId(), pose));
     }
+    //End of tag proccesing loop
+    SmartDashboard.putNumber("AprilTag.numTags", numTags);
+    SmartDashboard.putNumber("Closest ID", closestTag);
+    SmartDashboard.putNumber("Closest Distance", closestDistance);
+  }
+
+  public ArrayList<AprilTag> getTags(){
+    return tags;
   }
 
   // Initialize preferences for this class:
