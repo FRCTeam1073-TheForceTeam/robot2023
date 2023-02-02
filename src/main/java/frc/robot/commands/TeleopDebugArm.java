@@ -7,11 +7,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
 
-public class OptimizedArm extends CommandBase {
+public class TeleopDebugArm extends CommandBase {
   private Arm arm;
 
-  /** Creates a new OptimizedArm. */
-  public OptimizedArm() {
+  /** Creates a new DebugArm. */
+  public TeleopDebugArm() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(arm);
   }
@@ -28,14 +28,12 @@ public class OptimizedArm extends CommandBase {
     }
 
     if(false){
-      //move arm up/down
+      //move shoulder
     }
 
     if(false){
-      //move arm forward/backward
+      //move elbow
     }
-    
-    //Do we want other specific positions (i.e low/medium/high grid locations)?
   }
 
   // Called once the command ends or is interrupted.
