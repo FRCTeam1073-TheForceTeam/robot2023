@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
@@ -20,6 +23,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
+  //set variables below to correct lengths
+  public final double upperArm = 0;
+  public final double foreArm = 0;
 
   public class JointPositions{
     double shoulder;
@@ -28,6 +34,24 @@ public class Arm extends SubsystemBase{
     public JointPositions(double shoulderAng, double elbowAng){
       shoulder = shoulderAng;
       elbow = elbowAng;
+    }
+  }
+
+  public class JointWaypoints{
+    double shoulder;
+    double elbow;
+    double time;
+
+    public JointWaypoints(double shoulder, double elbow, double time){
+      this.shoulder = shoulder;
+      this.elbow = elbow;
+      this.time = time;
+    }
+
+    public JointWaypoints(JointPositions positions, double time){
+      shoulder = positions.shoulder;
+      elbow = positions.elbow;
+      this.time = time;
     }
   }
 
@@ -47,40 +71,43 @@ public class Arm extends SubsystemBase{
     double pitch;
   }
 
-  public class Spline{
-    public Spline(){
-
-    }
-  }
 
   public class ArmTrajectory{
 
-    private JointPositions startPosition;
-    private JointPositions endPosition;
-    private ArrayList<JointPositions> waypoints;
+    private ArrayList<JointWaypoints> waypoints;
     private TrajectoryConfig trajectoryConfig;
-    private Spline shoulderTrajectory;
-    private Spline elbowTrajectory;
+    private PolynomialSplineFunction elbowSplines;
+    private PolynomialSplineFunction shoulderSplines;
 
-    public ArmTrajectory(JointPositions startPosition, JointPositions endPosition, ArrayList<JointPositions> waypoints,
-    double maxVelocity, double maxAcceleration){
-      this.startPosition = startPosition;
-      this.endPosition = endPosition;
+    public ArmTrajectory(ArrayList<JointWaypoints> waypoints, double maxVelocity, double maxAcceleration){
       this.waypoints = waypoints;
       trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
-      Spline shoulderTrajectory = new Spline();
-      Spline elbowTrajectory = new Spline();
+      var interpolator = new SplineInterpolator();
+      double[] elbowPositions = new double[waypoints.size()];
+      double[] shoulderPositions = new double[waypoints.size()];
+      double[] times = new double[waypoints.size()];
+
+      for(int i = 0; i < waypoints.size(); i++){
+        elbowPositions[i] = waypoints.get(i).elbow;
+        shoulderPositions[i] = waypoints.get(i).shoulder;
+        times[i] = waypoints.get(i).time;
+      }
+
+      elbowSplines = interpolator.interpolate(elbowPositions, times);
+      shoulderSplines = interpolator.interpolate(shoulderPositions, times);
+    }
+/* 
+    public double getTimeForMotion(){
+      
     }
 
-    
+    public double timeBetweenPoints(JointPositions firstPoint, JointPositions secondPoint){
 
+    }
+*/
     public JointPositions getTrajectoryAtTime(double time){
       //placeholder for joint angles
-      JointPositions position = new JointPositions(0, 0);
-      //getAtX doesn't exist for spline yet
-      //position.shoulder = shoulderTrajectory.getAtX(time);
-      //position.elbow = elbowTrajectory.getAtX(time);
-      return position;
+      return new JointPositions(shoulderSplines.value(time), elbowSplines.value(time));
     }
   }
 
