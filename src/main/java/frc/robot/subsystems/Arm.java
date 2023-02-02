@@ -18,6 +18,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
@@ -154,6 +156,13 @@ public class Arm extends SubsystemBase{
     motor.configRemoteFeedbackFilter(encoder, 0);
     motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
     motor.setSensorPhase(true);
+  }
+  
+  public String getDiagnostics() {
+    ErrorCode error;
+    String result = new String();
+    //Check errors for all hardware
+    return result;
   }
 
   // This methods returns the angle of each joint

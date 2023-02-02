@@ -121,9 +121,26 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
   }
 
+  public String getDiagnostics() {
+    String result = modules[0].getDiagnostics();
+    result += modules[1].getDiagnostics();
+    result += modules[2].getDiagnostics();
+    result += modules[3].getDiagnostics();
+    //Check errors for all hardware
+    return result;
+  }
+
   //Returns IMU heading in degrees
   public double getHeading() {
     return pigeon2.getYaw();
+  }
+
+  public double getPitch(){
+    return pigeon2.getPitch();
+  }
+
+  public double getRoll(){
+    return pigeon2.getRoll();
   }
 
   // Reset IMU heading to zero degrees
@@ -201,6 +218,9 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
+
+    SmartDashboard.putNumber("Pitch", getPitch());
+    SmartDashboard.putNumber("Roll", getRoll());
   }
 
   public void parkingBrake(){
