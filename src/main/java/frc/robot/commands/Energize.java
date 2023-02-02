@@ -79,10 +79,6 @@ public class Energize extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if (drivePhase == 2) 
-    {
-      return true;
-    }
-    return false;
+    return drivePhase == 2;
   }
 }
