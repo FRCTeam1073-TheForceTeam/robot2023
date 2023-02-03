@@ -24,7 +24,7 @@ public class TeleopOptimizedArm extends CommandBase {
   @Override
   public void execute() {
     if(false){
-      arm.setTargetAngle(new Arm.JointPositions(0,0)); //tuck arm in
+      arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
 
     if(false){

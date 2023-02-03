@@ -26,7 +26,7 @@ public class TeleopDebugArm extends CommandBase {
   @Override
   public void execute() {
     if(false){
-      arm.setTargetAngle(new Arm.JointPositions(0,0)); //tuck arm in
+      arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
 
     arm.setJointVelocities(arm.new JointVelocities(oi.getOperatorLeftX() * .5, oi.getOperatorRightX()*.5));
