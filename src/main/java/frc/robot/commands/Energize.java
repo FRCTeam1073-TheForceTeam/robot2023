@@ -62,23 +62,35 @@ public class Energize extends CommandBase {
       
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(-maxLinearVelocity * 0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
 
-      if (Math.abs(drivetrain.getPitch()) < 6) {
+      if (Math.abs(drivetrain.getPitch()) < 2) {
         drivePhase = 2;
       }
+    }
+
+    if(drivePhase == 2){
+      drivetrain.parkingBrake();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees((drivetrain.getHeading())));
-    drivetrain.parkingBrake();
+    // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees((drivetrain.getHeading())));
+    // drivetrain.parkingBrake();
   }
 
   // Returns true when the command should end.
 
   @Override
   public boolean isFinished() {
+<<<<<<< Updated upstream
     return drivePhase == 2;
+=======
+    // if (drivePhase == 2) 
+    // {
+    //   return true;
+    // }
+    return false;
+>>>>>>> Stashed changes
   }
 }
