@@ -69,6 +69,7 @@ public class Energize extends CommandBase {
 
     if(drivePhase == 2){
       drivetrain.parkingBrake();
+      //drivePhase = 3;
     }
   }
 

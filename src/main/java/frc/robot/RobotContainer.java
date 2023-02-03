@@ -83,6 +83,6 @@ public class RobotContainer {
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints,
         new Pose2d(4.7, 1.7, new Rotation2d(3)), 1, 0.8, 0.5, 0.7)
     );*/
-    return new SequentialCommandGroup(new Energize(m_driveSubsystem, 0.25));
+    return new SequentialCommandGroup(new Energize(m_driveSubsystem, 0.3));
   }
 }
