@@ -6,9 +6,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.OI;
 
 public class TeleopDebugArm extends CommandBase {
   private Arm arm;
+  private OI oi;
 
   /** Creates a new DebugArm. */
   public TeleopDebugArm() {
@@ -27,13 +29,7 @@ public class TeleopDebugArm extends CommandBase {
       arm.setTargetAngle(new Arm.JointPositions(0,0)); //tuck arm in
     }
 
-    if(false){
-      //move shoulder
-    }
-
-    if(false){
-      //move elbow
-    }
+    arm.setJointVelocities(arm.new JointVelocities(oi.getOperatorLeftX() * .5, oi.getOperatorRightX()*.5));
   }
 
   // Called once the command ends or is interrupted.
