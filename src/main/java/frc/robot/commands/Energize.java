@@ -83,14 +83,6 @@ public class Energize extends CommandBase {
 
   @Override
   public boolean isFinished() {
-<<<<<<< Updated upstream
-    return drivePhase == 2;
-=======
-    // if (drivePhase == 2) 
-    // {
-    //   return true;
-    // }
     return false;
->>>>>>> Stashed changes
   }
 }
