@@ -50,7 +50,7 @@ public class DriveSubsystem extends SubsystemBase
 
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 0;
-    moduleConfig.position = new Translation2d(0.217, 0.217);
+    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.217), Preferences.getDouble("Drive.ModulePositions", 0.217));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module0.SteerAngleOffset", 2.879); //2.879;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -62,7 +62,7 @@ public class DriveSubsystem extends SubsystemBase
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 1;
-    moduleConfig.position = new Translation2d(0.217,-0.217);
+    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.217), -Preferences.getDouble("Drive.ModulePositions", 0.217));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module1.SteerAngleOffset", 1.866); // 1.866;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -74,7 +74,7 @@ public class DriveSubsystem extends SubsystemBase
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 2;
-    moduleConfig.position = new Translation2d(-0.217, 0.217);
+    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.217), Preferences.getDouble("Drive.ModulePositions", 0.217));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module2.SteerAngleOffset", 2.422); // 2.422;
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -85,7 +85,7 @@ public class DriveSubsystem extends SubsystemBase
     // moduleIDConfig.driveMotorID = 26; // moduleIDConfig.steerMotorID = 40; // moduleIDConfig.steerEncoderID = 10;
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 3;
-    moduleConfig.position = new Translation2d(-0.217,-0.217);
+    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.217), -Preferences.getDouble("Drive.ModulePositions", 0.217));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module3.SteerAngleOffset", 1.109); //1.109;
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -119,6 +119,7 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
     Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
     Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
+    Preferences.initDouble("Drive.ModulePositions", 0.217);
   }
 
   public String getDiagnostics() {
