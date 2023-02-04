@@ -229,6 +229,10 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].setSteerAngle(-Math.PI / 4);
     modules[2].setSteerAngle(-Math.PI / 4);
     modules[3].setSteerAngle(Math.PI / 4);
+    modules[0].setDriveVelocity(0);
+    modules[1].setDriveVelocity(0);
+    modules[2].setDriveVelocity(0);
+    modules[3].setDriveVelocity(0);
   }
   
   public void setDebugSpeed(double speed){

@@ -5,18 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SerialPort;
-import java.util.ArrayList;
-import java.util.List;
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.DriveThroughTrajectory;
-import frc.robot.commands.DriveToPoint;
+import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -39,6 +31,8 @@ public class RobotContainer {
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();
+  private final Engage m_Engage = new Engage(m_driveSubsystem, 0.25);
+  
   private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
 
   public RobotContainer() {
@@ -76,12 +70,13 @@ public class RobotContainer {
       //new DriveToPoint(m_driveSubsystem, new Pose2d(0, 0, new Rotation2d()), .5, .5)
       ); //returns robot position and angle to zero
   }*/
-    ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
+    /*ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
       waypoints.add(new Translation2d(3.4, -.6));
       waypoints.add(new Translation2d(5, -0.7));
     return new SequentialCommandGroup(
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints,
         new Pose2d(4.7, 1.7, new Rotation2d(3)), 1, 0.8, 0.5, 0.7)
-    );
+    );*/
+    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
   }
 }
