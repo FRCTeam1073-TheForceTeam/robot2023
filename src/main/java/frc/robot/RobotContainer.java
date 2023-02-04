@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.DriveToPoint;
-import frc.robot.commands.Energize;
+import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -39,7 +39,7 @@ public class RobotContainer {
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();
-  private final Energize m_Energize = new Energize(m_driveSubsystem, 0.25);
+  private final Engage m_Engage = new Engage(m_driveSubsystem, 0.25);
   
   public RobotContainer() {
 
@@ -83,6 +83,6 @@ public class RobotContainer {
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints,
         new Pose2d(4.7, 1.7, new Rotation2d(3)), 1, 0.8, 0.5, 0.7)
     );*/
-    return new SequentialCommandGroup(new Energize(m_driveSubsystem, 0.3));
+    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
   }
 }

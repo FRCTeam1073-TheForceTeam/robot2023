@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class Energize extends CommandBase {
-  /** Creates a new Energize. */
+public class Engage extends CommandBase {
+  /** Creates a new Engage. */
 
   int drivePhase; //start, drive, climb, stop
   double distanceTolerance = 0.1;
@@ -26,7 +26,7 @@ public class Energize extends CommandBase {
   private double maxLinearVelocity;   // Meters/second
   
 
-  public Energize(DriveSubsystem ds, double maxSpeed) {
+  public Engage(DriveSubsystem ds, double maxSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = ds;
     maxLinearVelocity = maxSpeed;
