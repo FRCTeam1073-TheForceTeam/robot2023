@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
@@ -19,6 +21,13 @@ public class Claw extends SubsystemBase {
   public static void initPreferences() 
   {
   
+  }
+
+  public String getDiagnostics() {
+    ErrorCode error;
+    String result = new String();
+    //Check errors for all hardware
+    return result;
   }
 
   // This method will open the claw

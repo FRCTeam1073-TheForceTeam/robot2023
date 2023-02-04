@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -35,6 +37,13 @@ public class Arm extends SubsystemBase {
   // Initialize preferences for this class:
   public static void initPreferences() {
   
+  }
+
+  public String getDiagnostics() {
+    ErrorCode error;
+    String result = new String();
+    //Check errors for all hardware
+    return result;
   }
 
   // This methods returns the angle of each joint
