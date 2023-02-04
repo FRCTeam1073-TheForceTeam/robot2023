@@ -10,10 +10,15 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.numbers.N3;
+import java.util.Arrays;
 
-public class AprilTagFinder extends SubsystemBase {
+public class AprilTagDetection extends SubsystemBase {
   /** Creates a new AprilTag. */
-  public AprilTagFinder() {}
+  public AprilTagDetection() {}
 
   @Override
   public void periodic() {
@@ -30,13 +35,13 @@ public class AprilTagFinder extends SubsystemBase {
     return new Pose2d();
   }
 
-  // This method returns the position of the passed in AprilTag id relative to the Robot
+  // This method returns the position of the passed in AprilTag ID relative to the Robot
   public Pose3d getRelativePose(int id){
     //getTagPose method in AprilTagFieldLayout
     return new Pose3d();
   }
 
-  //This method returns an array of all the visible AprilTag ids
+  //This method returns an array of all the visible AprilTag IDs
   public ArrayList<AprilTag> getVisibleTags()
   {
     return null;

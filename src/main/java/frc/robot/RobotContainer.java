@@ -4,9 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.SerialPort;
 import java.util.ArrayList;
 import java.util.List;
-
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,8 +23,9 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
+import frc.robot.subsystems.OpenMV;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.subsystems.AprilTagFinder;
+import frc.robot.subsystems.AprilTagDetection;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.Claw;
@@ -35,12 +36,14 @@ public class RobotContainer {
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_Bling = new Bling();
-  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
+  private final AprilTagDetection m_AprilTagDetection = new AprilTagDetection();
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();
   private final Engage m_Engage = new Engage(m_driveSubsystem, 0.25);
   
+  private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
+
   public RobotContainer() {
 
     // Configure Button Bindings
@@ -54,7 +57,7 @@ public class RobotContainer {
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
-    AprilTagFinder.initPreferences();
+    AprilTagDetection.initPreferences();
     Arm.initPreferences();
     Claw.initPreferences();
     Bling.initPreferences();
