@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.util.ArrayList;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -56,6 +57,7 @@ public class DriveThroughTrajectory extends CommandBase {
     posePoints = new ArrayList<Pose2d>();
     posePoints.add(start);
     posePoints.addAll(posePointList);
+    endPose = posePoints.get(posePoints.size() - 1);
     this.maxVelocity = maxVelocity;
     this.maxAngularVelocity = maxAngularVelocity;
     this.alpha = alpha;
@@ -78,7 +80,10 @@ public class DriveThroughTrajectory extends CommandBase {
     Transform2d difference = robotPose.minus(state.poseMeters);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
-    double angularVelocity = difference.getRotation().getRadians();
+
+    Transform2d angleDifference = endPose.minus(robotPose);
+    double angularVelocity = -0.4 * angleDifference.getRotation().getRadians();;
+    //double angularVelocity = difference.getRotation().getRadians();
 
     if(xVelocity > maxVelocity){
       xVelocity = maxVelocity;
@@ -99,9 +104,15 @@ public class DriveThroughTrajectory extends CommandBase {
       angularVelocity = -maxAngularVelocity;
     }
 
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
+    Rotation2d.fromDegrees(drivetrain.getHeading()));
     drivetrain.setChassisSpeeds(chassisSpeeds);
-    time += 0.02;
+    if(time < trajectory.getTotalTimeSeconds()){
+      time += 0.02;
+    }
+    else{
+      time = trajectory.getTotalTimeSeconds();
+    }
   }
 
   // Called once the command ends or is interrupted.
