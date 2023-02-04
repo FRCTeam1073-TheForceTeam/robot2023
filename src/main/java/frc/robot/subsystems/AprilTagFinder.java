@@ -14,8 +14,10 @@ import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -41,10 +43,12 @@ public class AprilTagFinder extends SubsystemBase {
     detections = new ArrayList<AprilTagDetection>();
     apriltagNetwork = NetworkTableInstance.getDefault().getTable("Vision");
     apriltagEntry = apriltagNetwork.getEntry("Tags1");
-    AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 1000, 1000, 320, 240);
+    AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 1385/1.75, 1385/1.75, 320, 240);
     poseEstimator = new AprilTagPoseEstimator(config);
     tags = new ArrayList<AprilTag>();
-    cameraTransform = new Transform3d(); //location of the camera in robot cordinates
+    cameraTransform = new Transform3d(new Translation3d(0.1143, -0.1397, 0.51435), new Rotation3d(0, Math.PI/2.0, 0)); //location of the camera in robot cordinates
+    //cameraTransform = new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, Math.PI/2.0, 0)); //location of the camera in robot cordinates
+    //cameraTransform = new Transform3d();
   }
    
   
@@ -85,18 +89,29 @@ public class AprilTagFinder extends SubsystemBase {
       //Keep track of the closest tag
       if (transform.getTranslation().getNorm() < closestDistance) {
         closestDistance = transform.getTranslation().getNorm();
-        closestTag = detection.getId();
+        closestTag = i;
       }
-      Pose3d pose = driveSubsystem.get3dOdometry();
+      //Pose3d pose = driveSubsystem.get3dOdometry();
+      //Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+      Pose3d pose = new Pose3d();
+      Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
+      pose = pose.plus(odoTransform);
       pose = pose.plus(cameraTransform);
       pose = pose.plus(transform);
       tags.add(new AprilTag(detection.getId(), pose));
     }
     //End of tag proccesing loop
     SmartDashboard.putNumber("AprilTag.numTags", numTags);
-    SmartDashboard.putNumber("Closest ID", closestTag);
-    SmartDashboard.putNumber("Closest Distance", closestDistance);
+    if (closestTag >= 0){
+      SmartDashboard.putNumber("Closest ID", tags.get(closestTag).ID);
+      SmartDashboard.putNumber("Closest Distance", closestDistance);
+      SmartDashboard.putNumber("Closest X", tags.get(closestTag).pose.getX());
+      SmartDashboard.putNumber("Closest Y", tags.get(closestTag).pose.getY());
+      SmartDashboard.putNumber("Closest Z", tags.get(closestTag).pose.getZ());
+    }
+    
   }
+
 
   public ArrayList<AprilTag> getTags(){
     return tags;
