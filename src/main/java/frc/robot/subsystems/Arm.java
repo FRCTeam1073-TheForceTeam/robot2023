@@ -26,8 +26,10 @@ public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
   //set variables below to correct lengths
-  public final double upperArm = 0;
-  public final double foreArm = 0;
+  public final double upperArm = 0.0;
+  public final double foreArm = 0.0;
+  public final double upperArmAngleOffset = 0.0;
+  public final double foreArmAngleOffset = 0.0;
 
   public class JointPositions{
     double shoulder;
@@ -167,6 +169,7 @@ public class Arm extends SubsystemBase{
 
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
+    //sensor angles should be divided by te appropriate ticks per radian
     return new JointPositions(shoulderMotor.getSelectedSensorPosition()/1000, elbowMotor.getSelectedSensorPosition()/1000);
   }
 
