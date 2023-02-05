@@ -114,7 +114,7 @@ public class AprilTagFinder extends SubsystemBase {
       //Pose3d pose = new Pose3d();
       //Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
       //pose = pose.plus(odoTransform);
-      //pose = pose.plus(cameraTransform);
+      pose = pose.plus(cameraTransform);
       //pose = pose.plus(transform);
       tags.add(new AprilTag(detection.getId(), pose));
     }
