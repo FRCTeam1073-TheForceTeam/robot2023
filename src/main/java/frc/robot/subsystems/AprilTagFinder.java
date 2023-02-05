@@ -73,6 +73,15 @@ public class AprilTagFinder extends SubsystemBase {
       homography[6] = tagData[i*23 + 10].doubleValue();
       homography[7] = tagData[i*23 + 11].doubleValue();
       homography[8] = tagData[i*23 + 12].doubleValue();
+      /*homography[0] = tagData[i*23 + 4].doubleValue();
+      homography[1] = tagData[i*23 + 7].doubleValue();
+      homography[2] = tagData[i*23 + 10].doubleValue();
+      homography[3] = tagData[i*23 + 5].doubleValue();
+      homography[4] = tagData[i*23 + 8].doubleValue();
+      homography[5] = tagData[i*23 + 11].doubleValue();
+      homography[6] = tagData[i*23 + 6].doubleValue();
+      homography[7] = tagData[i*23 + 9].doubleValue();
+      homography[8] = tagData[i*23 + 12].doubleValue();*/
       corners[0] = tagData[i*23 + 15].doubleValue();
       corners[1] = tagData[i*23 + 16].doubleValue();
       corners[2] = tagData[i*23 + 17].doubleValue();
@@ -85,19 +94,28 @@ public class AprilTagFinder extends SubsystemBase {
       tagData[i*23 + 1].intValue(), tagData[i*23 + 2].floatValue(), homography, 
       tagData[i*23 + 13].doubleValue(), tagData[i*23 + 14].doubleValue(), corners);
       detections.add(detection);
+      //Transform3d transform = poseEstimator.estimate(detection);
+      //AprilTagPoseEstimate poseEstimate = poseEstimator.estimateOrthogonalIteration(detection, 50);
       Transform3d transform = poseEstimator.estimate(detection);
+      if (transform.getZ() < 0.0){
+        transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), new Rotation3d());
+
+      }else{
+        transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), new Rotation3d());
+      }
       //Keep track of the closest tag
       if (transform.getTranslation().getNorm() < closestDistance) {
         closestDistance = transform.getTranslation().getNorm();
         closestTag = i;
       }
+      //Pose3d pose = new Pose3d();
       //Pose3d pose = driveSubsystem.get3dOdometry();
-      //Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
-      Pose3d pose = new Pose3d();
-      Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
-      pose = pose.plus(odoTransform);
-      pose = pose.plus(cameraTransform);
-      pose = pose.plus(transform);
+      Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+      //Pose3d pose = new Pose3d();
+      //Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
+      //pose = pose.plus(odoTransform);
+      //pose = pose.plus(cameraTransform);
+      //pose = pose.plus(transform);
       tags.add(new AprilTag(detection.getId(), pose));
     }
     //End of tag proccesing loop
