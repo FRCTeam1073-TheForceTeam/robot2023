@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -84,6 +85,13 @@ public class DriveThroughTrajectory extends CommandBase {
     Transform2d angleDifference = endPose.minus(robotPose);
     double angularVelocity = -0.4 * angleDifference.getRotation().getRadians();;
     //double angularVelocity = difference.getRotation().getRadians();
+
+    SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
+    SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
+    SmartDashboard.putNumber("Difference X", difference.getX());
+    SmartDashboard.putNumber("Difference y", difference.getY());
+    SmartDashboard.putNumber("Time", time);
+
 
     if(xVelocity > maxVelocity){
       xVelocity = maxVelocity;
