@@ -13,12 +13,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class OpenMV extends SubsystemBase {
 
   // The target output from OpenMV
+  // TODO: needs to output target positions in robot coordinates
   public class Target{
     public String type;
     public int imagex = 0;
     public int imagey = 0;
     public double confidence = 0.0;
     public double area = 0.0;
+    public double targetx = 0.0; // target position in robot coordinates
+    public double targety = 0.0; // target position in robot coordinates
   }
 
   private SerialPort port;
@@ -79,6 +82,9 @@ public class OpenMV extends SubsystemBase {
           t.imagey = Integer.parseInt(fields[index +2]);
           t.confidence = Double.parseDouble(fields[index +3]);
           t.area = Double.parseDouble(fields[index +4]);
+          // TODO: add conversion to robot coordinates
+          t.targetx = (240 - t.imagey)/200;
+          t.targety = (320 - t.imagex)/300;
           targets.add(t);
         }
         lastUpdateTime = Timer.getFPGATimestamp(); // Update last valid time since we have a packet.
