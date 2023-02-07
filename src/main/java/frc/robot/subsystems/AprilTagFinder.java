@@ -46,7 +46,7 @@ public class AprilTagFinder extends SubsystemBase {
     AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 1385/1.75, 1385/1.75, 320, 240);
     poseEstimator = new AprilTagPoseEstimator(config);
     tags = new ArrayList<AprilTag>();
-    cameraTransform = new Transform3d(new Translation3d(0.1143, -0.1397, 0.51435), new Rotation3d(0, Math.PI/2.0, 0)); //location of the camera in robot cordinates
+    cameraTransform = new Transform3d(new Translation3d(0.1143, -0.1397, 0.51435), new Rotation3d(0, 0, 0)); //location of the camera in robot cordinates
     //cameraTransform = new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, Math.PI/2.0, 0)); //location of the camera in robot cordinates
     //cameraTransform = new Transform3d();
   }
@@ -140,7 +140,7 @@ public class AprilTagFinder extends SubsystemBase {
     
   }
 
-  
+
   public ArrayList<AprilTag> getTags(){
     return tags;
   }
