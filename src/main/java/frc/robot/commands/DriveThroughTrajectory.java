@@ -78,13 +78,13 @@ public class DriveThroughTrajectory extends CommandBase {
   public void execute() {
     robotPose = drivetrain.getOdometry();
     Trajectory.State state = trajectory.sample(time);
-    Transform2d difference = robotPose.minus(state.poseMeters);
+    Transform2d difference = state.poseMeters.minus(robotPose);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
 
-    Transform2d angleDifference = endPose.minus(robotPose);
-    double angularVelocity = -0.4 * angleDifference.getRotation().getRadians();;
-    //double angularVelocity = difference.getRotation().getRadians();
+    //Transform2d angleDifference = endPose.minus(robotPose);
+    //double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
+    double angularVelocity = 0.4 * difference.getRotation().getRadians();
 
     SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
     SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
@@ -125,14 +125,17 @@ public class DriveThroughTrajectory extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+    drivetrain.setChassisSpeeds(chassisSpeeds);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     var error = endPose.minus(robotPose);
-    if (error.getTranslation().getNorm()< distanceTolerance && error.getRotation().getRadians() < angleTolerance) {
-      System.out.println("DriveToPoint Is Finished");
+    if (error.getTranslation().getNorm()< distanceTolerance && Math.abs(error.getRotation().getRadians()) < angleTolerance) {
+      System.out.println("DriveThroughPoint Is Finished");
       return true;
     }
     return false;
