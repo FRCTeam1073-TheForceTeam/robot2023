@@ -99,11 +99,11 @@ public class AprilTagFinder extends SubsystemBase {
       Transform3d transform = poseEstimator.estimate(detection);
       if (transform.getZ() < 0.0){
         transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
-        new Rotation3d(-transform.getRotation().getZ(), transform.getRotation().getX(), transform.getRotation().getY()));
+        new Rotation3d(transform.getRotation().getX(), 1 + transform.getRotation().getZ(), -transform.getRotation().getY()));
 
       }else{
         transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
-        new Rotation3d(transform.getRotation().getZ(), -transform.getRotation().getX(), -transform.getRotation().getY()));
+        new Rotation3d(-transform.getRotation().getX(), -transform.getRotation().getZ(), Math.PI + transform.getRotation().getY()));
       }
       //Keep track of the closest tag
       if (transform.getTranslation().getNorm() < closestDistance) {
