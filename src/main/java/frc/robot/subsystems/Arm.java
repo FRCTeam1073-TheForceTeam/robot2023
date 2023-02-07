@@ -26,16 +26,17 @@ public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
   //set variables below to correct lengths
-  public final double upperArm = 0.0;
-  public final double foreArm = 0.0;
-  public final double upperArmAngleOffset = 0.0;
-  public final double foreArmAngleOffset = 0.0;
+  public final double upperArmLength = 0.0;
+  public final double forearmLength = 0.0;
+  public final double shoulderOffset = 0.0;
+  public final double elbowOffset = 0.0;
 
   public class JointPositions{
     double shoulder;
     double elbow;
 
     public JointPositions(double shoulderAng, double elbowAng){
+      //showing angles in relation to the flat robot chassis and not the angle between two arm segments
       shoulder = shoulderAng;
       elbow = elbowAng;
     }
@@ -169,8 +170,10 @@ public class Arm extends SubsystemBase{
 
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
-    //sensor angles should be divided by te appropriate ticks per radian
-    return new JointPositions(shoulderMotor.getSelectedSensorPosition()/1000, elbowMotor.getSelectedSensorPosition()/1000);
+    //sensor angles should be divided by the appropriate ticks per radian
+    double shoulderRawAngle = shoulderMotor.getSelectedSensorPosition()/1000;
+    double elbowRawAngle = elbowMotor.getSelectedSensorPosition()/1000; 
+    return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
   }
 
   // This method returns the maximum angles of joints
@@ -197,11 +200,35 @@ public class Arm extends SubsystemBase{
 
   // This method returns the position of claw given different joint angles
   public CartesianPosition getCartesianPosition(JointPositions positions){
-    return null;
+    CartesianPosition cartesianPosition = new CartesianPosition();
+    cartesianPosition.x = (Math.cos(positions.elbow) * forearmLength) + (Math.cos(positions.shoulder) * upperArmLength);
+    cartesianPosition.z = (Math.sin(positions.elbow) * forearmLength) + (Math.sin(positions.shoulder) * upperArmLength);
+    cartesianPosition.pitch = getJointAngles().elbow + getJointAngles().shoulder;
+    return cartesianPosition;
   }
 
   // This method returns the joint angles given a position of the claw
   public JointPositions getInverseKinematics(CartesianPosition clawPose){
-    return null;
+    double x = clawPose.x;
+    double z = clawPose.z;
+    JointPositions poses = new JointPositions(0, 0);
+    double elbowAngle = Math.acos((Math.pow(x, 2) + Math.pow(z, 2) - Math.pow(upperArmLength, 2) - Math.pow(forearmLength, 2))/
+      (2 * upperArmLength * forearmLength));
+    double shoulderAngle = Math.atan(z/x) - Math.atan((forearmLength * Math.sin(elbowAngle))/
+      (upperArmLength + forearmLength * Math.cos(elbowAngle)));
+
+    return new JointPositions(shoulderAngle, elbowAngle + shoulderAngle);
+  }
+
+  public JointPositions getInverseKinematicsForElbowUp(CartesianPosition clawPose){
+    double x = clawPose.x;
+    double z = clawPose.z;
+    JointPositions poses = new JointPositions(0, 0);
+    double elbowAngle = - Math.acos((Math.pow(x, 2) + Math.pow(z, 2) - Math.pow(upperArmLength, 2) - Math.pow(forearmLength, 2))/
+      (2 * upperArmLength * forearmLength));
+    double shoulderAngle = Math.atan(z/x) + Math.atan((forearmLength * Math.sin(elbowAngle))/
+      (upperArmLength + forearmLength * Math.cos(elbowAngle)));
+
+    return new JointPositions(shoulderAngle, elbowAngle + shoulderAngle);
   }
 }
