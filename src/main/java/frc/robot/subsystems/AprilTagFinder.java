@@ -98,10 +98,12 @@ public class AprilTagFinder extends SubsystemBase {
       //AprilTagPoseEstimate poseEstimate = poseEstimator.estimateOrthogonalIteration(detection, 50);
       Transform3d transform = poseEstimator.estimate(detection);
       if (transform.getZ() < 0.0){
-        transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), new Rotation3d());
+        transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
+        new Rotation3d(-transform.getRotation().getZ(), transform.getRotation().getX(), transform.getRotation().getY()));
 
       }else{
-        transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), new Rotation3d());
+        transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
+        new Rotation3d(transform.getRotation().getZ(), -transform.getRotation().getX(), -transform.getRotation().getY()));
       }
       //Keep track of the closest tag
       if (transform.getTranslation().getNorm() < closestDistance) {
@@ -110,13 +112,18 @@ public class AprilTagFinder extends SubsystemBase {
       }
       //Pose3d pose = new Pose3d();
       //Pose3d pose = driveSubsystem.get3dOdometry();
-      Pose3d pose = new Pose3d(transform.getTranslation(), transform.getRotation());
+      Pose3d tagPose = new Pose3d(cameraTransform.getTranslation(), cameraTransform.getRotation());
+      //Pose3d tagPose = new Pose3d(transform.getTranslation(), transform.getRotation());
       //Pose3d pose = new Pose3d();
       //Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
+      
+      tagPose = tagPose.plus(transform);
+      //tagPose = tagPose.plus(cameraTransform);
       //pose = pose.plus(odoTransform);
-      pose = pose.plus(cameraTransform);
+
       //pose = pose.plus(transform);
-      tags.add(new AprilTag(detection.getId(), pose));
+      tags.add(new AprilTag(detection.getId(), tagPose));
+
     }
     //End of tag proccesing loop
     SmartDashboard.putNumber("AprilTag.numTags", numTags);
@@ -126,11 +133,14 @@ public class AprilTagFinder extends SubsystemBase {
       SmartDashboard.putNumber("Closest X", tags.get(closestTag).pose.getX());
       SmartDashboard.putNumber("Closest Y", tags.get(closestTag).pose.getY());
       SmartDashboard.putNumber("Closest Z", tags.get(closestTag).pose.getZ());
+      SmartDashboard.putNumber("Tag Rotation X", tags.get(closestTag).pose.getRotation().getX());
+      SmartDashboard.putNumber("Tag Rotation Y", tags.get(closestTag).pose.getRotation().getY());
+      SmartDashboard.putNumber("Tag Rotation Z", tags.get(closestTag).pose.getRotation().getZ());
     }
     
   }
 
-
+  
   public ArrayList<AprilTag> getTags(){
     return tags;
   }
