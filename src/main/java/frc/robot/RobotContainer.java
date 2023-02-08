@@ -78,9 +78,9 @@ public class RobotContainer {
 
   //test making last y negative and see results
     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-      waypoints.add(new Pose2d(2.7, -0.28, new Rotation2d()));
-      waypoints.add(new Pose2d(4.3, -1.45, new Rotation2d()));
-      waypoints.add(new Pose2d(4.8, 2.7, new Rotation2d(3)));
+      waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
+      waypoints.add(new Pose2d(1.0, 1.0, new Rotation2d()));
+      waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d(3)));
     return new SequentialCommandGroup(
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
       0.8, 0.5, 0.5)
