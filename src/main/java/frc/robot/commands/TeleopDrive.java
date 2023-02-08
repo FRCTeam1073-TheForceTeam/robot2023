@@ -6,6 +6,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+//import javax.lang.model.util.ElementScanner14;
+
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -89,17 +94,17 @@ public class TeleopDrive extends CommandBase
     }
     else if (fieldCentric){
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        leftY * velocityMult,
-        leftX * velocityMult, 
-        rightX * rotateMult,
+        -leftY * velocityMult,
+        -leftX * velocityMult, 
+        -rightX * rotateMult,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
     else{
       ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-      chassisSpeeds.vxMetersPerSecond = leftY * velocityMult; 
-      chassisSpeeds.vyMetersPerSecond = leftX * velocityMult; 
-      chassisSpeeds.omegaRadiansPerSecond = rightX * rotateMult;
+      chassisSpeeds.vxMetersPerSecond = -leftY * velocityMult; 
+      chassisSpeeds.vyMetersPerSecond = -leftX * velocityMult; 
+      chassisSpeeds.omegaRadiansPerSecond = -rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
   }

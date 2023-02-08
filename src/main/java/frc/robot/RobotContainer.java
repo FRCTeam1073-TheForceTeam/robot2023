@@ -5,24 +5,23 @@
 package frc.robot;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveThroughTrajectory;
-import frc.robot.commands.DriveToPoint;
+import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
+import frc.robot.subsystems.OpenMV;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.AprilTagDetection;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
@@ -34,11 +33,14 @@ public class RobotContainer {
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_Bling = new Bling();
-  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
+  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder(m_driveSubsystem);
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();
+  private final Engage m_Engage = new Engage(m_driveSubsystem, 0.25);
   
+  private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
+
   public RobotContainer() {
 
     // Configure Button Bindings
@@ -52,7 +54,7 @@ public class RobotContainer {
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
-    AprilTagFinder.initPreferences();
+    AprilTagDetection.initPreferences();
     Arm.initPreferences();
     Claw.initPreferences();
     Bling.initPreferences();
@@ -74,12 +76,16 @@ public class RobotContainer {
       //new DriveToPoint(m_driveSubsystem, new Pose2d(0, 0, new Rotation2d()), .5, .5)
       ); //returns robot position and angle to zero
   }*/
-    ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
-      waypoints.add(new Translation2d(3.4, -.6));
-      waypoints.add(new Translation2d(5, -0.7));
+
+  //test making last y negative and see results
+    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+      waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
+      waypoints.add(new Pose2d(1.0, 1.0, new Rotation2d()));
+      waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d(3)));
     return new SequentialCommandGroup(
-      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints,
-        new Pose2d(4.7, 1.7, new Rotation2d(3)), 1, 0.8, 0.5, 0.7)
+      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
+      0.8, 0.5, 0.5)
     );
+    //return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
   }
 }

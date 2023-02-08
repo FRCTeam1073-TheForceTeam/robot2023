@@ -149,7 +149,7 @@ public class SwerveModule
     public void setDriveVelocity(double driveVelocity)
     {
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
-        driveMotor.set(ControlMode.Velocity, driveVelocity * cfg.tickPerMeter / 10.0);
+        driveMotor.set(ControlMode.Velocity, -driveVelocity * cfg.tickPerMeter / 10.0);
     }
 
     //setSteerAngle in radians
