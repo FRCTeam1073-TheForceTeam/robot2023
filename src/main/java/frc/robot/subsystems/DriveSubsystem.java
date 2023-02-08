@@ -8,7 +8,9 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -33,7 +35,7 @@ public class DriveSubsystem extends SubsystemBase
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
   {
-    pigeon2 = new Pigeon2(9);
+    pigeon2 = new Pigeon2(13);
     var error = pigeon2.configFactoryDefault();
     if (error != ErrorCode.OK) {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
@@ -45,8 +47,8 @@ public class DriveSubsystem extends SubsystemBase
     modulePositions = new SwerveModulePosition[4];
 
     //front left
-    SwerveModuleIDConfig moduleIDConfig = new SwerveModuleIDConfig(43, 28, 14);
-    // moduleIDConfig.driveMotorID = 43; // moduleIDConfig.steerMotorID = 28; // moduleIDConfig.steerEncoderID = 14;
+    SwerveModuleIDConfig moduleIDConfig = new SwerveModuleIDConfig(9, 5, 1);
+    // moduleIDConfig.driveMotorID = 9; // moduleIDConfig.steerMotorID = 5; // moduleIDConfig.steerEncoderID = 1;
 
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 0;
@@ -57,8 +59,8 @@ public class DriveSubsystem extends SubsystemBase
     modulePositions[0] = new SwerveModulePosition();
 
     //front right
-    moduleIDConfig = new SwerveModuleIDConfig(38, 33, 11);
-    // moduleIDConfig.driveMotorID = 38; // moduleIDConfig.steerMotorID = 33; // moduleIDConfig.steerEncoderID = 11;
+    moduleIDConfig = new SwerveModuleIDConfig(10, 6, 2);
+    // moduleIDConfig.driveMotorID = 10; // moduleIDConfig.steerMotorID = 6; // moduleIDConfig.steerEncoderID = 2;
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 1;
@@ -69,8 +71,8 @@ public class DriveSubsystem extends SubsystemBase
     modulePositions[1] = new SwerveModulePosition();
 
     //back left
-    moduleIDConfig = new SwerveModuleIDConfig(39, 47, 12);
-    // moduleIDConfig.driveMotorID = 39; // moduleIDConfig.steerMotorID = 47; // moduleIDConfig.steerEncoderID = 12;
+    moduleIDConfig = new SwerveModuleIDConfig(11, 7, 3);
+    // moduleIDConfig.driveMotorID = 11; // moduleIDConfig.steerMotorID = 7; // moduleIDConfig.steerEncoderID = 3;
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 2;
@@ -81,8 +83,8 @@ public class DriveSubsystem extends SubsystemBase
     modulePositions[2] = new SwerveModulePosition();
 
     //back right
-    moduleIDConfig = new SwerveModuleIDConfig(26, 40, 10);
-    // moduleIDConfig.driveMotorID = 26; // moduleIDConfig.steerMotorID = 40; // moduleIDConfig.steerEncoderID = 10;
+    moduleIDConfig = new SwerveModuleIDConfig(12, 8, 4);
+    // moduleIDConfig.driveMotorID = 12; // moduleIDConfig.steerMotorID = 8; // moduleIDConfig.steerEncoderID = 4;
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 3;
     moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.217), -Preferences.getDouble("Drive.ModulePositions", 0.217));
@@ -151,6 +153,9 @@ public class DriveSubsystem extends SubsystemBase
 
   // Set the commanded chassis speeds for the drive subsystem.
   public void setChassisSpeeds(ChassisSpeeds speeds){
+    SmartDashboard.putNumber("ChassisSpeed x", speeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("ChassisSpeed y", speeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("ChassisSpeed rotation", speeds.omegaRadiansPerSecond);
     chassisSpeeds = speeds;
   }
 
@@ -182,6 +187,10 @@ public class DriveSubsystem extends SubsystemBase
     modules[3].setBrake(brakeOn);
   }
 
+  public SwerveDriveKinematics getKinematics(){
+    return kinematics;
+  }
+
   public void updateOdometry() {
     modules[0].updatePosition(modulePositions[0]);
     modules[1].updatePosition(modulePositions[1]);
@@ -198,16 +207,23 @@ public class DriveSubsystem extends SubsystemBase
     return new Pose2d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(), Rotation2d.fromDegrees(getHeading()));
   }
 
+  public Pose3d get3dOdometry(){
+    // return odometry position as a pose 3d
+    Pose2d odo = getOdometry();
+    //TODO: use internal roll and pitch methods later
+    return new Pose3d(odo.getX(), odo.getY(), 0.0, new Rotation3d(pigeon2.getRoll(), pigeon2.getPitch(), getHeading()));
+  }
+  
   @Override
   public void periodic(){
     if (! debug){
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
-      states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      states[3] = optimizeB(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+      //states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
+      //states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
+      //states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
+      //states[3] = optimizeB(states[3], new Rotation2d(modules[3].getSteeringAngle()));
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);

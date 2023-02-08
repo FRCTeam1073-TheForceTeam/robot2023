@@ -94,17 +94,17 @@ public class TeleopDrive extends CommandBase
     }
     else if (fieldCentric){
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        leftY * velocityMult,
-        leftX * velocityMult, 
-        rightX * rotateMult,
+        -leftY * velocityMult,
+        -leftX * velocityMult, 
+        -rightX * rotateMult,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
     else{
       ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-      chassisSpeeds.vxMetersPerSecond = leftY * velocityMult; 
-      chassisSpeeds.vyMetersPerSecond = leftX * velocityMult; 
-      chassisSpeeds.omegaRadiansPerSecond = rightX * rotateMult;
+      chassisSpeeds.vxMetersPerSecond = -leftY * velocityMult; 
+      chassisSpeeds.vyMetersPerSecond = -leftX * velocityMult; 
+      chassisSpeeds.omegaRadiansPerSecond = -rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
   }
