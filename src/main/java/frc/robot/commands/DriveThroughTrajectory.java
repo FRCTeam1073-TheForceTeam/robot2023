@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
@@ -63,6 +64,8 @@ public class DriveThroughTrajectory extends CommandBase {
     this.maxAngularVelocity = maxAngularVelocity;
     this.alpha = alpha;
     trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
+    //trajectoryCfg.addConstraint(new SwerveDriveKinematicsConstraint(drivetrain.getKinematics(), 2.0));
+    trajectoryCfg.setKinematics(drivetrain.getKinematics());
     trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
     addRequirements(ds);
   }
@@ -78,7 +81,7 @@ public class DriveThroughTrajectory extends CommandBase {
   public void execute() {
     robotPose = drivetrain.getOdometry();
     Trajectory.State state = trajectory.sample(time);
-    Transform2d difference = state.poseMeters.minus(robotPose);
+    Transform2d difference = new Transform2d(robotPose, state.poseMeters);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
 
@@ -88,6 +91,7 @@ public class DriveThroughTrajectory extends CommandBase {
 
     SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
     SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
+    SmartDashboard.putNumber("Trajectory theta", state.poseMeters.getRotation().getDegrees());
     SmartDashboard.putNumber("Difference X", difference.getX());
     SmartDashboard.putNumber("Difference y", difference.getY());
     SmartDashboard.putNumber("Time", time);
