@@ -83,14 +83,18 @@ public class Arm extends SubsystemBase{
     private TrajectoryConfig trajectoryConfig;
     private PolynomialSplineFunction elbowSplines;
     private PolynomialSplineFunction shoulderSplines;
+    double[] elbowPositions;
+    double[] shoulderPositions;
+    double[] times;
+
 
     public ArmTrajectory(ArrayList<JointWaypoints> waypoints, double maxVelocity, double maxAcceleration){
       this.waypoints = waypoints;
       trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
       var interpolator = new SplineInterpolator();
-      double[] elbowPositions = new double[waypoints.size()];
-      double[] shoulderPositions = new double[waypoints.size()];
-      double[] times = new double[waypoints.size()];
+      elbowPositions = new double[waypoints.size()];
+      shoulderPositions = new double[waypoints.size()];
+      times = new double[waypoints.size()];
 
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i] = waypoints.get(i).elbow;
@@ -101,15 +105,27 @@ public class Arm extends SubsystemBase{
       elbowSplines = interpolator.interpolate(elbowPositions, times);
       shoulderSplines = interpolator.interpolate(shoulderPositions, times);
     }
-/* 
-    public double getTimeForMotion(){
-      
+ /* 
+    public double getTimeForMotion(double[] singularJoint){
+      double difference = Math.abs(singularJoint[0] - singularJoint[shoulderPositions.length]);
+      double time = trajectoryConfig.getMaxVelocity()/trajectoryConfig.getMaxAcceleration();
+      time += difference/trajectoryConfig.getMaxVelocity();
+      time += trajectoryConfig.getMaxVelocity()/trajectoryConfig.getMaxAcceleration();
+      return time;
     }
-
+/* 
     public double timeBetweenPoints(JointPositions firstPoint, JointPositions secondPoint){
 
     }
 */
+    public JointVelocities getVelocityAtTime(double time){
+      //get derivative of elbow spline
+      double elbowVelocity = elbowSplines.derivative().value(time);
+      //get derivative of shoulder spline
+      double shoulderVelocity = shoulderSplines.derivative().value(time);
+      return new JointVelocities(shoulderVelocity, elbowVelocity);
+    }
+
     public JointPositions getTrajectoryAtTime(double time){
       //placeholder for joint angles
       return new JointPositions(shoulderSplines.value(time), elbowSplines.value(time));
@@ -211,11 +227,12 @@ public class Arm extends SubsystemBase{
   public JointPositions getInverseKinematics(CartesianPosition clawPose){
     double x = clawPose.x;
     double z = clawPose.z;
-    JointPositions poses = new JointPositions(0, 0);
+    //JointPositions poses = new JointPositions(0, 0);
     double elbowAngle = Math.acos((Math.pow(x, 2) + Math.pow(z, 2) - Math.pow(upperArmLength, 2) - Math.pow(forearmLength, 2))/
       (2 * upperArmLength * forearmLength));
     double shoulderAngle = Math.atan(z/x) - Math.atan((forearmLength * Math.sin(elbowAngle))/
       (upperArmLength + forearmLength * Math.cos(elbowAngle)));
+      elbowAngle -= shoulderAngle;
 
     return new JointPositions(shoulderAngle, elbowAngle + shoulderAngle);
   }
@@ -223,7 +240,7 @@ public class Arm extends SubsystemBase{
   public JointPositions getInverseKinematicsForElbowUp(CartesianPosition clawPose){
     double x = clawPose.x;
     double z = clawPose.z;
-    JointPositions poses = new JointPositions(0, 0);
+    //JointPositions poses = new JointPositions(0, 0);
     double elbowAngle = - Math.acos((Math.pow(x, 2) + Math.pow(z, 2) - Math.pow(upperArmLength, 2) - Math.pow(forearmLength, 2))/
       (2 * upperArmLength * forearmLength));
     double shoulderAngle = Math.atan(z/x) + Math.atan((forearmLength * Math.sin(elbowAngle))/
