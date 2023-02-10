@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -21,8 +22,8 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveThroughTrajectory extends CommandBase {
   /** Creates a new DriveThroughTrajectory. */
-  double distanceTolerance = 0.1;
-  double angleTolerance = 0.05;
+  double distanceTolerance = 0.4;
+  double angleTolerance = 0.1;
 
   DriveSubsystem drivetrain;
   Pose2d startPose;
@@ -85,9 +86,9 @@ public class DriveThroughTrajectory extends CommandBase {
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
 
-    //Transform2d angleDifference = endPose.minus(robotPose);
-    //double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
-    double angularVelocity = 0.4 * difference.getRotation().getRadians();
+    Transform2d angleDifference = endPose.minus(robotPose);
+    double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
+    //double angularVelocity = 0.4 * difference.getRotation().getRadians();
 
     SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
     SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
@@ -96,7 +97,10 @@ public class DriveThroughTrajectory extends CommandBase {
     SmartDashboard.putNumber("Difference y", difference.getY());
     SmartDashboard.putNumber("Time", time);
 
-
+    xVelocity = MathUtil.clamp(xVelocity, -maxVelocity, maxVelocity);
+    yVelocity = MathUtil.clamp(yVelocity, -maxVelocity, maxVelocity);
+    angularVelocity = MathUtil.clamp(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+/* 
     if(xVelocity > maxVelocity){
       xVelocity = maxVelocity;
     }
@@ -115,7 +119,7 @@ public class DriveThroughTrajectory extends CommandBase {
     if(angularVelocity < -maxAngularVelocity){
       angularVelocity = -maxAngularVelocity;
     }
-
+*/
     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
     Rotation2d.fromDegrees(drivetrain.getHeading()));
     drivetrain.setChassisSpeeds(chassisSpeeds);
@@ -137,11 +141,16 @@ public class DriveThroughTrajectory extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    var error = endPose.minus(robotPose);
+    var error = robotPose.minus(endPose);
+     
     if (error.getTranslation().getNorm()< distanceTolerance && Math.abs(error.getRotation().getRadians()) < angleTolerance) {
       System.out.println("DriveThroughPoint Is Finished");
       return true;
     }
+    /*
+    if(time >= trajectory.getTotalTimeSeconds()){
+      return true;
+    }*/
     return false;
   }
 }
