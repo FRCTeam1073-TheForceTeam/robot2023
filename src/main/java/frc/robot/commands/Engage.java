@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class Engage extends CommandBase {
+public class Engage extends CommandBase 
+{
   /** Creates a new Engage. */
-
+  PersistentParkingBrake brake;
   int drivePhase; //start, drive, climb, stop
   double distanceTolerance = 0.1;
   double angleTolerance = 0.05;
@@ -37,6 +38,7 @@ public class Engage extends CommandBase {
   @Override
   public void initialize() {
     drivePhase = 0; //starts  moving
+    brake = new PersistentParkingBrake(drivetrain);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -67,8 +69,10 @@ public class Engage extends CommandBase {
       }
     }
 
-    if(drivePhase == 2){
-      drivetrain.parkingBrake();
+    if(drivePhase == 2)
+    {
+      //drivetrain.parkingBrake();
+      brake.execute();
       //drivePhase = 3;
     }
   }
