@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import javax.lang.model.util.ElementScanner14;
@@ -44,10 +45,11 @@ public class TeleopDrive extends CommandBase
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute(){
+  public void execute()
+  {
     double velocityMult = maximumLinearVelocity;
     double rotateMult = maximumRotationVelocity;
-
+    SmartDashboard.putNumber("POV", m_OI.getPOVButton());
     if (m_OI.getLeftBumper()){
       velocityMult *= 0.5; // 50% maximum speed
       rotateMult *= 0.5;
@@ -107,6 +109,8 @@ public class TeleopDrive extends CommandBase
       chassisSpeeds.omegaRadiansPerSecond = -rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     }
+    
+    
   }
 
   // Called once the command ends or is interrupted.

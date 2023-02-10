@@ -72,6 +72,9 @@ public class Engage extends CommandBase
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(maxLinearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
       drivetrain.setChassisSpeeds(chassisSpeeds);
       //drivetrain.parkingBrake();
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {}
       if (Math.abs(drivetrain.getPitch()) < 2)
       {
         drivePhase = 3;
