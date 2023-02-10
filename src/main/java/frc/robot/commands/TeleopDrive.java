@@ -21,6 +21,10 @@ import frc.robot.subsystems.OI;
 
 public class TeleopDrive extends CommandBase 
 {
+  double angleTolerance = 0.05;
+  ChassisSpeeds chassisSpeeds;
+  Pose2d targetRotation;
+  Pose2d robotRotation;
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
   private boolean fieldCentric;
@@ -57,7 +61,14 @@ public class TeleopDrive extends CommandBase
     else if (m_OI.getRightBumper()){
       velocityMult *= 1.0; // Maximum speed
       rotateMult *= 1.0;
-    } else {
+    }
+    else if (m_OI.getPOVButton() == 90) {
+      robotRotation = m_driveSubsystem.getOdometry();
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(maximumLinearVelocity, 0, 0, Rotation2d.fromDegrees(m_driveSubsystem.getHeading()));
+      m_driveSubsystem.setChassisSpeeds(chassisSpeeds);
+
+    }
+    else {
       velocityMult *= 0.1;  // 10% maximum speed.
       rotateMult *= 0.1;
     }
