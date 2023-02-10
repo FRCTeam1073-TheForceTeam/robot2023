@@ -21,12 +21,7 @@ import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
 import frc.robot.subsystems.OpenMV;
 import frc.robot.subsystems.SwerveModule;
-<<<<<<< HEAD
-//import frc.robot.subsystems.AprilTagDetection;
-=======
-import frc.robot.subsystems.AprilTagDetection;
 import frc.robot.subsystems.AprilTagFinder;
->>>>>>> main
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.Claw;
@@ -37,11 +32,7 @@ public class RobotContainer {
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_Bling = new Bling();
-<<<<<<< HEAD
-  //private final AprilTagDetection m_AprilTagDetection = new AprilTagDetection();
-=======
   private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder(m_driveSubsystem);
->>>>>>> main
   private final Arm m_Arm = new Arm();
   private final Underglow m_Underglow = new Underglow();
   private final Claw m_Claw = new Claw();

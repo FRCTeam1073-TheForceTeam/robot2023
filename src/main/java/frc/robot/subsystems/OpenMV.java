@@ -22,6 +22,7 @@ public class OpenMV extends SubsystemBase {
     public double area = 0.0;
     public double targetx = 0.0; // target position in robot coordinates
     public double targety = 0.0; // target position in robot coordinates
+    public double targetAngle = 0.0; // target angle in robot coordinates
   }
 
   private SerialPort port;
@@ -29,6 +30,14 @@ public class OpenMV extends SubsystemBase {
   private int counter = 0;
   private ArrayList<Target> targets;
   private String leftover;
+  private double focalLength = 0.0028; // 2.8 * 10^-3 meters
+  private double pixelSizeX = 0.000011; // 11 μm, 1.1 * 10^-5
+  private double pixelSizeY = 0.000011; // 11 μm, 1.1 * 10^-5
+  private int resolutionX = 320;
+  private int resolutionY = 240; // divide by 2 to find bottom half (ground)
+  private double yOfPixels;
+  private double xOfPixels;
+  private double mountHeight;
 
   /** Creates a new OpenMV interface on given serial port. */
   public OpenMV(SerialPort.Port p) {
@@ -73,19 +82,33 @@ public class OpenMV extends SubsystemBase {
       if (fields.length% 5 != 0){
         System.out.println("Invalid OpenMV Message!");
         return false;
-      }else {
+      }
+      else {
         // System.out.println("Valid OpenMV Message");
         for (int index = 0; index < fields.length; index += 5) {
-          Target t = new Target();
-          t.type = fields[index];
-          t.imagex = Integer.parseInt(fields[index +1]);
-          t.imagey = Integer.parseInt(fields[index +2]);
-          t.confidence = Double.parseDouble(fields[index +3]);
-          t.area = Double.parseDouble(fields[index +4]);
-          // TODO: add conversion to robot coordinates
-          t.targetx = (240 - t.imagey)/200;
-          t.targety = (320 - t.imagex)/300;
-          targets.add(t);
+          if(Integer.parseInt(fields[index +2]) >= resolutionY/2) //if image is on bottom half of pixels...
+          {
+            Target t = new Target();
+            t.type = fields[index];
+            t.imagex = Integer.parseInt(fields[index +1]);
+            t.imagey = Integer.parseInt(fields[index +2]);
+            t.confidence = Double.parseDouble(fields[index +3]);
+            t.area = Double.parseDouble(fields[index +4]);
+
+            // conversion to robot coordinates (x distance)
+            yOfPixels = (t.imagey - (resolutionY/2))*pixelSizeY; 
+            t.targetx = (mountHeight * focalLength)/yOfPixels; 
+            // TODO: account for type of game piece and subtract length from middle to ground point
+  
+            // conversion to robot coordinate (angle)
+            xOfPixels = (t.imagex - (resolutionX/2))*pixelSizeX;
+            t.targetAngle = Math.atan(focalLength/xOfPixels);
+  
+            // conversion to robot coordinates (y distance)
+            t.targety = t.targetx * Math.tan(t.targetAngle);
+            targets.add(t);
+          }
+          
         }
         lastUpdateTime = Timer.getFPGATimestamp(); // Update last valid time since we have a packet.
         return true;
