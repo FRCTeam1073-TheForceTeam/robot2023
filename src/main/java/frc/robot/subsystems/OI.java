@@ -125,6 +125,14 @@ public class OI extends SubsystemBase
 
     //-------Driver Controller below
 
+    public double getDriverRightTrigger(){
+        return driverController.getRawAxis(3);
+    }
+
+    public double getDriverLeftTrigger(){
+        return driverController.getRawAxis(2);
+    }
+
     public boolean getLeftBumper()
     {
         return driverController.getRawButton(5);
