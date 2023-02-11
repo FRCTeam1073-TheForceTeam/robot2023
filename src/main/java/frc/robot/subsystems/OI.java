@@ -182,6 +182,14 @@ public class OI extends SubsystemBase
         return operatorController.getRawButton(1);
     }
 
+    public boolean getOperatorYButton(){
+        return operatorController.getRawButton(4);
+    }
+
+    public boolean getOperatorBButton(){
+        return operatorController.getRawButton(2);
+    }
+
     // public void setRumble(double val){
     //     operatorController.setRumble(RumbleType.kLeftRumble, val);
     //     operatorController.setRumble(RumbleType.kRightRumble, val);

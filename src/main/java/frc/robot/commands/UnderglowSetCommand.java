@@ -29,16 +29,11 @@ public class UnderglowSetCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(oi.getRawButton(1))
-    {
+    if(oi.getOperatorXButton()) {
       underglow.setLEDIntensity(0.5, 0, 0);
     }
-    else if(oi.getRawButton(2)){
+    else if(oi.getOperatorAButton()) {
       underglow.setLEDIntensity(0, 0, 1);
-    }
-    else if(oi.getRawButton(3))
-    {
-      underglow.setLEDIntensity(1, 0, 1);
     }
     else
     {

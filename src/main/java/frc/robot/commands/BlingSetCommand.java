@@ -29,16 +29,12 @@ public class BlingSetCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(oi.getRawButton(1))
+    if(oi.getOperatorYButton())
     {
       bling.setRGBAll(255, 0, 0);
     }
-    else if(oi.getRawButton(2)){
+    else if(oi.getOperatorBButton()){
       bling.setRGBAll(0, 255, 0);
-    }
-    else if(oi.getRawButton(3))
-    {
-      bling.setRGBAll(0, 0, 255);
     }
     else
     {
