@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopDrive;
@@ -47,7 +46,6 @@ public class RobotContainer {
     configureBindings();
 
     // Set default commands
-    new JoystickButton(m_OI.driverController, 3);
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
   }
 
