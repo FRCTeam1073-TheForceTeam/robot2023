@@ -36,6 +36,7 @@ public class AprilTagFinder extends SubsystemBase {
   private ArrayList<AprilTag> tags;
   private Transform3d cameraTransform;
   private DriveSubsystem driveSubsystem;
+  private int numTags;
 
   /** Creates a new AprilTag. */
   public AprilTagFinder(DriveSubsystem ds) {
@@ -58,7 +59,7 @@ public class AprilTagFinder extends SubsystemBase {
     Number[] tagData = apriltagEntry.getNumberArray(new Number[0]);
     detections.clear();
     tags.clear();
-    int numTags = tagData.length/23;
+    numTags = tagData.length/23;
     double closestDistance = 9999.0;
     int closestTag = -1;
     for (int i = 0; i < numTags; i = i +1){
@@ -138,6 +139,10 @@ public class AprilTagFinder extends SubsystemBase {
       SmartDashboard.putNumber("Tag Rotation Z", tags.get(closestTag).pose.getRotation().getZ());
     }
     
+  }
+
+  public boolean AnyAprilTagVisible(){
+    return numTags > 0;
   }
 
 

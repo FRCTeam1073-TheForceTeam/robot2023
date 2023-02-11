@@ -22,7 +22,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class AlignToAprilTag extends CommandBase {
   /** Creates a new AlignToAprilTag. */
-  int id;
   ArrayList<Integer> visibleTagIDs; 
   ChassisSpeeds chassisSpeeds;
   DriveSubsystem drivetrain;
@@ -49,13 +48,13 @@ public class AlignToAprilTag extends CommandBase {
 
   //double maxRotationlVelocity;
 
-  public AlignToAprilTag(int aprilTagID, DriveSubsystem drivetrain, double maxVelocity) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, double maxVelocity) {
     // Use addRequirements() here to declare subsystem dependencies.
-    id = aprilTagID;
     this.drivetrain = drivetrain;
     this.maxVelocity = maxVelocity;
     finder = new AprilTagFinder(drivetrain);
     maxAngularSpeed = 0.5;
+    addRequirements(drivetrain);
   }
 
  //   for(int i = 0; i < finder.getVisibleTags().size(); i++){
@@ -68,7 +67,8 @@ public class AlignToAprilTag extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    apriltagConnect = NetworkTableInstance.getDefault().getTable("Vision");
+    apriltagConnect = NetworkTableInstance.getDefault().getTable("SmartDashboard");
+    //if (AprilTagFinder.AnyAprilTagVisible() == true){
     apriltagConnectEntryID = apriltagConnect.getEntry("Closest ID");
     apriltagConnectEntryY = apriltagConnect.getEntry("Closest Y");
     apriltagConnectEntryY = apriltagConnect.getEntry("Tag Rotation Y");
@@ -76,6 +76,12 @@ public class AlignToAprilTag extends CommandBase {
     targetTagID = (int)apriltagConnectEntryID.getDouble(0.0);
     targetTagY = (int)apriltagConnectEntryY.getDouble(0.0);
     initialHeading = drivetrain.getHeading();
+    phase = 0;
+    //}else{
+      //targetTagID = 0;
+     // phase = 3;
+    //}
+    System.out.println("Initialize AlingToAprilTag");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -84,6 +90,7 @@ public class AlignToAprilTag extends CommandBase {
     double difference;
     double heading = drivetrain.getOdometry().getRotation().getDegrees();
     if (phase == 0){
+      //lines the robot up parralel to the grid
       if (drivetrain.getHeading() > 0){
         difference = 180 - heading;
       }else{
@@ -103,6 +110,7 @@ public class AlignToAprilTag extends CommandBase {
     }
     
     if (phase == 1){
+      //Moves sideways until the robot can detect the apriltag again
       if (initialHeading < 0){
         xSpeed = 0;
         ySpeed = .5;
@@ -131,6 +139,7 @@ public class AlignToAprilTag extends CommandBase {
     }
 
     if(phase == 2){
+      //Moves to the center of the tag
       double currentY = apriltagConnectEntryY.getDouble(0.0);
       if(Math.abs(currentY) > 0.05){  
         xSpeed = 0;
