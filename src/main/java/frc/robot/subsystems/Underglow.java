@@ -8,6 +8,7 @@ import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import com.ctre.phoenix.ErrorCode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,7 +22,7 @@ public class Underglow extends SubsystemBase {
   private CANifier canifier;
 
   public Underglow() {
-    canifier = new CANifier(8);
+    canifier = new CANifier(14);
     canifier.configFactoryDefault();
     canifier.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 1000);
   }
@@ -54,9 +55,8 @@ public class Underglow extends SubsystemBase {
   }
 
   public void setLEDIntensity(double redPercent, double greenPercent, double bluePercent){
-    redPercent /= 2;
-    greenPercent /= 2;
-    bluePercent /= 2;
+    redPercent = MathUtil.clamp(redPercent, 0, 1);
+    bluePercent = MathUtil.clamp(bluePercent, 0, 1);
     canifier.setLEDOutput(redPercent, CANifier.LEDChannel.LEDChannelA);
     canifier.setLEDOutput(greenPercent, CANifier.LEDChannel.LEDChannelB);
     canifier.setLEDOutput(bluePercent, CANifier.LEDChannel.LEDChannelC);

@@ -174,7 +174,7 @@ public class OI extends SubsystemBase
     
     public boolean getOperatorXButton()
     {
-        return operatorController.getRawButtonPressed(3);
+        return operatorController.getRawButton(3);
     }
 
     public boolean getOperatorAButton()

@@ -30,7 +30,8 @@ public class UnderglowSetCommand extends CommandBase {
   @Override
   public void execute() {
     if(oi.getOperatorXButton()) {
-      underglow.setLEDIntensity(0.5, 0, 0);
+      underglow.setLEDIntensity(1, 0, 0);
+      System.out.println("pressing X button");
     }
     else if(oi.getOperatorAButton()) {
       underglow.setLEDIntensity(0, 0, 1);
