@@ -41,6 +41,9 @@ public class AlignToAprilTag extends CommandBase {
   int robotYaw;
   double maxAngularSpeed;
   double maxSpeed;
+  double xSpeed;
+  double ySpeed;
+  double angularVelocity;
   int phase = 0;
   double initialHeading;
 
@@ -79,17 +82,21 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void execute() {
     double difference;
+    double heading = drivetrain.getOdometry().getRotation().getDegrees();
     if (phase == 0){
       if (drivetrain.getHeading() > 0){
-        difference = 180 - drivetrain.getHeading();
+        difference = 180 - heading;
       }else{
-        difference = -180 - drivetrain.getHeading();
+        difference = -180 - heading;
       }
 
       if (Math.abs(difference) > .1){
-        double angularVelocity = - 0.8 * difference;
+        angularVelocity = - 0.8 * difference;
         angularVelocity = MathUtil.clamp(angularVelocity, -maxAngularSpeed, maxAngularSpeed);
-
+        xSpeed = 0;
+        ySpeed = 0;
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
       }else{
         phase = 1;
       }
@@ -97,11 +104,46 @@ public class AlignToAprilTag extends CommandBase {
     
     if (phase == 1){
       if (initialHeading < 0){
-        //ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds( -xSpeed, Rotation2d.fromDegrees(drivetrain.getHeading()));
+        xSpeed = 0;
+        ySpeed = .5;
+        angularVelocity = 0;
+        int currentTagID = (int)apriltagConnectEntryID.getDouble(0.0);
+        if (currentTagID != targetTagID){
+          ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
+            drivetrain.setChassisSpeeds(speeds);
+        }else{
+          phase = 2;
+        }
+      }else{
+        xSpeed = 0;
+        ySpeed = -.5;
+        angularVelocity = 0;
+        int currentTagID = (int)apriltagConnectEntryID.getDouble(0.0);
+        if (currentTagID != targetTagID){
+          ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
+            drivetrain.setChassisSpeeds(speeds);
+        }else{
+          phase = 2;
+        }
       }
     }
-  
-    
+
+    if(phase == 2){
+      double currentY = apriltagConnectEntryY.getDouble(0.0);
+      if(Math.abs(currentY) > 0.05){  
+        xSpeed = 0;
+        ySpeed = -currentY * 0.5;
+        angularVelocity = 0;
+        ySpeed = MathUtil.clamp(ySpeed, -0.5, 0.5);
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          0,ySpeed,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+        drivetrain.setChassisSpeeds(speeds);
+      }else{
+        phase = 3;
+      }
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -118,6 +160,7 @@ public class AlignToAprilTag extends CommandBase {
     //if(difference.getY() < tolerance){
       //return true;
     //}
-    return false;
+    return (phase == 3);
+    //return false;
   }
 }
