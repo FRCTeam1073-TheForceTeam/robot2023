@@ -133,6 +133,10 @@ public class DriveSubsystem extends SubsystemBase
     return result;
   }
 
+  public void setDebugMode(boolean debug) {
+    this.debug = debug;
+  }
+
   //Returns IMU heading in degrees
   public double getHeading() {
     return pigeon2.getYaw();
@@ -230,7 +234,9 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
     }
-
+    else { //in debug mode
+      SmartDashboard.putNumber("Module 0 Velocity", modules[0].getDriveRawVelocity());
+    }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
@@ -265,6 +271,13 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].setSteerAngle(angle);
     modules[2].setSteerAngle(angle);
     modules[3].setSteerAngle(angle);
+  }
+
+  public void setDebugDrivePower(double power) {
+    modules[0].setDebugTranslate(power);
+    modules[1].setDebugTranslate(power);
+    modules[2].setDebugTranslate(power);
+    modules[3].setDebugTranslate(power);
   }
 
   public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle){

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopDrive;
@@ -70,7 +71,13 @@ public class RobotContainer {
 
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+  }
+
+  public void setTestMode() {
+    CommandScheduler.getInstance().schedule(new DriveTestCommand(m_driveSubsystem, m_OI));     
+    System.out.println("Test Mode on");
+  }
 
   public Command getAutonomousCommand() {
     //forward = x, backward = -x, left = y, right = -y
