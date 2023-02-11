@@ -4,11 +4,13 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.ErrorCode;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Bling extends SubsystemBase {
@@ -20,26 +22,44 @@ public class Bling extends SubsystemBase {
 
   public boolean cleared;
 
+  public int ledR = 0;
+  public int ledG = 0;
+  public int ledB = 0;
+
   public Bling() {
-    m_led = new AddressableLED(9);
+    m_led = new AddressableLED(0);
     // TODO: change for the actual length
-    m_ledBuffer = new AddressableLEDBuffer(0);//0 as placeholder
+    m_ledBuffer = new AddressableLEDBuffer(24);//0 as placeholder
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
-    slotLength = (int) (m_ledBuffer.getLength() / (1));//1 as placeholder
+    slotLength = (int) (m_ledBuffer.getLength() / (8));//1 as placeholder
+  }
+
+  public void initialize() {
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_led.setData(m_ledBuffer);
+    ledR = (int)SmartDashboard.getNumber("R Value", ledR);
+    ledG = (int)SmartDashboard.getNumber("G Value", ledG);
+    ledB = (int)SmartDashboard.getNumber("B Value", ledB);
+    setRGBAll(ledR, ledG, ledB);
+  }
+
+  public void setRGB(int i, int r, int g, int b)
+  {
+    m_ledBuffer.setRGB(i, r, g, b);
   }
 
   // Initialize preferences for this class:
   public static void initPreferences() {
   
   }
-
+  
   public String getDiagnostics() {
     ErrorCode error;
     String result = new String();
@@ -65,7 +85,7 @@ public class Bling extends SubsystemBase {
 
   public void setLED(int i, int r, int g, int b) {
     m_ledBuffer.setRGB(i, r, g, b);
-    // m_led.setData(m_ledBuffer);
+    m_led.setData(m_ledBuffer);
   }
 
 
@@ -84,7 +104,7 @@ public class Bling extends SubsystemBase {
     for (var i = 0; i < (m_ledBuffer.getLength()); i++) {
       m_ledBuffer.setRGB(i, r, g, b);
     }
-    // m_led.setData(m_ledBuffer);
+    m_led.setData(m_ledBuffer);
   }
 
    // rangeRGB() sets a range of LEDs to one color
@@ -108,6 +128,18 @@ public class Bling extends SubsystemBase {
 
     if (volts > max_volts) {
       volts = max_volts;
+    }
+  }
+
+  public void setRGBAll(int r, int g, int b)
+  {
+    ledR = r;
+    ledG = g;
+    ledB = b;
+
+    for(int i = 0; i < m_ledBuffer.getLength(); i++)
+    {
+      m_ledBuffer.setRGB(i, r, g, b);
     }
   }
 }

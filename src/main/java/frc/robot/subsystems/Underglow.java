@@ -4,14 +4,28 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifierStatusFrame;
 import com.ctre.phoenix.ErrorCode;
 
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+ // Resources:
+  // CANifier - https://docs.ctre-phoenix.com/en/stable/ch12_BringUpCANifier.html
+  // setLEDOutput() - https://store.ctr-electronics.com/content/api/java/html/classcom_1_1ctre_1_1phoenix_1_1_c_a_nifier.html
+
+
 public class Underglow extends SubsystemBase {
   /** Creates a new Underglow. */
-  public Underglow() {}
+  private CANifier canifier;
+
+  public Underglow() {
+    canifier = new CANifier(8);
+    canifier.configFactoryDefault();
+    canifier.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 1000);
+  }
+
 
   @Override
   public void periodic() {
@@ -32,10 +46,19 @@ public class Underglow extends SubsystemBase {
 
   // This method sets the color
   public void setColor(Color8Bit color){
-
+    //canifier.?
   }
 
   public Color8Bit getCurrentColor(){
     return new Color8Bit(0,0,0);
+  }
+
+  public void setLEDIntensity(double redPercent, double greenPercent, double bluePercent){
+    redPercent /= 2;
+    greenPercent /= 2;
+    bluePercent /= 2;
+    canifier.setLEDOutput(redPercent, CANifier.LEDChannel.LEDChannelA);
+    canifier.setLEDOutput(greenPercent, CANifier.LEDChannel.LEDChannelB);
+    canifier.setLEDOutput(bluePercent, CANifier.LEDChannel.LEDChannelC);
   }
 }
