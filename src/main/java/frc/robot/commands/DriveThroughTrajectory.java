@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveThroughTrajectory extends CommandBase {
   /** Creates a new DriveThroughTrajectory. */
+
   double distanceTolerance = 0.4;
   double angleTolerance = 0.1;
 
@@ -67,8 +69,27 @@ public class DriveThroughTrajectory extends CommandBase {
     trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
     //trajectoryCfg.addConstraint(new SwerveDriveKinematicsConstraint(drivetrain.getKinematics(), 2.0));
     trajectoryCfg.setKinematics(drivetrain.getKinematics());
-    trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
+    //trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
+    trajectory = generateTrajectory(posePointList, trajectoryCfg);
     addRequirements(ds);
+  }
+
+  public Trajectory generateTrajectory(ArrayList<Pose2d> waypoints, TrajectoryConfig trajecotryCfg){
+    List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
+    double trajectoryTime = 0;
+    for(int i = 0; i < wayPoints.size(); i++){
+      Trajectory.State ts = new Trajectory.State();
+      ts.poseMeters = waypoints.get(i);
+      ts.timeSeconds = trajectoryTime;
+      ts.velocityMetersPerSecond = trajecotryCfg.getMaxVelocity();
+      ts.curvatureRadPerMeter = 0;
+      ts.accelerationMetersPerSecondSq = 1;
+      traj.add(ts);
+      //update time appropriately
+      trajectoryTime += 1;
+    }
+
+    return new Trajectory(traj);
   }
 
   // Called when the command is initially scheduled.
