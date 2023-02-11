@@ -14,6 +14,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 public class AlignToAprilTag extends CommandBase {
   /** Creates a new AlignToAprilTag. */
@@ -27,6 +31,9 @@ public class AlignToAprilTag extends CommandBase {
   AprilTagFinder finder;
   double tolerance;
   Pose3d difference;
+  private NetworkTable apriltagConnect;
+  private NetworkTableEntry apriltagConnectEntry;
+
   //double maxRotationlVelocity;
 
   public AlignToAprilTag(int aprilTagID, DriveSubsystem drivetrain, double maxVelocity) {
@@ -34,11 +41,15 @@ public class AlignToAprilTag extends CommandBase {
     id = aprilTagID;
     this.drivetrain = drivetrain;
     this.maxVelocity = maxVelocity;
-    finder = new AprilTagFinder();
-    for(int i = 0; i < finder.getVisibleTags().size(); i++){
-      visibleTagIDs.add(finder.getVisibleTags().get(i).ID);
-    }
-    addRequirements(drivetrain);
+    finder = new AprilTagFinder(drivetrain);
+    apriltagConnect = NetworkTableInstance.getDefault().getTable("Vision");
+    apriltagConnectEntry = apriltagConnect.getEntry("Closest ID");
+
+ //   for(int i = 0; i < finder.getVisibleTags().size(); i++){
+ //     visibleTagIDs.add(finder.getVisibleTags().get(i).getId());
+ //   }
+ //   addRequirements(drivetrain);
+
   }
 
   // Called when the command is initially scheduled.
