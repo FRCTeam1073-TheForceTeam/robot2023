@@ -10,17 +10,20 @@ public class OI extends SubsystemBase
 
 
     public Joystick driverController;
+    public Joystick operatorController;
 
 
 
     public OI() 
     {
         driverController = new Joystick(0);
+        operatorController = new Joystick(1);
         LEFT_X_ZERO = 0;
         LEFT_Y_ZERO = 0;
         RIGHT_X_ZERO = 0;
         RIGHT_Y_ZERO = 0;
          zeroDriverController();
+         zeroOperatorController();
     }
 
     public static void initPreferences() 
@@ -30,6 +33,7 @@ public class OI extends SubsystemBase
 
     public void onEnable() {
         zeroDriverController();
+        zeroOperatorController();
     }
 
     @Override
@@ -37,6 +41,7 @@ public class OI extends SubsystemBase
         // This method will be called once per scheduler run
     }
 
+    //------- Driver Controller Joysticks Below
 
     public void zeroDriverController() {
         //Sets all the offsets to zero, then uses whatever value it returns as the new offset.
@@ -77,6 +82,49 @@ public class OI extends SubsystemBase
         return MathUtil.clamp(2.0 * (driverController.getRawAxis(5) - (RIGHT_Y_MAX + RIGHT_Y_MIN) * 0.5) / (RIGHT_Y_MAX - RIGHT_Y_MIN) - RIGHT_Y_ZERO, -1, 1);
     }
 
+    //------- Operator Controller Joysticks Below
+    
+    public void zeroOperatorController() {
+        //Sets all the offsets to zero, then uses whatever value it returns as the new offset.
+        OPERATOR_LEFT_Y_ZERO = 0;
+        OPERATOR_LEFT_X_ZERO = 0;
+        OPERATOR_RIGHT_X_ZERO = 0;
+        OPERATOR_RIGHT_Y_ZERO = 0;
+        OPERATOR_LEFT_X_ZERO = getOperatorLeftX();
+        OPERATOR_LEFT_Y_ZERO = getOperatorLeftY();
+        OPERATOR_RIGHT_X_ZERO = getOperatorRightX();
+        OPERATOR_RIGHT_Y_ZERO = getOperatorRightY();
+    }
+
+    private final double OPERATOR_LEFT_X_MIN = -1;
+    private final double OPERATOR_LEFT_X_MAX = 1;
+    private double OPERATOR_LEFT_X_ZERO = 0;
+    public double getOperatorLeftX() {
+        return MathUtil.clamp(2.0 * (driverController.getRawAxis(0) - (OPERATOR_LEFT_X_MAX + OPERATOR_LEFT_X_MIN) * 0.5) / (OPERATOR_LEFT_X_MAX - OPERATOR_LEFT_X_MIN) - OPERATOR_LEFT_X_ZERO, -1, 1);
+    }
+
+    private final double OPERATOR_LEFT_Y_MIN = -1;
+    private final double OPERATOR_LEFT_Y_MAX = 1;
+    private double OPERATOR_LEFT_Y_ZERO = 0;
+    public double getOperatorLeftY() {
+        return MathUtil.clamp(2.0 * (driverController.getRawAxis(1) - (OPERATOR_LEFT_Y_MAX + OPERATOR_LEFT_Y_MIN) * 0.5) / (OPERATOR_LEFT_Y_MAX - OPERATOR_LEFT_Y_MIN) - OPERATOR_LEFT_Y_ZERO, -1, 1);
+    }
+
+    private final double OPERATOR_RIGHT_X_MIN=-1;
+    private final double OPERATOR_RIGHT_X_MAX = 1;
+    private double OPERATOR_RIGHT_X_ZERO = 0;
+    public double getOperatorRightX() {
+        return MathUtil.clamp(2.0 * (driverController.getRawAxis(4) - (OPERATOR_RIGHT_X_MAX + OPERATOR_RIGHT_X_MIN) * 0.5) / (OPERATOR_RIGHT_X_MAX - OPERATOR_RIGHT_X_MIN) - OPERATOR_RIGHT_X_ZERO, -1, 1);
+    }
+    private final double OPERATOR_RIGHT_Y_MIN = -1;
+    private final double OPERATOR_RIGHT_Y_MAX = 1;
+    private double OPERATOR_RIGHT_Y_ZERO = 0;
+    public double getOperatorRightY() {
+        return MathUtil.clamp(2.0 * (driverController.getRawAxis(5) - (OPERATOR_RIGHT_Y_MAX + OPERATOR_RIGHT_Y_MIN) * 0.5) / (OPERATOR_RIGHT_Y_MAX - OPERATOR_RIGHT_Y_MIN) - OPERATOR_RIGHT_Y_ZERO, -1, 1);
+    }
+
+    //-------Driver Controller below
+
     public boolean getLeftBumper()
     {
         return driverController.getRawButton(5);
@@ -107,8 +155,36 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(1);
     }
 
+    //-------- Operator Controller Below
+
+    public boolean getOperatorLeftBumper()
+    {
+        return operatorController.getRawButton(5);
+    }
+
+    public boolean getOperatorRightBumper()
+    {
+        return operatorController.getRawButton(6);
+    }
+    
+    public boolean getOperatorMenuButton()
+    {
+        return operatorController.getRawButton(8);
+    }
+    
+    public boolean getOperatorXButton()
+    {
+        return operatorController.getRawButtonPressed(3);
+    }
+
+    public boolean getOperatorAButton()
+    {
+        return operatorController.getRawButton(1);
+    }
+
     // public void setRumble(double val){
     //     operatorController.setRumble(RumbleType.kLeftRumble, val);
     //     operatorController.setRumble(RumbleType.kRightRumble, val);
     // }
+    
 }
