@@ -31,16 +31,19 @@ public class TeleopDrive extends CommandBase
 
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi){
-    addRequirements(ds);
+    super.setName("Teleop Drive");
     m_driveSubsystem = ds;
     m_OI = oi;
     fieldCentric = false;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(ds);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize(){}
+  public void initialize(){
+    System.out.println("TeleopDrive: Init");
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -48,8 +51,8 @@ public class TeleopDrive extends CommandBase
     double velocityMult = maximumLinearVelocity;
     double rotateMult = maximumRotationVelocity;
 
-    velocityMult = 1 + m_OI.getDriverLeftTrigger();
-    rotateMult = 1 + m_OI.getDriverRightTrigger();
+    velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
+    rotateMult = 1.0 + m_OI.getDriverRightTrigger();
 
     // if (m_OI.getLeftBumper()){
     //   velocityMult *= 0.5; // 50% maximum speed
@@ -104,6 +107,7 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
     else{
+      // Robot centric driving.
       ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
       chassisSpeeds.vxMetersPerSecond = -leftY * velocityMult; 
       chassisSpeeds.vyMetersPerSecond = -leftX * velocityMult; 
@@ -114,7 +118,11 @@ public class TeleopDrive extends CommandBase
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted){}
+  public void end(boolean interrupted){
+    if (interrupted) {
+      System.out.println("TeleopDrive: Interrupted!");
+    }
+  }
 
   // Returns true when the command should end.
   @Override

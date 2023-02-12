@@ -29,10 +29,11 @@ public class DriveTestCommand extends CommandBase
 
   /** Creates a new Teleop. */
   public DriveTestCommand(DriveSubsystem ds, OI oi){
-    addRequirements(ds);
+    super.setName("DriveTestCommand");
     m_driveSubsystem = ds;
     m_OI = oi;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(ds);
   }
 
   // Called when the command is initially scheduled.
@@ -58,7 +59,8 @@ public class DriveTestCommand extends CommandBase
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted){
+  public void end(boolean interrupted) {
+    System.out.println("DriveTestCommand ended.");
     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0,0,0);
     m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
     m_driveSubsystem.setDebugMode(false);

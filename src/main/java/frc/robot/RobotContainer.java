@@ -46,9 +46,6 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    // Configure Button Bindings
-    configureBindings();
-
     // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
@@ -56,6 +53,7 @@ public class RobotContainer {
   }
 
   public static void initPreferences() {
+    System.out.println("RobotContainer: init Preferences.");
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
@@ -72,11 +70,15 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    System.out.println("RobotContainer: configure Bindings");
   }
 
   public void setTestMode() {
-    CommandScheduler.getInstance().schedule(new DriveTestCommand(m_driveSubsystem, m_OI));     
-    System.out.println("Test Mode on");
+    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
+    dtc.schedule();
+    m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
+
+    System.out.println("Robot Container: Test mode set");
   }
 
   public Command getAutonomousCommand() {
@@ -89,25 +91,33 @@ public class RobotContainer {
   }*/
 
   //test making last y negative and see results
-    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-      waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
-      waypoints.add(new Pose2d(1.0, 1.0, new Rotation2d()));
-      waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d(3)));
-    return new SequentialCommandGroup(
-      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
-      0.8, 0.5, 0.5)
-    );
+   //  ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+    //   waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
+    //   waypoints.add(new Pose2d(1.0, 1.0, new Rotation2d()));
+    //   waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d(3)));
+    // return new SequentialCommandGroup(
+    //   new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
+    //   0.8, 0.5, 0.5)
+    // );
     //return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
+
+    return new DriveTestCommand(m_driveSubsystem, m_OI);
   }
 
-  public void setLighting()
+  public void setStartupLighting()
   {
-    //initialize lighting at competitions
+    // Pick intensity based on driver station connection.
+    double intensity = 0.3; // Default to dim.
+    if (DriverStation.isDSAttached()) {
+      intensity = 1.0; // Bright if attached.
+    }
+    // Set lighting to driver station aliance color.
     if(DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      m_underglow.setLEDIntensity(0, 0, 1);
+      m_underglow.setLEDIntensity(0, 0, intensity);
     }
     else {
-      m_underglow.setLEDIntensity(1, 0, 0);
+      m_underglow.setLEDIntensity(intensity, 0, 0);
     }
   }
+
 }

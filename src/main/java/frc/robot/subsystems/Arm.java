@@ -115,11 +115,11 @@ public class Arm extends SubsystemBase{
 
   /** Creates a new Arm. */
   //Set height limiter
-  public Arm(){
-    shoulderMotor = new TalonFX(0);
-    elbowMotor = new TalonFX(0);
-    shoulderEncoder = new CANCoder(0);
-    elbowEncoder = new CANCoder(0);
+  public Arm() {
+    shoulderMotor = new TalonFX(16);
+    elbowMotor = new TalonFX(18);
+    shoulderEncoder = new CANCoder(15);
+    elbowEncoder = new CANCoder(17);
     setUpMotor(shoulderMotor, shoulderEncoder);
     setUpMotor(elbowMotor, elbowEncoder);
 

@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // We must call this before creating the robot container: Sets up preferences.
+    // We must call this before creating the robot container: Sets up preferences *once* at startup.
     RobotContainer.initPreferences();
 
     // Create our robot container
@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.setLighting();
+    m_robotContainer.setStartupLighting();
   }
 
   @Override
@@ -40,10 +40,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    System.out.println("Autonomous Init");
+    System.out.println("Robot: Autonomous Init");
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
+    } else {
+      System.out.println("NO Autonomous Command!");
     }
   }
 
@@ -55,6 +57,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    System.out.println("Robot: Teleop Init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -68,7 +71,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
+    System.out.println("Robot: testInit");
     m_robotContainer.setTestMode();
   }
 
