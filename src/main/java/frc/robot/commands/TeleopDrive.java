@@ -34,7 +34,7 @@ public class TeleopDrive extends CommandBase
     super.setName("Teleop Drive");
     m_driveSubsystem = ds;
     m_OI = oi;
-    fieldCentric = false;
+    fieldCentric = true;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
   }
