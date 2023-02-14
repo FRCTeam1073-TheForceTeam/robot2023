@@ -54,6 +54,9 @@ public class RobotContainer {
   private static final String kTestMode = "Test Mode";
   private static final String kScoreHybrid = "Score Hybrid";
 
+  private final SendableChooser<String> m_trajectoryChooser = new SendableChooser<>();
+  private static final String kTrajectory = "Trajectory";
+
   // private final SendableChooser<String> m_robotLocation = new SendableChooser<String>();
   // private static final String kPose1 = "Position 1";
   // private static final String kPose2 = "Position 2";
@@ -71,6 +74,8 @@ public class RobotContainer {
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
     m_chooser.addOption("Score Hybrid", kScoreHybrid);
+    m_trajectoryChooser.addOption("Waypoint", kTrajectory);
+    SmartDashboard.putData("Auto Chooser", m_chooser);
     SmartDashboard.putData("Auto Chooser", m_chooser);
 
   //   m_robotLocation.setDefaultOption("Position 1", kPose1);
