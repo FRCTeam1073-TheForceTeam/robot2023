@@ -99,6 +99,7 @@ public class TeleopDrive extends CommandBase
       else if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
         speeds = new ChassisSpeeds(0,0,.5);
       }
+      m_driveSubsystem.setChassisSpeeds(speeds);
     }
 
     while(m_OI.getDPad() == 90){ //90 is 270 on the robot
@@ -109,6 +110,7 @@ public class TeleopDrive extends CommandBase
       else if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
         speeds = new ChassisSpeeds(0,0,.5);
       }
+      m_driveSubsystem.setChassisSpeeds(speeds);
     }
 
     while(m_OI.getDPad() == 180){
@@ -118,6 +120,7 @@ public class TeleopDrive extends CommandBase
       else if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
         speeds = new ChassisSpeeds(0,0,.5);
       }
+      m_driveSubsystem.setChassisSpeeds(speeds);
     }
 
     while(m_OI.getDPad() == 270){ //270 is 90 on the robot
@@ -128,6 +131,7 @@ public class TeleopDrive extends CommandBase
               (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
         speeds = new ChassisSpeeds(0,0,.5);
       }
+      m_driveSubsystem.setChassisSpeeds(speeds);
     }
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
