@@ -49,11 +49,8 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double velocityMult = maximumLinearVelocity;
-    double rotateMult = maximumRotationVelocity;
-
-    velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
-    rotateMult = 1.0 + m_OI.getDriverRightTrigger();
+    double velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
+    double rotateMult = m_OI.getDriverRightTrigger();
 
     // if (m_OI.getLeftBumper()){
     //   velocityMult *= 0.5; // 50% maximum speed
@@ -78,9 +75,9 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.resetOdometry(zero);
     }
 
-    double leftY = m_OI.getDriverLeftY();
-    double leftX = m_OI.getDriverLeftX();
-    double rightX = m_OI.getDriverRightX();
+    double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity / 2;
+    double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity / 2;
+    double rightX = m_OI.getDriverRightX() * maximumRotationVelocity / 2;
     if (Math.abs(leftY) < .35) {leftY = 0;}
     if (Math.abs(leftX) < .35) {leftX = 0;}
     if (Math.abs(rightX) < .35) {rightX = 0;}
