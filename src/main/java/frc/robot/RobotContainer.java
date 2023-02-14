@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -43,13 +45,39 @@ public class RobotContainer {
   private final Claw m_claw = new Claw();
   private final Engage m_engage = new Engage(m_driveSubsystem, 0.25);  
   private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
+  
+  //Auto Chooser
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private static final String kBasicEngage = "Basic Engage";
+  private static final String kEngagePlus = "Engage Plus";
+  private static final String kLeaveCommunity = "Leave Community";
+  private static final String kTestMode = "Test Mode";
+  private static final String kScoreHybrid = "Score Hybrid";
+
+  // private final SendableChooser<String> m_robotLocation = new SendableChooser<String>();
+  // private static final String kPose1 = "Position 1";
+  // private static final String kPose2 = "Position 2";
+  // private static final String kPose3 = "Position 3";
+
 
   public RobotContainer() {
 
     // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
+   
+    m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
+    m_chooser.addOption("Engage Plus", kEngagePlus);
+    m_chooser.addOption("Leave Community", kLeaveCommunity);
+    m_chooser.addOption("Test Mode", kTestMode);
+    m_chooser.addOption("Score Hybrid", kScoreHybrid);
+    SmartDashboard.putData("Auto Chooser", m_chooser);
 
+  //   m_robotLocation.setDefaultOption("Position 1", kPose1);
+  //   m_robotLocation.addOption("Position 2", kPose2);
+  //   m_robotLocation.addOption("Position 3", kPose3);
+  //   SmartDashboard.putData("Robot Position Selector", m_robotLocation);
+  // 
   }
 
   public static void initPreferences() {
@@ -101,7 +129,59 @@ public class RobotContainer {
     // );
     //return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
 
+    //return new DriveTestCommand(m_driveSubsystem, m_OI);
+
+    switch (m_chooser.getSelected()) {
+      case kBasicEngage:
+        return basicEngage();
+      case kEngagePlus:
+        return engagePlus();
+      case kLeaveCommunity:
+        return leaveCommunity();
+      case kTestMode:
+        return testMode();
+      case kScoreHybrid:
+        return scoreHybrid();
+      default:
+        System.out.println("No Auto Selected -_-");
+        return null;
+    }
+  }
+
+  public Command basicEngage() {
+    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
+  }
+
+  public Command engagePlus() {
+    System.out.println("Left Community and then engaged");
+    return null;
+  }
+
+  public Command leaveCommunity() {
+    // switch (m_robotLocation.getSelected()) {
+    //   case kPose1:
+    //     System.out.println("Leaving Community from position 1");
+    //     return null;
+    //   case kPose2:
+    //     System.out.println("Leaving Community from position 2");
+    //     return null;
+    //   case kPose3:
+    //     System.out.println("Leaving Community from position 3");
+    //     return null;
+    //   default:
+    //     return null;
+    // }
+    return null;
+  }
+
+  public Command testMode() {
+    System.out.println("Test Mode on");
     return new DriveTestCommand(m_driveSubsystem, m_OI);
+  }
+
+  public Command scoreHybrid() {
+    System.out.println("Hybrid Scored");
+    return null;
   }
 
   public void setStartupLighting()
