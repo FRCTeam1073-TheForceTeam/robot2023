@@ -209,7 +209,18 @@ public class RobotContainer {
 
   public Command trajectoryWaypoint() {
     System.out.println("Waypoint Beginning");
-    return new DriveTestCommand(m_driveSubsystem, m_OI);
+    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+        waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d()));
+        waypoints.add(new Pose2d(0.5, 0.0, new Rotation2d()));
+//       waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d()));
+//     //   waypoints.add(new Pose2d(2.5, 1.0, new Rotation2d()));
+//       waypoints.add(new Pose2d(3.0, 0.0, new Rotation2d()));////
+       waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d(3)));
+     // return new SequentialCommandGroup(
+     //   new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
+
+    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+    new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
   }
 
   public void setStartupLighting()
