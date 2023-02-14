@@ -49,8 +49,8 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
-    double rotateMult = m_OI.getDriverRightTrigger();
+    double mult1 = 1.0 + m_OI.getDriverLeftTrigger();
+    double mult2 = 1.0 + m_OI.getDriverRightTrigger();
 
     // if (m_OI.getLeftBumper()){
     //   velocityMult *= 0.5; // 50% maximum speed
@@ -75,9 +75,9 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.resetOdometry(zero);
     }
 
-    double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity / 2;
-    double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity / 2;
-    double rightX = m_OI.getDriverRightX() * maximumRotationVelocity / 2;
+    double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity / 4;
+    double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity / 4;
+    double rightX = m_OI.getDriverRightX() * maximumRotationVelocity / 4;
     if (Math.abs(leftY) < .35) {leftY = 0;}
     if (Math.abs(leftX) < .35) {leftX = 0;}
     if (Math.abs(rightX) < .35) {rightX = 0;}
@@ -151,9 +151,9 @@ public class TeleopDrive extends CommandBase
       }
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        -leftY * velocityMult,
-        -leftX * velocityMult,
-        -rightX * rotateMult,
+        -leftY * mult1 * mult2,
+        -leftX * mult1 * mult2,
+        -rightX * mult1 * mult2,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
@@ -161,9 +161,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = -leftY * velocityMult; 
-      speeds.vyMetersPerSecond = -leftX * velocityMult; 
-      speeds.omegaRadiansPerSecond = -rightX * rotateMult;
+      speeds.vxMetersPerSecond = -leftY * mult1 * mult2; 
+      speeds.vyMetersPerSecond = -leftX * mult1 * mult2; 
+      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2;
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
   }
