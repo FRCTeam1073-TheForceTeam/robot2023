@@ -54,24 +54,20 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double velocityMult = maximumLinearVelocity;
-    double rotateMult = maximumRotationVelocity;
-/*  code from week0 (untested)
-*   
-*   double velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
-*   double rotateMult = m_OI.getDriverRightTrigger();
-*/
-    if (m_OI.getLeftBumper()){
-      velocityMult *= 0.5; // 50% maximum speed
-      rotateMult *= 0.5;
-    }
-    else if (m_OI.getRightBumper()){
-      velocityMult *= 1.0; // Maximum speed
-      rotateMult *= 1.0;
-    } else {
-      velocityMult *= 0.1;  // 10% maximum speed.
-      rotateMult *= 0.1;
-    }
+    double mult1 = 1.0 + m_OI.getDriverLeftTrigger();
+    double mult2 = 1.0 + m_OI.getDriverRightTrigger();
+
+    // if (m_OI.getLeftBumper()){
+    //   velocityMult *= 0.5; // 50% maximum speed
+    //   rotateMult *= 0.5;
+    // }
+    // else if (m_OI.getRightBumper()){
+    //   velocityMult *= 1.0; // Maximum speed
+    //   rotateMult *= 1.0;
+    // } else {
+    //   velocityMult *= 0.1;  // 10% maximum speed.
+    //   rotateMult *= 0.1;
+    // }
 
     // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){
