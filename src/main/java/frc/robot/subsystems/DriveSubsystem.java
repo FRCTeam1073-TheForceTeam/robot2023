@@ -106,7 +106,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
-    odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions);
+    odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions, new Pose2d(0,0,new Rotation2d(Math.PI)));
 
     // Configure maximum linear speed for limiting:
     maximumLinearSpeed = Preferences.getDouble("Drive.MaximumLinearSpeed", 3.5);

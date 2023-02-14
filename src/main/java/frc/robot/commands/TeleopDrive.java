@@ -24,6 +24,7 @@ public class TeleopDrive extends CommandBase
   OI m_OI;
   private boolean fieldCentric;
   private boolean parked;
+  ChassisSpeeds speeds;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
@@ -34,7 +35,7 @@ public class TeleopDrive extends CommandBase
     super.setName("Teleop Drive");
     m_driveSubsystem = ds;
     m_OI = oi;
-    fieldCentric = false;
+    fieldCentric = true;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
   }
@@ -99,20 +100,74 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.parkingBrake();
     }
     else if (fieldCentric){
-      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+      //Snap to cardinal directions
+      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);
+
+      if(m_OI.getDPad() == 0){
+        if(currentAngle == 0){
+          rightX = 0;
+        }
+        if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+          rightX = -.5;
+        }
+        else if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 90){ //90 is 270 on the robot
+        if(currentAngle == 3/2 * Math.PI){
+          rightX = 0;
+        }
+        if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+          (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+          rightX = -.5;
+        }
+        else if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 180){
+        if(currentAngle == Math.PI){
+          rightX = 0;
+        }
+        if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+          rightX = -.5;
+        }
+        else if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 270){ //270 is 90 on the robot
+        if(currentAngle == Math.PI / 2){
+          rightX = 0;
+        }
+        if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+          rightX = -.5;
+        }
+        else if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+                (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         -leftY * velocityMult,
-        -leftX * velocityMult, 
+        -leftX * velocityMult,
         -rightX * rotateMult,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
       m_driveSubsystem.setChassisSpeeds(speeds);
     }
+    
     else{
       // Robot centric driving.
-      ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-      chassisSpeeds.vxMetersPerSecond = -leftY * velocityMult; 
-      chassisSpeeds.vyMetersPerSecond = -leftX * velocityMult; 
-      chassisSpeeds.omegaRadiansPerSecond = -rightX * rotateMult;
-      m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
+      speeds = new ChassisSpeeds();
+      speeds.vxMetersPerSecond = -leftY * velocityMult; 
+      speeds.vyMetersPerSecond = -leftX * velocityMult; 
+      speeds.omegaRadiansPerSecond = -rightX * rotateMult;
+      m_driveSubsystem.setChassisSpeeds(speeds); 
     }
   }
 
