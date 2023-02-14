@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import javax.lang.model.util.ElementScanner14;
@@ -20,6 +21,10 @@ import frc.robot.subsystems.OI;
 
 public class TeleopDrive extends CommandBase 
 {
+  double angleTolerance = 0.05;
+  ChassisSpeeds chassisSpeeds;
+  Pose2d targetRotation;
+  Pose2d robotRotation;
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
   private boolean fieldCentric;
@@ -49,20 +54,24 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
-    double rotateMult = m_OI.getDriverRightTrigger();
-
-    // if (m_OI.getLeftBumper()){
-    //   velocityMult *= 0.5; // 50% maximum speed
-    //   rotateMult *= 0.5;
-    // }
-    // else if (m_OI.getRightBumper()){
-    //   velocityMult *= 1.0; // Maximum speed
-    //   rotateMult *= 1.0;
-    // } else {
-    //   velocityMult *= 0.1;  // 10% maximum speed.
-    //   rotateMult *= 0.1;
-    // }
+    double velocityMult = maximumLinearVelocity;
+    double rotateMult = maximumRotationVelocity;
+/*  code from week0 (untested)
+*   
+*   double velocityMult = 1.0 + m_OI.getDriverLeftTrigger();
+*   double rotateMult = m_OI.getDriverRightTrigger();
+*/
+    if (m_OI.getLeftBumper()){
+      velocityMult *= 0.5; // 50% maximum speed
+      rotateMult *= 0.5;
+    }
+    else if (m_OI.getRightBumper()){
+      velocityMult *= 1.0; // Maximum speed
+      rotateMult *= 1.0;
+    } else {
+      velocityMult *= 0.1;  // 10% maximum speed.
+      rotateMult *= 0.1;
+    }
 
     // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){
@@ -166,6 +175,8 @@ public class TeleopDrive extends CommandBase
       speeds.omegaRadiansPerSecond = -rightX * rotateMult;
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
+    
+    
   }
 
   // Called once the command ends or is interrupted.

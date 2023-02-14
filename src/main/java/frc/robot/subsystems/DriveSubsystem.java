@@ -224,10 +224,10 @@ public class DriveSubsystem extends SubsystemBase
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
-      //states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
-      //states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
-      //states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
-      //states[3] = optimizeB(states[3], new Rotation2d(modules[3].getSteeringAngle()));
+      states[0] = optimizeB(states[0], new Rotation2d(modules[0].getSteeringAngle()));
+      states[1] = optimizeB(states[1], new Rotation2d(modules[1].getSteeringAngle()));
+      states[2] = optimizeB(states[2], new Rotation2d(modules[2].getSteeringAngle()));
+      states[3] = optimizeB(states[3], new Rotation2d(modules[3].getSteeringAngle()));
 
       modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
