@@ -163,6 +163,10 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(1);
     }
 
+    public int getDPad(){
+        return driverController.getPOV();
+    }
+
     //-------- Operator Controller Below
 
     public boolean getOperatorLeftBumper()

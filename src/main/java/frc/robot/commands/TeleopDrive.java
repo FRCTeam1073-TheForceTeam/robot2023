@@ -24,6 +24,7 @@ public class TeleopDrive extends CommandBase
   OI m_OI;
   private boolean fieldCentric;
   private boolean parked;
+  ChassisSpeeds speeds;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
@@ -88,6 +89,47 @@ public class TeleopDrive extends CommandBase
       parked = !parked;
     }
 
+    //Snap to cardinal directions
+    double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % 2 * Math.PI;
+
+    while(m_OI.getDPad() == 0){
+      if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+        speeds = new ChassisSpeeds(0,0,-.5);
+      }
+      else if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+        speeds = new ChassisSpeeds(0,0,.5);
+      }
+    }
+
+    while(m_OI.getDPad() == 90){ //90 is 270 on the robot
+      if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+        (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+          speeds = new ChassisSpeeds(0,0,-.5);
+      }
+      else if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+        speeds = new ChassisSpeeds(0,0,.5);
+      }
+    }
+
+    while(m_OI.getDPad() == 180){
+      if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+        speeds = new ChassisSpeeds(0,0,-.5);
+      }
+      else if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+        speeds = new ChassisSpeeds(0,0,.5);
+      }
+    }
+
+    while(m_OI.getDPad() == 270){ //270 is 90 on the robot
+      if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+        speeds = new ChassisSpeeds(0,0,-.5);
+      }
+      else if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+              (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+        speeds = new ChassisSpeeds(0,0,.5);
+      }
+    }
+
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
       fieldCentric = !fieldCentric;
@@ -99,7 +141,7 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.parkingBrake();
     }
     else if (fieldCentric){
-      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         -leftY * velocityMult,
         -leftX * velocityMult, 
         -rightX * rotateMult,
@@ -108,11 +150,11 @@ public class TeleopDrive extends CommandBase
     }
     else{
       // Robot centric driving.
-      ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-      chassisSpeeds.vxMetersPerSecond = -leftY * velocityMult; 
-      chassisSpeeds.vyMetersPerSecond = -leftX * velocityMult; 
-      chassisSpeeds.omegaRadiansPerSecond = -rightX * rotateMult;
-      m_driveSubsystem.setChassisSpeeds(chassisSpeeds); 
+      speeds = new ChassisSpeeds();
+      speeds.vxMetersPerSecond = -leftY * velocityMult; 
+      speeds.vyMetersPerSecond = -leftX * velocityMult; 
+      speeds.omegaRadiansPerSecond = -rightX * rotateMult;
+      m_driveSubsystem.setChassisSpeeds(speeds); 
     }
   }
 
