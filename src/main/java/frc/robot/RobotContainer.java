@@ -53,6 +53,7 @@ public class RobotContainer {
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
   private static final String kScoreHybrid = "Score Hybrid";
+  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
   // private final SendableChooser<String> m_robotLocation = new SendableChooser<String>();
   // private static final String kPose1 = "Position 1";
@@ -71,6 +72,7 @@ public class RobotContainer {
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
     m_chooser.addOption("Score Hybrid", kScoreHybrid);
+    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
     SmartDashboard.putData("Auto Chooser", m_chooser);
 
   //   m_robotLocation.setDefaultOption("Position 1", kPose1);
@@ -142,6 +144,8 @@ public class RobotContainer {
         return testMode();
       case kScoreHybrid:
         return scoreHybrid();
+      case kTrajectoryWaypoint:
+        return trajectoryWaypoint();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -182,6 +186,11 @@ public class RobotContainer {
   public Command scoreHybrid() {
     System.out.println("Hybrid Scored");
     return null;
+  }
+
+  public Command trajectoryWaypoint() {
+    System.out.println("Waypoint Beginning");
+    return new DriveTestCommand(m_driveSubsystem, m_OI);
   }
 
   public void setStartupLighting()
