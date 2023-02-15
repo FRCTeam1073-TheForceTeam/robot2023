@@ -54,11 +54,11 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    //double mult1 = 1.0 + m_OI.getDriverLeftTrigger();
-    //double mult2 = 1.0 + m_OI.getDriverRightTrigger();
+    double mult1 = (1.0 + m_OI.getDriverLeftTrigger()) * 5;
+    double mult2 = 1.0 + m_OI.getDriverRightTrigger();
 
-    double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.45;
-    double mult2 = m_OI.getDriverRightTrigger() * maximumLinearVelocity * 0.45;
+    //double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.475;
+    //double mult2 = m_OI.getDriverRightTrigger() * maximumLinearVelocity * 0.475;
 
     // if (m_OI.getLeftBumper()){
     //   velocityMult *= 0.5; // 50% maximum speed
@@ -83,9 +83,9 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.resetOdometry(zero);
     }
 
-    double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity / 10;
-    double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity / 10;
-    double rightX = m_OI.getDriverRightX() * maximumRotationVelocity / 10;
+    double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity * 0.05;
+    double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity * 0.05;
+    double rightX = m_OI.getDriverRightX() * maximumRotationVelocity * 0.05;
     if (Math.abs(leftY) < .35) {leftY = 0;}
     if (Math.abs(leftX) < .35) {leftX = 0;}
     if (Math.abs(rightX) < .35) {rightX = 0;}
@@ -107,8 +107,11 @@ public class TeleopDrive extends CommandBase
     else if (fieldCentric){
       //Snap to cardinal directions
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);
+      double cardinalError;
+      SmartDashboard.putNumber("Current Angle within 2 pi", currentAngle);
 
       if(m_OI.getDPad() == 0){
+        //cardinalError = Math.abs()
         if(currentAngle == 0){
           rightX = 0;
         }
@@ -159,11 +162,11 @@ public class TeleopDrive extends CommandBase
       }
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        -leftY + mult1 + mult2,
-        -leftX + mult1 + mult2,
-        -rightX + mult1 + mult2,
+        -leftY * mult1 * mult2,
+        -leftX * mult1 * mult2,
+        -rightX * mult1 * mult2,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
-      m_driveSubsystem.setChassisSpeeds(speeds);
+        m_driveSubsystem.setChassisSpeeds(speeds);
     }
     
     else{
