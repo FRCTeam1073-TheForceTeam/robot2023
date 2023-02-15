@@ -108,8 +108,9 @@ public class DriveThroughTrajectory extends CommandBase {
     double yVelocity = alpha * difference.getY();
 
     Transform2d angleDifference = endPose.minus(robotPose);
-    double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
+    //double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
     //double angularVelocity = 0.4 * difference.getRotation().getRadians();
+    double angularVelocity = 0;
 
     SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
     SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
