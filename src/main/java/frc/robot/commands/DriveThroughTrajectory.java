@@ -74,12 +74,12 @@ public class DriveThroughTrajectory extends CommandBase {
     addRequirements(ds);
   }
 
-  public Trajectory generateTrajectory(ArrayList<Pose2d> waypoints, TrajectoryConfig trajecotryCfg){
+  public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints, TrajectoryConfig trajecotryCfg){
     List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
     double trajectoryTime = 0;
     for(int i = 0; i < wayPoints.size(); i++){
       Trajectory.State ts = new Trajectory.State();
-      ts.poseMeters = waypoints.get(i);
+      ts.poseMeters = wayPoints.get(i);
       ts.timeSeconds = trajectoryTime;
       ts.velocityMetersPerSecond = trajecotryCfg.getMaxVelocity();
       ts.curvatureRadPerMeter = 0;

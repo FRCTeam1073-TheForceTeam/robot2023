@@ -39,7 +39,7 @@ public class RobotContainer {
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_bling = new Bling();
   private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
-  private final Arm m_arm = new Arm();
+//  private final Arm m_arm = new Arm();
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
@@ -152,6 +152,8 @@ public class RobotContainer {
 
     //return new DriveTestCommand(m_driveSubsystem, m_OI);
 
+    System.out.println(m_chooser.getSelected());
+
     switch (m_chooser.getSelected()) {
       case kBasicEngage:
         return basicEngage();
@@ -209,6 +211,7 @@ public class RobotContainer {
 
   public Command trajectoryWaypoint() {
     System.out.println("Waypoint Beginning");
+
     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
         waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d()));
         waypoints.add(new Pose2d(0.5, 0.0, new Rotation2d()));
@@ -219,8 +222,7 @@ public class RobotContainer {
      // return new SequentialCommandGroup(
      //   new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 
-    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-    new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
+    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
   }
 
   public void setStartupLighting()
