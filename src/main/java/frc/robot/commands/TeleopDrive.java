@@ -163,7 +163,7 @@ public class TeleopDrive extends CommandBase
         -leftX + mult1 + mult2,
         -rightX + mult1 + mult2,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
-      m_driveSubsystem.setChassisSpeeds(speeds);
+        m_driveSubsystem.setChassisSpeeds(speeds);
     }
     
     else{
