@@ -5,7 +5,9 @@
 package frc.robot.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -21,8 +23,9 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveThroughTrajectory extends CommandBase {
   /** Creates a new DriveThroughTrajectory. */
-  double distanceTolerance = 0.1;
-  double angleTolerance = 0.05;
+
+  double distanceTolerance = 0.4;
+  double angleTolerance = 0.1;
 
   DriveSubsystem drivetrain;
   Pose2d startPose;
@@ -66,8 +69,27 @@ public class DriveThroughTrajectory extends CommandBase {
     trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
     //trajectoryCfg.addConstraint(new SwerveDriveKinematicsConstraint(drivetrain.getKinematics(), 2.0));
     trajectoryCfg.setKinematics(drivetrain.getKinematics());
-    trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
+    //trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
+    trajectory = generateTrajectory(posePointList, trajectoryCfg);
     addRequirements(ds);
+  }
+
+  public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints, TrajectoryConfig trajecotryCfg){
+    List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
+    double trajectoryTime = 0;
+    for(int i = 0; i < wayPoints.size(); i++){
+      Trajectory.State ts = new Trajectory.State();
+      ts.poseMeters = wayPoints.get(i);
+      ts.timeSeconds = trajectoryTime;
+      ts.velocityMetersPerSecond = trajecotryCfg.getMaxVelocity();
+      ts.curvatureRadPerMeter = 0;
+      ts.accelerationMetersPerSecondSq = 1;
+      traj.add(ts);
+      //update time appropriately
+      trajectoryTime += 1;
+    }
+
+    return new Trajectory(traj);
   }
 
   // Called when the command is initially scheduled.
@@ -85,9 +107,9 @@ public class DriveThroughTrajectory extends CommandBase {
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
 
-    //Transform2d angleDifference = endPose.minus(robotPose);
-    //double angularVelocity = 0.4 * angleDifference.getRotation().getRadians();;
-    double angularVelocity = 0.4 * difference.getRotation().getRadians();
+    double angularVelocity = 0.6 * difference.getRotation().getRadians();
+    //double angularVelocity = 0.4 * difference.getRotation().getRadians();
+    //double angularVelocity = 0;
 
     SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
     SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
@@ -96,28 +118,15 @@ public class DriveThroughTrajectory extends CommandBase {
     SmartDashboard.putNumber("Difference y", difference.getY());
     SmartDashboard.putNumber("Time", time);
 
+    xVelocity = MathUtil.clamp(xVelocity, -maxVelocity, maxVelocity);
+    yVelocity = MathUtil.clamp(yVelocity, -maxVelocity, maxVelocity);
+    angularVelocity = MathUtil.clamp(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
 
-    if(xVelocity > maxVelocity){
-      xVelocity = maxVelocity;
-    }
-    if(xVelocity < - maxVelocity){
-      xVelocity = - maxVelocity;
-    }
-    if(yVelocity > maxVelocity){
-      yVelocity = maxVelocity;
-    }
-    if(yVelocity < -maxVelocity){
-      yVelocity = -maxVelocity;
-    }
-    if(angularVelocity > maxAngularVelocity){
-      angularVelocity = maxAngularVelocity;
-    } 
-    if(angularVelocity < -maxAngularVelocity){
-      angularVelocity = -maxAngularVelocity;
-    }
+//    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
+//      Rotation2d.fromDegrees(drivetrain.getHeading()));
 
-    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
-    Rotation2d.fromDegrees(drivetrain.getHeading()));
+    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
+
     drivetrain.setChassisSpeeds(chassisSpeeds);
     if(time < trajectory.getTotalTimeSeconds()){
       time += 0.02;
@@ -137,11 +146,16 @@ public class DriveThroughTrajectory extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    var error = endPose.minus(robotPose);
+    var error = robotPose.minus(endPose);
+     
     if (error.getTranslation().getNorm()< distanceTolerance && Math.abs(error.getRotation().getRadians()) < angleTolerance) {
       System.out.println("DriveThroughPoint Is Finished");
       return true;
     }
+    /*
+    if(time >= trajectory.getTotalTimeSeconds()){
+      return true;
+    }*/
     return false;
   }
 }

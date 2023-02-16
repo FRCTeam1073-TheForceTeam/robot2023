@@ -27,10 +27,10 @@ and 2-3 motors /w CANCoder feedback for the arm. Possible additional nodes to co
 | Swerve #3 Drive Motor |  12    |
 | Pigeon IMU            |  13    |
 | CANifier (under-glow) |  14    |
-| Arm Joint #0 Encoder  |  15    |
-| Arm Joint #0 Motor    |  16    |
-| Arm Joint #1 Encoder  |  17    |
-| Arm Joint #1 Motor    |  18    |
+| Arm Joint #0 Encoder  |  15    | Shoulder
+| Arm Joint #0 Motor    |  16    | Shoulder
+| Arm Joint #1 Encoder  |  17    | Elbow
+| Arm Joint #1 Motor    |  18    | Elbow
 
 
 

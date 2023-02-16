@@ -35,7 +35,7 @@ public class SwerveModuleConfig
 
     public SwerveModuleConfig()
     {
-        tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 52257);
+        tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 86670.8);
         driveP = Preferences.getDouble("Drive.Drive.Kp", 0.1); 
         driveI = Preferences.getDouble("Drive.Drive.Ki", 0.0);
         driveD = Preferences.getDouble("Drive.Drive.Kd", 0.0);
@@ -56,7 +56,7 @@ public class SwerveModuleConfig
     }
 
     public static void initPreferences() {
-        Preferences.initDouble("Drive.Drive.TickPerMeter", 52257);
+        Preferences.initDouble("Drive.Drive.TickPerMeter", 86670.8);
         Preferences.initDouble("Drive.Drive.Kp", 0.1);
         Preferences.initDouble("Drive.Drive.Ki", 0.0);
         Preferences.initDouble("Drive.Drive.Kd", 0.0);

@@ -54,26 +54,38 @@ public class Engage extends CommandBase
           Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
         drivetrain.setChassisSpeeds(chassisSpeeds);
       
-      if (drivetrain.getPitch() > 13) {
+      if (Math.abs(drivetrain.getPitch()) > 13) {
         drivePhase = 1; //starts climbing
       }
     } //end of phase 0
 
     if (drivePhase == 1)
     {
-      
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(-maxLinearVelocity * 0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-
-      if (Math.abs(drivetrain.getPitch()) < 2) {
+      if (Math.abs(drivetrain.getPitch()) < 5) 
+      {
         drivePhase = 2;
       }
     }
 
     if(drivePhase == 2)
     {
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(maxLinearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+      drivetrain.setChassisSpeeds(chassisSpeeds);
       //drivetrain.parkingBrake();
-      brake.execute();
-      //drivePhase = 3;
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {}
+      if (Math.abs(drivetrain.getPitch()) < 2)
+      {
+        drivePhase = 3;
+      }
+      //brake.execute();
+    }
+    if (drivePhase == 3)
+    {
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees((drivetrain.getHeading())));
+      drivetrain.setChassisSpeeds(chassisSpeeds);
+      brake.execute(); 
     }
   }
 

@@ -95,6 +95,10 @@ public class SwerveModule
     public double getDriveVelocity(){
         return -driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
+
+    public double getDriveRawVelocity() {
+        return driveMotor.getSelectedSensorVelocity();
+    }
     
     //*Wrapping code from sds example swerve library
     public void setCommand(double steeringAngle, double driveVelocity){

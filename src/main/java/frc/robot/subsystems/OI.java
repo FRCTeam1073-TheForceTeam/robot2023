@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI extends SubsystemBase
 {
@@ -130,6 +131,14 @@ public class OI extends SubsystemBase
 
     //-------Driver Controller below
 
+    public double getDriverRightTrigger(){
+        return driverController.getRawAxis(3);
+    }
+
+    public double getDriverLeftTrigger(){
+        return driverController.getRawAxis(2);
+    }
+
     public boolean getLeftBumper()
     {
         return driverController.getRawButton(5);
@@ -160,6 +169,10 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(1);
     }
 
+    public int getDPad(){
+        return driverController.getPOV();
+    }
+
     //-------- Operator Controller Below
 
     public boolean getOperatorLeftBumper()
@@ -179,12 +192,20 @@ public class OI extends SubsystemBase
     
     public boolean getOperatorXButton()
     {
-        return operatorController.getRawButtonPressed(3);
+        return operatorController.getRawButton(3);
     }
 
     public boolean getOperatorAButton()
     {
         return operatorController.getRawButton(1);
+    }
+
+    public boolean getOperatorYButton(){
+        return operatorController.getRawButton(4);
+    }
+
+    public boolean getOperatorBButton(){
+        return operatorController.getRawButton(2);
     }
 
     // public void setRumble(double val){
