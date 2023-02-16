@@ -13,7 +13,9 @@ public class TeleopDebugArm extends CommandBase {
   private OI oi;
 
   /** Creates a new DebugArm. */
-  public TeleopDebugArm() {
+  public TeleopDebugArm(Arm arm, OI oi) {
+    this.arm = arm;
+    this.oi = oi;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(arm);
   }
@@ -29,12 +31,14 @@ public class TeleopDebugArm extends CommandBase {
       arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
 
-    arm.setJointVelocities(arm.new JointVelocities(oi.getOperatorLeftX() * .5, oi.getOperatorRightX()*.5));
+    arm.setJointVelocities(arm.new JointVelocities(oi.getOperatorLeftX(), oi.getOperatorRightX()));
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    arm.setJointVelocities(arm.new JointVelocities(0,0));
+  }
 
   // Returns true when the command should end.
   @Override

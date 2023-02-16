@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
+import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -39,12 +40,13 @@ public class RobotContainer {
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_bling = new Bling();
   private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
-//  private final Arm m_arm = new Arm();
+  private final Arm m_arm = new Arm();
+  private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
   private final Engage m_engage = new Engage(m_driveSubsystem, 0.25);  
-  private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
+  //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
   //Auto Chooser
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
@@ -66,6 +68,7 @@ public class RobotContainer {
     // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
     m_chooser.addOption("Engage Plus", kEngagePlus);

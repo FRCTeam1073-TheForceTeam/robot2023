@@ -29,7 +29,9 @@ public class Arm extends SubsystemBase{
   public final double upperArmLength = 0.0;
   public final double forearmLength = 0.0;
   public final double shoulderOffset = 0.0;
+  public final double shoulderAbsoluteOffset = 2.42;
   public final double elbowOffset = 0.0;
+  public final double elbowAbsoluteOffset = 1.73;
 
   public class JointPositions{
     double shoulder;
@@ -142,14 +144,14 @@ public class Arm extends SubsystemBase{
     setUpMotor(shoulderMotor, shoulderEncoder);
     setUpMotor(elbowMotor, elbowEncoder);
 
-    shoulderMotor.config_kP(0, 0);
+    shoulderMotor.config_kP(0, 0.1);
     shoulderMotor.config_kI(0, 0);
     shoulderMotor.config_kD(0, 0);
     shoulderMotor.config_kF(0, 0);
     shoulderMotor.configMaxIntegralAccumulator(0, 0);
     shoulderMotor.setIntegralAccumulator(0);
 
-    elbowMotor.config_kP(0, 0);
+    elbowMotor.config_kP(0, 0.1);
     elbowMotor.config_kI(0, 0);
     elbowMotor.config_kD(0, 0);
     elbowMotor.config_kF(0, 0);
@@ -162,6 +164,8 @@ public class Arm extends SubsystemBase{
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
+    SmartDashboard.putNumber("Shoulder Absolute Angle", getAbsoluteAngles().shoulder);
+    SmartDashboard.putNumber("Elbow Absolute Angle", getAbsoluteAngles().elbow);
   }
 
   // Initialize preferences for this class:
@@ -172,9 +176,9 @@ public class Arm extends SubsystemBase{
   public void setUpMotor(TalonFX motor, CANCoder encoder){
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Brake);
-    motor.configRemoteFeedbackFilter(encoder, 0);
-    motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
-    motor.setSensorPhase(true);
+    // motor.configRemoteFeedbackFilter(encoder, 0);
+    // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
+    // motor.setSensorPhase(true);
   }
   
   public String getDiagnostics() {
@@ -187,9 +191,16 @@ public class Arm extends SubsystemBase{
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
     //sensor angles should be divided by the appropriate ticks per radian
-    double shoulderRawAngle = shoulderMotor.getSelectedSensorPosition()/1000;
-    double elbowRawAngle = elbowMotor.getSelectedSensorPosition()/1000; 
-    return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
+    double shoulderRawAngle = shoulderMotor.getSelectedSensorPosition()/26075.9;
+    double elbowRawAngle = elbowMotor.getSelectedSensorPosition()/13037.95; 
+    //return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
+    return new JointPositions(shoulderRawAngle, elbowRawAngle);
+  }
+
+  public JointPositions getAbsoluteAngles(){
+    double shoulderAngle = -(shoulderEncoder.getAbsolutePosition() * Math.PI / 180 - shoulderAbsoluteOffset);
+    double elbowAngle = elbowEncoder.getAbsolutePosition() * Math.PI / 180 - elbowAbsoluteOffset;
+    return new JointPositions(shoulderAngle, elbowAngle);
   }
 
   // This method returns the maximum angles of joints
@@ -210,8 +221,8 @@ public class Arm extends SubsystemBase{
 
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
-    shoulderMotor.set(ControlMode.Velocity, speed.shoulder);
-    elbowMotor.set(ControlMode.Velocity, speed.elbow);
+    shoulderMotor.set(ControlMode.Velocity, speed.shoulder * 26075.9 / 10);
+    elbowMotor.set(ControlMode.Velocity, speed.elbow * 13037.95 / 10);
   }
 
   // This method returns the position of claw given different joint angles
