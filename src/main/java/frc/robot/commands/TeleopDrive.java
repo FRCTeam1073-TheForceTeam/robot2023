@@ -102,7 +102,7 @@ public class TeleopDrive extends CommandBase
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
 
     if(parked){
-      m_driveSubsystem.parkingBrake();
+      m_driveSubsystem.parkingBrake(true);
     }
     else if (fieldCentric){
       //Snap to cardinal directions

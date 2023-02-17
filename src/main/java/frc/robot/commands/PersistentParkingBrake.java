@@ -25,7 +25,11 @@ public class PersistentParkingBrake extends CommandBase
     {
         if (!isParkingBrakeOn)
         {
-            drivetrain.parkingBrake();
+            drivetrain.parkingBrake(true);
+        }
+        else
+        {
+            
         }
         //isParkingBrakeOn = true;
     }

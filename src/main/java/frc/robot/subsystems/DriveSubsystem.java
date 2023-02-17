@@ -31,6 +31,7 @@ public class DriveSubsystem extends SubsystemBase
   private Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
   private double maximumLinearSpeed = 1.0;
+  private boolean parkingBrakeOn = false;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
@@ -40,7 +41,7 @@ public class DriveSubsystem extends SubsystemBase
     if (error != ErrorCode.OK) {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
     }
-    error = pigeon2.setYaw(0);
+    error = pigeon2.setYaw(180);
 
     // Make space for four swerve modules:
     modules = new SwerveModule[4];
@@ -184,7 +185,8 @@ public class DriveSubsystem extends SubsystemBase
     return kinematics.toChassisSpeeds(wheelStates);
   }
 
-  public void setBrakes(boolean brakeOn){
+  public void setBrakes(boolean brakeOn)
+  {
     modules[0].setBrake(brakeOn);
     modules[1].setBrake(brakeOn);
     modules[2].setBrake(brakeOn);
@@ -220,7 +222,8 @@ public class DriveSubsystem extends SubsystemBase
   
   @Override
   public void periodic(){
-    if (! debug){
+    if (!debug && !parkingBrakeOn)
+    {
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
@@ -234,7 +237,8 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
     }
-    else { //in debug mode
+    else 
+    { //in debug mode
       SmartDashboard.putNumber("Module 0 Velocity", modules[0].getDriveRawVelocity());
     }
     updateOdometry();
@@ -246,15 +250,20 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Roll", getRoll());
   }
 
-  public void parkingBrake(){
-    modules[0].setSteerAngle(Math.PI / 4);
-    modules[1].setSteerAngle(-Math.PI / 4);
-    modules[2].setSteerAngle(-Math.PI / 4);
-    modules[3].setSteerAngle(Math.PI / 4);
-    modules[0].setDriveVelocity(0);
-    modules[1].setDriveVelocity(0);
-    modules[2].setDriveVelocity(0);
-    modules[3].setDriveVelocity(0);
+  public void parkingBrake(boolean parkingBrakeOn)
+  {
+    this.parkingBrakeOn = parkingBrakeOn;
+    if (parkingBrakeOn)
+    {
+      modules[0].setSteerAngle(Math.PI / 4);
+      modules[1].setSteerAngle(-Math.PI / 4);
+      modules[2].setSteerAngle(-Math.PI / 4);
+      modules[3].setSteerAngle(Math.PI / 4);
+      modules[0].setDriveVelocity(0);
+      modules[1].setDriveVelocity(0);
+      modules[2].setDriveVelocity(0);
+      modules[3].setDriveVelocity(0);
+    }   
   }
   
   public void setDebugSpeed(double speed){

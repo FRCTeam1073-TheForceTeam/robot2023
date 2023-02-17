@@ -24,7 +24,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class DriveThroughTrajectory extends CommandBase {
   /** Creates a new DriveThroughTrajectory. */
 
-  double distanceTolerance = 0.4;
+  double distanceTolerance = 0.2;
   double angleTolerance = 0.1;
 
   DriveSubsystem drivetrain;

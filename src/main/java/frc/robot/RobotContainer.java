@@ -45,7 +45,6 @@ public class RobotContainer {
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
-  private final Engage m_engage = new Engage(m_driveSubsystem, 0.25);  
   //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
   //Auto Chooser
@@ -177,12 +176,23 @@ public class RobotContainer {
   }
 
   public Command basicEngage() {
-    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
+    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3, false));
   }
 
-  public Command engagePlus() {
-    System.out.println("Left Community and then engaged");
-    return null;
+  public Command engagePlus() 
+  {
+    ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
+    ArrayList<Pose2d> scoreWaypoints = new ArrayList<Pose2d>();
+
+    scoreWaypoints.add(new Pose2d(-0.3, 0, new Rotation2d(3.14)));
+    communityWaypoints.add(new Pose2d(2.75, 0, new Rotation2d(3.14)));
+
+    return new SequentialCommandGroup(
+      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+        new Rotation2d()), scoreWaypoints, 0.5, 0.8, 0.5, 0.5),
+      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+        new Rotation2d()), communityWaypoints, 0.5, 0.8, 0.5, 0.5),
+      new Engage(m_driveSubsystem, 0.3, true));
   }
 
   public Command leaveCommunity() {

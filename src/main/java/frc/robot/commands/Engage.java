@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
@@ -19,18 +20,22 @@ public class Engage extends CommandBase
   double distanceTolerance = 0.1;
   double angleTolerance = 0.05;
   boolean forward; //camera faces april tag
+  boolean inverted;
 
   DriveSubsystem drivetrain;
   ChassisSpeeds chassisSpeeds;
   Pose2d targetPose;
   Pose2d robotPose;
   private double maxLinearVelocity;   // Meters/second
+  private double linearVelocity;
+  private double startTime;
   
 
-  public Engage(DriveSubsystem ds, double maxSpeed) {
+  public Engage(DriveSubsystem ds, double maxSpeed, boolean inverted) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = ds;
     maxLinearVelocity = maxSpeed;
+    this.inverted = inverted;
     addRequirements(ds);
   }
 
@@ -39,6 +44,14 @@ public class Engage extends CommandBase
   public void initialize() {
     drivePhase = 0; //starts  moving
     brake = new PersistentParkingBrake(drivetrain);
+    if (inverted)
+    {
+      linearVelocity = -maxLinearVelocity;
+    }
+    else
+    {
+      linearVelocity = maxLinearVelocity;
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +61,7 @@ public class Engage extends CommandBase
     if (drivePhase == 0) {
       robotPose = drivetrain.getOdometry();
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          maxLinearVelocity,
+          linearVelocity,
           0, 
           0,
           Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
@@ -64,18 +77,17 @@ public class Engage extends CommandBase
       if (Math.abs(drivetrain.getPitch()) < 5) 
       {
         drivePhase = 2;
+        startTime = Timer.getFPGATimestamp();
+
       }
     }
 
     if(drivePhase == 2)
     {
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(maxLinearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
       drivetrain.setChassisSpeeds(chassisSpeeds);
       //drivetrain.parkingBrake();
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {}
-      if (Math.abs(drivetrain.getPitch()) < 2)
+      if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitch()) < 2)
       {
         drivePhase = 3;
       }
@@ -85,13 +97,15 @@ public class Engage extends CommandBase
     {
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees((drivetrain.getHeading())));
       drivetrain.setChassisSpeeds(chassisSpeeds);
-      brake.execute(); 
+      drivetrain.parkingBrake(true);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
+  public void end(boolean interrupted) 
+  {
+    drivetrain.parkingBrake(false);
     // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees((drivetrain.getHeading())));
     // drivetrain.parkingBrake();
   }
