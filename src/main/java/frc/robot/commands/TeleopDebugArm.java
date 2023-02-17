@@ -11,6 +11,8 @@ import frc.robot.subsystems.OI;
 public class TeleopDebugArm extends CommandBase {
   private Arm arm;
   private OI oi;
+  private final double maximumX = 48;
+  private final double maximumZ = 78;
 
   /** Creates a new DebugArm. */
   public TeleopDebugArm(Arm arm, OI oi) {
@@ -30,8 +32,29 @@ public class TeleopDebugArm extends CommandBase {
     if(false){
       arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
+    double leftX = oi.getOperatorLeftX();
+    double rightX = oi.getOperatorRightX();
+    
+    if(leftX > 0){
+      if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
+        leftX *= -1;
+      }
 
-    arm.setJointVelocities(arm.new JointVelocities(oi.getOperatorLeftX(), oi.getOperatorRightX()));
+      if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
+        leftX *= -1;
+      }
+    }
+    else{
+      if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
+        leftX = -rightX;      
+      }
+
+      if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
+        leftX = -rightX;      
+      }
+    }
+
+    arm.setJointVelocities(arm.new JointVelocities(leftX, rightX));
   }
 
   // Called once the command ends or is interrupted.

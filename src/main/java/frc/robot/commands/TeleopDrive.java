@@ -54,7 +54,7 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 2.5);
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 5);
     double mult2 = 1.0 + m_OI.getDriverRightTrigger();
 
     //double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.475;
@@ -162,9 +162,9 @@ public class TeleopDrive extends CommandBase
       }
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        -leftY * mult1 * mult2,
-        -leftX * mult1 * mult2,
-        -rightX * mult1 * mult2,
+        -leftY * mult1 * mult2 * 0.5,
+        -leftX * mult1 * mult2 * 0.5,
+        -rightX * mult1 * mult2 * 0.5,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
         m_driveSubsystem.setChassisSpeeds(speeds);
     }
@@ -172,9 +172,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = -leftY * mult1 * mult2; 
-      speeds.vyMetersPerSecond = -leftX * mult1 * mult2; 
-      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2;
+      speeds.vxMetersPerSecond = -leftY * mult1 * mult2 * 0.5; 
+      speeds.vyMetersPerSecond = -leftX * mult1 * mult2 * 0.5; 
+      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2 * 0.5;
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     

@@ -12,6 +12,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
@@ -26,8 +27,8 @@ public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
   //set variables below to correct lengths
-  public final double upperArmLength = 0.0;
-  public final double forearmLength = 0.0;
+  public final double upperArmLength = 25.0;
+  public final double forearmLength = 27.5;
   public final double shoulderOffset = 0.0;
   public final double shoulderAbsoluteOffset = 2.42;
   public final double elbowOffset = 0.0;
@@ -76,6 +77,18 @@ public class Arm extends SubsystemBase{
     double x;
     double z;
     double pitch;
+
+    public double getCartesianX(){
+      return x;
+    }
+
+    public double getCartesianZ(){
+      return z;
+    }
+
+    public double getCartesianPitch(){
+      return pitch;
+    }
   }
 
 
@@ -179,6 +192,7 @@ public class Arm extends SubsystemBase{
     // motor.configRemoteFeedbackFilter(encoder, 0);
     // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
     // motor.setSensorPhase(true);
+    motor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 17, 0.1));
   }
   
   public String getDiagnostics() {
@@ -191,8 +205,8 @@ public class Arm extends SubsystemBase{
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
     //sensor angles should be divided by the appropriate ticks per radian
-    double shoulderRawAngle = shoulderMotor.getSelectedSensorPosition()/26075.9;
-    double elbowRawAngle = elbowMotor.getSelectedSensorPosition()/13037.95; 
+    double shoulderRawAngle = (shoulderMotor.getSelectedSensorPosition()/26075.9) + getAbsoluteAngles().shoulder;
+    double elbowRawAngle = (elbowMotor.getSelectedSensorPosition()/13037.95) + getAbsoluteAngles().elbow; 
     //return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
     return new JointPositions(shoulderRawAngle, elbowRawAngle);
   }
