@@ -51,6 +51,7 @@ public class RobotContainer {
   
   //Auto Chooser
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private static final String kNoAuto = "No Autonomous";
   private static final String kBasicEngage = "Basic Engage";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
@@ -73,6 +74,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
+    m_chooser.addOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
@@ -164,6 +166,9 @@ public class RobotContainer {
     System.out.println(m_chooser.getSelected());
 
     switch (m_chooser.getSelected()) {
+      case kNoAuto:
+        return null;
+        //no command ^^^
       case kBasicEngage:
         return basicEngage();
       case kEngagePlus:
@@ -203,6 +208,15 @@ public class RobotContainer {
   }
 
   public Command leaveCommunity() {
+
+    System.out.println("Leave Community");
+
+    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+        waypoints.add(new Pose2d(3.0, 0.0, new Rotation2d(3.1)));
+
+    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
+
     // switch (m_robotLocation.getSelected()) {
     //   case kPose1:
     //     System.out.println("Leaving Community from position 1");
@@ -216,7 +230,7 @@ public class RobotContainer {
     //   default:
     //     return null;
     // }
-    return null;
+    //return null;
   }
 
   public Command testMode() {
