@@ -212,7 +212,7 @@ public class RobotContainer {
     System.out.println("Leave Community");
 
     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(new Pose2d(3.0, 0.0, new Rotation2d(3.1)));
+        waypoints.add(new Pose2d(2.5, 0.0, new Rotation2d(3.1)));
 
     return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
       new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
