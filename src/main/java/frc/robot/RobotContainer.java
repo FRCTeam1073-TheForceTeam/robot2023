@@ -104,6 +104,10 @@ public class RobotContainer {
 
   }
 
+  public void teleopInit(){
+    m_driveSubsystem.parkingBrake(false);
+  }
+
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
   }

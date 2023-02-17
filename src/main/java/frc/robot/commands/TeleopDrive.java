@@ -86,9 +86,9 @@ public class TeleopDrive extends CommandBase
     double leftY = m_OI.getDriverLeftY() * maximumLinearVelocity * 0.1;
     double leftX = m_OI.getDriverLeftX() * maximumLinearVelocity * 0.1;
     double rightX = m_OI.getDriverRightX() * maximumRotationVelocity * 0.1;
-    if (Math.abs(leftY) < .35) {leftY = 0;}
-    if (Math.abs(leftX) < .35) {leftX = 0;}
-    if (Math.abs(rightX) < .35) {rightX = 0;}
+    if (Math.abs(leftY) < .15) {leftY = 0;}
+    if (Math.abs(leftX) < .15) {leftX = 0;}
+    if (Math.abs(rightX) < .15) {rightX = 0;}
 
     if(m_OI.getXButton()){
       parked = !parked;

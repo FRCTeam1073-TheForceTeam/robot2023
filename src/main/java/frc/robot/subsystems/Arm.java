@@ -43,6 +43,10 @@ public class Arm extends SubsystemBase{
       shoulder = shoulderAng;
       elbow = elbowAng;
     }
+
+    public double getShoulderAngle(){
+      return shoulder;
+    }
   }
 
   public class JointWaypoints{
