@@ -184,6 +184,11 @@ public class OI extends SubsystemBase
     {
         return operatorController.getRawButton(6);
     }
+
+    public boolean getOperatorViewButton()
+    {
+        return operatorController.getRawButton(7);
+    }
     
     public boolean getOperatorMenuButton()
     {
