@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
@@ -39,6 +40,7 @@ public class RobotContainer {
   private final OI m_OI = new OI();
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_bling = new Bling();
+  private final BlingTeleopCommand m_blingTeleopCommand = new BlingTeleopCommand(m_bling, m_OI);
   private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
   private final Arm m_arm = new Arm();
   private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
@@ -68,6 +70,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
     m_chooser.addOption("Engage Plus", kEngagePlus);
