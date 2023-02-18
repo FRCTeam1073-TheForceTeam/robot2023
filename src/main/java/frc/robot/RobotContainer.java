@@ -57,9 +57,9 @@ public class RobotContainer {
   private static final String kBasicEngage = "Basic Engage";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
-  private static final String kTestMode = "Test Mode";
-  private static final String kScoreHybrid = "Score Hybrid";
-  private static final String kTrajectoryWaypoint = "Traj Waypoint";
+//  private static final String kTestMode = "Test Mode";
+//  private static final String kScoreHybrid = "Score Hybrid";
+//  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
   // private final SendableChooser<String> m_robotLocation = new SendableChooser<String>();
   // private static final String kPose1 = "Position 1";
@@ -80,9 +80,9 @@ public class RobotContainer {
     m_chooser.addOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
-    m_chooser.addOption("Test Mode", kTestMode);
-    m_chooser.addOption("Score Hybrid", kScoreHybrid);
-    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
+//    m_chooser.addOption("Test Mode", kTestMode);
+//    m_chooser.addOption("Score Hybrid", kScoreHybrid);
+//    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
     SmartDashboard.putData("Auto Chooser", m_chooser);
 
   //   m_robotLocation.setDefaultOption("Position 1", kPose1);
@@ -117,13 +117,13 @@ public class RobotContainer {
     System.out.println("RobotContainer: configure Bindings");
   }
 
-  public void setTestMode() {
-    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
-    dtc.schedule();
-    m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
+//  public void setTestMode() {
+//    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
+//    dtc.schedule();
+//    m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
 
-    System.out.println("Robot Container: Test mode set");
-  }
+//    System.out.println("Robot Container: Test mode set");
+//  }
 
   public Command getAutonomousCommand() {
     //forward = x, backward = -x, left = y, right = -y
@@ -178,12 +178,12 @@ public class RobotContainer {
         return engagePlus();
       case kLeaveCommunity:
         return leaveCommunity();
-      case kTestMode:
-        return testMode();
-      case kScoreHybrid:
-        return scoreHybrid();
-      case kTrajectoryWaypoint:
-        return trajectoryWaypoint();
+//      case kTestMode:
+//        return testMode();
+//      case kScoreHybrid:
+//        return scoreHybrid();
+//      case kTrajectoryWaypoint:
+//        return trajectoryWaypoint();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -236,20 +236,20 @@ public class RobotContainer {
     //return null;
   }
 
-  public Command testMode() {
-    System.out.println("Test Mode on");
-    return new DriveTestCommand(m_driveSubsystem, m_OI);
-  }
+//  public Command testMode() {
+//    System.out.println("Test Mode on");
+//    return new DriveTestCommand(m_driveSubsystem, m_OI);
+//  }
 
-  public Command scoreHybrid() {
-    System.out.println("Hybrid Scored");
-    return null;
-  }
+//  public Command scoreHybrid() {
+//    System.out.println("Hybrid Scored");
+//    return null;
+//  }
 
-  public Command trajectoryWaypoint() {
-    System.out.println("Waypoint Beginning");
+//  public Command trajectoryWaypoint() {
+//    System.out.println("Waypoint Beginning");
 
-    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+//    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
   
     //FORWARD TEST
 
@@ -259,18 +259,18 @@ public class RobotContainer {
   //        waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
         
   // BOX TEST  
-        waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d()));
-        waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
-        waypoints.add(new Pose2d(1.0, -1.0, new Rotation2d()));
-        waypoints.add(new Pose2d(0.0, -1.0, new Rotation2d()));
+//        waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d()));
+//        waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
+//        waypoints.add(new Pose2d(1.0, -1.0, new Rotation2d()));
+//        waypoints.add(new Pose2d(0.0, -1.0, new Rotation2d()));
         
-        waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d(3.1)));
+//        waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d(3.1)));
      // return new SequentialCommandGroup(
      //   new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 
-    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
-  }
+//    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+//      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
+//  }
 
   public void setStartupLighting()
   {
