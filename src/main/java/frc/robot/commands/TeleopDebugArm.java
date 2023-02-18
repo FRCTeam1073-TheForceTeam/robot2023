@@ -32,7 +32,7 @@ public class TeleopDebugArm extends CommandBase {
     if(false){
       arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
-    double leftY = oi.getOperatorLeftY();
+    double leftY = -oi.getOperatorLeftY();
     double rightY = oi.getOperatorRightY();
     /* 
     if(leftX > 0){
