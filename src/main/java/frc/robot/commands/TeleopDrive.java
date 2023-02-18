@@ -28,7 +28,7 @@ public class TeleopDrive extends CommandBase
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
   private boolean fieldCentric;
-  private boolean parked;
+  private boolean parked = false;
   ChassisSpeeds speeds;
 
   // Teleop drive velocity scaling:
@@ -101,11 +101,11 @@ public class TeleopDrive extends CommandBase
 
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
 
-    if(parked){
+    if(parked && !m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(true);
     }
     
-    if(!parked){
+    if(!parked && m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(false);
     }
     
