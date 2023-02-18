@@ -57,13 +57,13 @@ public class TeleopDebugArm extends CommandBase {
     //if(leftX < 0 || rightX < 0){
     //  if(arm.getJointAngles().shoulder <= arm.getMinAngles().shoulder )
     //}
-    if(arm.getAbsoluteAngles().getShoulderAngle() <= arm.getMinAngles().getShoulderAngle()){
-      leftX = Math.max(0, leftX);
-    }
+    // if(arm.getAbsoluteAngles().getShoulderAngle() >= arm.getMinAngles().getShoulderAngle()){
+    //   leftX = Math.max(0, leftX);
+    // }
 
-    if(arm.getAbsoluteAngles().getElbowAngle() <= arm.getMinAngles().getElbowAngle()){
-      rightX = Math.max(0, rightX);
-    }
+    // if(arm.getAbsoluteAngles().getElbowAngle() <= arm.getMinAngles().getElbowAngle()){
+    //   rightX = Math.max(0, rightX);
+    // }
 /* 
     if(arm.getAbsoluteAngles().getShoulderAngle() >= arm.getMaxAngles().getShoulderAngle()){
       leftX = Math.max(0, leftX);

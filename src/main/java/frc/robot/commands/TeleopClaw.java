@@ -31,7 +31,7 @@ public class TeleopClaw extends CommandBase {
       claw.setVacuumPower(0);
     }
     if(oi.getOperatorRightBumper()){
-      claw.setVacuumPower(.5);
+      claw.setVacuumPower(1);
     }
   }
 

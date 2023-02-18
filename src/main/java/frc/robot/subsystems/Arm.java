@@ -180,7 +180,7 @@ public class Arm extends SubsystemBase{
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
 
-    minAngles = getAbsoluteAngles();
+    //minAngles = getAbsoluteAngles();
   }
 
   @Override
@@ -230,12 +230,12 @@ public class Arm extends SubsystemBase{
 
   // This method returns the maximum angles of joints
   public JointPositions getMaxAngles(){
-    return null;
+    return new JointPositions(3.37, 0.08);
   }
 
   // This method returns the minimum angles of joints
   public JointPositions getMinAngles(){ 
-    return minAngles;
+    return new JointPositions(-3.37, 2.98);
   }
 
   // This method sets a target angle for joints
