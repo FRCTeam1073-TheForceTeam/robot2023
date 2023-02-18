@@ -19,6 +19,7 @@ import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
+import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.UnderglowSetCommand;
@@ -47,6 +48,7 @@ public class RobotContainer {
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
+  private final TeleopClaw m_clawCommand = new TeleopClaw(m_claw, m_OI);
   //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
   //Auto Chooser
@@ -71,6 +73,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);

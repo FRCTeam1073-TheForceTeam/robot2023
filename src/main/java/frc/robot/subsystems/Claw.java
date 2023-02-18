@@ -5,16 +5,26 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
+  private TalonFX vacuumMotor; 
+
   /** Creates a new Claw. */
-  public Claw() {}
+  public Claw() {
+    vacuumMotor = new TalonFX(19);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void setVacuumPower(double power){
+    vacuumMotor.set(ControlMode.PercentOutput, power);
   }
 
   // Initialize preferences for this class:
