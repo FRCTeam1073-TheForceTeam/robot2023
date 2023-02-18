@@ -104,6 +104,11 @@ public class TeleopDrive extends CommandBase
     if(parked){
       m_driveSubsystem.parkingBrake(true);
     }
+    
+    if(!parked){
+      m_driveSubsystem.parkingBrake(false);
+    }
+    
     else if (fieldCentric){
       //Snap to cardinal directions
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);

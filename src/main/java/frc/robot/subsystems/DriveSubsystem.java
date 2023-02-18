@@ -266,6 +266,10 @@ public class DriveSubsystem extends SubsystemBase
     }   
   }
   
+  public boolean getParkingBrake(){
+    return parkingBrakeOn;
+  }
+
   public void setDebugSpeed(double speed){
     modules[0].setDriveVelocity(speed);
     modules[1].setDriveVelocity(speed);
