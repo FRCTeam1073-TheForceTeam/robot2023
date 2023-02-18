@@ -54,8 +54,8 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 5);
-    double mult2 = 1.0 + m_OI.getDriverRightTrigger();
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 2.5);
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * 2.0);
 
     //double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.475;
     //double mult2 = m_OI.getDriverRightTrigger() * maximumLinearVelocity * 0.475;

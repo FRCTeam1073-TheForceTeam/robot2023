@@ -33,6 +33,7 @@ public class Arm extends SubsystemBase{
   public final double shoulderAbsoluteOffset = 2.42;
   public final double elbowOffset = 0.0;
   public final double elbowAbsoluteOffset = 1.73;
+  public JointPositions minAngles;
 
   public class JointPositions{
     double shoulder;
@@ -46,6 +47,10 @@ public class Arm extends SubsystemBase{
 
     public double getShoulderAngle(){
       return shoulder;
+    }
+
+    public double getElbowAngle(){
+      return elbow;
     }
   }
 
@@ -174,6 +179,8 @@ public class Arm extends SubsystemBase{
     elbowMotor.config_kF(0, 0);
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
+
+    minAngles = getAbsoluteAngles();
   }
 
   @Override
@@ -227,8 +234,8 @@ public class Arm extends SubsystemBase{
   }
 
   // This method returns the minimum angles of joints
-  public JointPositions getMinAngles(){
-    return null;
+  public JointPositions getMinAngles(){ 
+    return minAngles;
   }
 
   // This method sets a target angle for joints
