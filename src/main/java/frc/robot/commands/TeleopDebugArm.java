@@ -32,8 +32,8 @@ public class TeleopDebugArm extends CommandBase {
     if(false){
       arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
-    double leftX = oi.getOperatorLeftX();
-    double rightX = oi.getOperatorRightX();
+    double leftY = oi.getOperatorLeftY();
+    double rightY = oi.getOperatorRightY();
     /* 
     if(leftX > 0){
       if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
@@ -73,7 +73,7 @@ public class TeleopDebugArm extends CommandBase {
       rightX = Math.max(0, rightX);
     }
 */
-    arm.setJointVelocities(arm.new JointVelocities(leftX, rightX));
+    arm.setJointVelocities(arm.new JointVelocities(leftY, rightY));
   }
 
   // Called once the command ends or is interrupted.
