@@ -237,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
     }
-    else 
+    else if(!parkingBrakeOn)
     { //in debug mode
       SmartDashboard.putNumber("Module 0 Velocity", modules[0].getDriveRawVelocity());
     }
@@ -255,17 +255,19 @@ public class DriveSubsystem extends SubsystemBase
     this.parkingBrakeOn = parkingBrakeOn;
     if (parkingBrakeOn)
     {
-      modules[0].setSteerAngle(Math.PI / 4);
-      modules[1].setSteerAngle(-Math.PI / 4);
-      modules[2].setSteerAngle(-Math.PI / 4);
-      modules[3].setSteerAngle(Math.PI / 4);
-      modules[0].setDriveVelocity(0);
-      modules[1].setDriveVelocity(0);
-      modules[2].setDriveVelocity(0);
-      modules[3].setDriveVelocity(0);
-    }   
+      SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
+      states[0] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[0].getSteeringAngle()));
+      states[1] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[1].getSteeringAngle()));
+      states[2] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[2].getSteeringAngle()));
+      states[3] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[3].getSteeringAngle()));
+
+      modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
+      modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
+      modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
+      modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+    }
   }
-  
+
   public boolean getParkingBrake(){
     return parkingBrakeOn;
   }
