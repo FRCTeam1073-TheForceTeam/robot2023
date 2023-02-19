@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     System.out.println("Robot: testInit");
-    m_robotContainer.setTestMode();
+    //m_robotContainer.setTestMode();
   }
 
   @Override
