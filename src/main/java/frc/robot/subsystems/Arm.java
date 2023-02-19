@@ -9,18 +9,15 @@ import java.util.ArrayList;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.ctre.phoenix.ErrorCode;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
@@ -34,6 +31,8 @@ public class Arm extends SubsystemBase{
   public final double elbowOffset = 0.0;
   public final double elbowAbsoluteOffset = 1.73;
   public JointPositions minAngles;
+  public JointPositions currentJointPositions = new JointPositions();
+  public JointVelocities currentJointVelocities = new JointVelocities();
 
   public class JointPositions{
     double shoulder;
@@ -43,6 +42,12 @@ public class Arm extends SubsystemBase{
       //showing angles in relation to the flat robot chassis and not the angle between two arm segments
       shoulder = shoulderAng;
       elbow = elbowAng;
+    }
+
+    public JointPositions(){
+      //showing angles in relation to the flat robot chassis and not the angle between two arm segments
+      shoulder = 0.0;
+      elbow = 0.0;
     }
 
     public double getShoulderAngle(){
@@ -79,6 +84,11 @@ public class Arm extends SubsystemBase{
     public JointVelocities(double shoulderVel, double elbowVel){
       shoulder = shoulderVel;
       elbow = elbowVel;
+    }
+
+    public JointVelocities(){
+      shoulder = 0.0;
+      elbow = 0.0;
     }
   }
 
@@ -186,10 +196,14 @@ public class Arm extends SubsystemBase{
   @Override
   public void periodic(){
     // This method will be called once per scheduler run
+    currentJointPositions = getAbsoluteAngles();
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
-    SmartDashboard.putNumber("Shoulder Absolute Angle", getAbsoluteAngles().shoulder);
-    SmartDashboard.putNumber("Elbow Absolute Angle", getAbsoluteAngles().elbow);
+    SmartDashboard.putNumber("Shoulder Absolute Angle", currentJointPositions.shoulder);
+    SmartDashboard.putNumber("Elbow Absolute Angle", currentJointPositions.elbow);
+    SmartDashboard.putNumber("Shoulder Velocitiy", currentJointVelocities.shoulder);
+    SmartDashboard.putNumber("Elbow Velocitiy", currentJointVelocities.elbow);
+    
   }
 
   // Initialize preferences for this class:
@@ -223,8 +237,8 @@ public class Arm extends SubsystemBase{
   }
 
   public JointPositions getAbsoluteAngles(){
-    double shoulderAngle = -(shoulderEncoder.getAbsolutePosition() * Math.PI / 180 - shoulderAbsoluteOffset);
-    double elbowAngle = elbowEncoder.getAbsolutePosition() * Math.PI / 180 - elbowAbsoluteOffset;
+    double shoulderAngle = -(shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset);
+    double elbowAngle = elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
     return new JointPositions(shoulderAngle, elbowAngle);
   }
 
@@ -246,8 +260,32 @@ public class Arm extends SubsystemBase{
 
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
-    shoulderMotor.set(ControlMode.Velocity, speed.shoulder * 26075.9 / 10);
+    if(currentJointPositions.shoulder < -3.77){ //3.79
+      if(speed.shoulder < 0){
+        speed.shoulder = 0;
+      }
+    }
+    if(currentJointPositions.shoulder > 0.98){ //1.0
+      if(speed.shoulder > 0){
+        speed.shoulder = 0;
+      }
+    }
+
+    if(currentJointPositions.elbow < -2.82){ //-2.82
+      if(speed.elbow < 0){
+        speed.elbow = 0;
+      }
+    }
+    if(currentJointPositions.elbow > 2.99){
+      if(speed.elbow > 0){
+        speed.elbow = 0;
+      }
+    }
+
+    shoulderMotor.set(ControlMode.Velocity, -speed.shoulder * 26075.9 / 10);
     elbowMotor.set(ControlMode.Velocity, speed.elbow * 13037.95 / 10);
+    currentJointVelocities.shoulder = speed.shoulder;
+    currentJointVelocities.elbow = speed.elbow;
   }
 
   // This method returns the position of claw given different joint angles
