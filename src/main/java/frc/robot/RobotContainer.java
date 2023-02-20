@@ -57,7 +57,7 @@ public class RobotContainer {
   private static final String kBasicEngage = "Basic Engage";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
-//  private static final String kTestMode = "Test Mode";
+  private static final String kTestMode = "Test Mode";
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
@@ -80,7 +80,8 @@ public class RobotContainer {
     m_chooser.addOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
-//    m_chooser.addOption("Test Mode", kTestMode);
+    m_chooser.addOption("Test Mode", kTestMode);
+//    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
     SmartDashboard.putData("Auto Chooser", m_chooser);
@@ -117,13 +118,13 @@ public class RobotContainer {
     System.out.println("RobotContainer: configure Bindings");
   }
 
-//  public void setTestMode() {
-//    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
-//    dtc.schedule();
-//    m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
+    public void setTestMode() {
+    DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
+    dtc.schedule();
+    m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
 
-//    System.out.println("Robot Container: Test mode set");
-//  }
+    System.out.println("Robot Container: Test mode set");
+  }
 
   public Command getAutonomousCommand() {
     //forward = x, backward = -x, left = y, right = -y
@@ -178,8 +179,8 @@ public class RobotContainer {
         return engagePlus();
       case kLeaveCommunity:
         return leaveCommunity();
-//      case kTestMode:
-//        return testMode();
+      case kTestMode:
+        return testMode();
 //      case kScoreHybrid:
 //        return scoreHybrid();
 //      case kTrajectoryWaypoint:
@@ -191,7 +192,7 @@ public class RobotContainer {
   }
 
   public Command basicEngage() {
-    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3, false));
+    return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
   }
 
   public Command engagePlus() 
@@ -200,15 +201,16 @@ public class RobotContainer {
     ArrayList<Pose2d> scoreWaypoints = new ArrayList<Pose2d>();
 
     scoreWaypoints.add(new Pose2d(-0.3, 0, new Rotation2d(3.14)));
-    communityWaypoints.add(new Pose2d(2.75, 0, new Rotation2d(3.14)));
+    communityWaypoints.add(new Pose2d(2.25, 0, new Rotation2d(3.14)));
 
     return new SequentialCommandGroup(
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), scoreWaypoints, 0.5, 0.8, 0.5, 0.5),
+        new Rotation2d()), scoreWaypoints, 1.0, 0.8, 0.5, 0.5),
       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), communityWaypoints, 0.5, 0.8, 0.5, 0.5),
-      new Engage(m_driveSubsystem, 0.3, true));
-  }
+        new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.5),
+      new Engage(m_driveSubsystem, 0.5, true));
+      //WEEK 0: changed max velocity in both drive through trajectories to 1.0 from 0.5, and set engage max speed to 0.5 from 0.3
+    }
 
   public Command leaveCommunity() {
 
@@ -236,10 +238,10 @@ public class RobotContainer {
     //return null;
   }
 
-//  public Command testMode() {
-//    System.out.println("Test Mode on");
-//    return new DriveTestCommand(m_driveSubsystem, m_OI);
-//  }
+  public Command testMode() {
+    System.out.println("Test Mode on");
+    return new DriveTestCommand(m_driveSubsystem, m_OI);
+  }
 
 //  public Command scoreHybrid() {
 //    System.out.println("Hybrid Scored");

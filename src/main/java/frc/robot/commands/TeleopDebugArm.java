@@ -32,8 +32,9 @@ public class TeleopDebugArm extends CommandBase {
     if(false){
       arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
     }
-    double leftY = -oi.getOperatorLeftY();
-    double rightY = oi.getOperatorRightY();
+    //code change for week zero (increased speed) 
+    double leftY = -oi.getOperatorLeftY() * 1.2;
+    double rightY = oi.getOperatorRightY() * 1.2;
     /* 
     if(leftX > 0){
       if(arm.getCartesianPosition(arm.getJointAngles()).getCartesianX() >= maximumX ){
