@@ -11,8 +11,10 @@ import frc.robot.subsystems.OI;
 public class TeleopDebugArm extends CommandBase {
   private Arm arm;
   private OI oi;
-  private final double maximumX = 48;
-  private final double maximumZ = 78;
+  //private final double maximumX = 48;
+  //private final double maximumZ = 78;
+  private final double maxShoulderVel = 3;
+  private final double maxElbowVel = 3;
 
   /** Creates a new DebugArm. */
   public TeleopDebugArm(Arm arm, OI oi) {
@@ -74,7 +76,7 @@ public class TeleopDebugArm extends CommandBase {
       rightX = Math.max(0, rightX);
     }
 */
-    arm.setJointVelocities(arm.new JointVelocities(leftY, rightY));
+    arm.setJointVelocities(arm.new JointVelocities(leftY * maxShoulderVel, rightY * maxElbowVel));
   }
 
   // Called once the command ends or is interrupted.

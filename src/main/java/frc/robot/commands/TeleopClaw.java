@@ -28,10 +28,10 @@ public class TeleopClaw extends CommandBase {
   @Override
   public void execute() {
     if(oi.getOperatorLeftBumper()){
-      claw.setVacuumPower(0);
+      claw.setVacuumSpeed(0);
     }
     if(oi.getOperatorRightBumper()){
-      claw.setVacuumPower(1);
+      claw.setVacuumSpeed(628.4); //intial: 314.2 rps
     }
   }
 
