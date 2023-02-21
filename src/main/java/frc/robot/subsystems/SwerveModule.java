@@ -37,8 +37,7 @@ public class SwerveModule
     // private SwerveModuleIDConfig ids;
     private CANCoder steerEncoder;
     public Translation2d position;
-        //TODO: do we want it to give us absolute position
-
+    
     public SwerveModule(SwerveModuleConfig cfg, SwerveModuleIDConfig ids)
     {
         this.position = cfg.position;
@@ -95,6 +94,10 @@ public class SwerveModule
     // Return drive velocity in meters/second.
     public double getDriveVelocity(){
         return -driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
+    }
+
+    public double getDriveRawVelocity() {
+        return driveMotor.getSelectedSensorVelocity();
     }
     
     //*Wrapping code from sds example swerve library
