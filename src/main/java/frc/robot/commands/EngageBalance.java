@@ -43,6 +43,10 @@ public class EngageBalance extends CommandBase
     @Override 
     public void execute()
     {
+        if (Math.abs(drivetrain.getPitch()) < 5)
+        {
+            
+        }
         robotPose = drivetrain.getOdometry();
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
         drivetrain.setChassisSpeeds(chassisSpeeds);

@@ -49,11 +49,6 @@ public class EngageDriveUp extends CommandBase
           0,
           Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
         drivetrain.setChassisSpeeds(chassisSpeeds);
-        if (Math.abs(drivetrain.getPitch()) > 13) 
-        {
-            phase = 1;
-            //return true;
-        }
     }
 
     @Override
@@ -65,8 +60,9 @@ public class EngageDriveUp extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (phase == 1 && Math.abs(drivetrain.getPitch()) < 5)
+        if (Math.abs(drivetrain.getPitch()) > 13) 
         {
+            
             return true;
         }
         else

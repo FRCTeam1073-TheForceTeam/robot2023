@@ -223,7 +223,7 @@ public class RobotContainer {
   {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, 0.5, false), 
-      new EngageBalance(m_driveSubsystem, 0.5, true),
+      new EngageBalance(m_driveSubsystem, 0.5, false),
       new ParkingBrake(m_driveSubsystem, true));
   }
 
