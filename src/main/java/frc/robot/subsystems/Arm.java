@@ -15,7 +15,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,6 +25,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
+  private SlewRateLimiter elbowLimiter;
+  private SlewRateLimiter shoulderLimiter;
+  private boolean isElbowMagnetHealthy;
+  private boolean isShoulderMagnetHealthy;
   //set variables below to correct lengths
   public final double upperArmLength = 25.0;
   public final double forearmLength = 27.5;
@@ -30,6 +36,8 @@ public class Arm extends SubsystemBase{
   public final double shoulderAbsoluteOffset = 2.42;
   public final double elbowOffset = 0.0;
   public final double elbowAbsoluteOffset = 1.73;
+  public final double shoulderTicksPerRadian = 26075.9;
+  public final double elbowTicksPerRadian = 13037.95;
   public JointPositions minAngles;
   public JointPositions currentJointPositions = new JointPositions();
   public JointVelocities currentJointVelocities = new JointVelocities();
@@ -173,6 +181,10 @@ public class Arm extends SubsystemBase{
     elbowMotor = new TalonFX(18);
     shoulderEncoder = new CANCoder(15);
     elbowEncoder = new CANCoder(17);
+
+    elbowLimiter = new SlewRateLimiter(0.5);
+    shoulderLimiter = new SlewRateLimiter(0.5);
+
     setUpMotor(shoulderMotor, shoulderEncoder);
     setUpMotor(elbowMotor, elbowEncoder);
 
@@ -190,6 +202,9 @@ public class Arm extends SubsystemBase{
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
 
+    elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian);
+    shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian);
+
     //minAngles = getAbsoluteAngles();
   }
 
@@ -199,11 +214,28 @@ public class Arm extends SubsystemBase{
     currentJointPositions = getAbsoluteAngles();
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
+    SmartDashboard.putNumber("Shoulder Encoder Angle", shoulderMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Elbow Encoder Angle", elbowMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Shoulder Absolute Angle", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle", currentJointPositions.elbow);
     SmartDashboard.putNumber("Shoulder Velocitiy", currentJointVelocities.shoulder);
     SmartDashboard.putNumber("Elbow Velocitiy", currentJointVelocities.elbow);
+    SmartDashboard.putBoolean("Is Elbow Magnet Healthy", isElbowMagnetHealthy);
+    SmartDashboard.putBoolean("Is Shoulder Magnet Healthy", isShoulderMagnetHealthy);
     
+    if(elbowEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
+      isElbowMagnetHealthy = false;
+    }
+    else{
+      isElbowMagnetHealthy = true;
+    }
+
+    if(shoulderEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
+      isShoulderMagnetHealthy = false;
+    }
+    else{
+      isShoulderMagnetHealthy = true;
+    }
   }
 
   // Initialize preferences for this class:
@@ -230,8 +262,8 @@ public class Arm extends SubsystemBase{
   // This methods returns the angle of each joint
   public JointPositions getJointAngles(){
     //sensor angles should be divided by the appropriate ticks per radian
-    double shoulderRawAngle = (shoulderMotor.getSelectedSensorPosition()/26075.9) + getAbsoluteAngles().shoulder;
-    double elbowRawAngle = (elbowMotor.getSelectedSensorPosition()/13037.95) + getAbsoluteAngles().elbow; 
+    double shoulderRawAngle = (shoulderMotor.getSelectedSensorPosition()/shoulderTicksPerRadian);
+    double elbowRawAngle = (elbowMotor.getSelectedSensorPosition()/elbowTicksPerRadian); 
     //return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
     return new JointPositions(shoulderRawAngle, elbowRawAngle);
   }
@@ -254,6 +286,8 @@ public class Arm extends SubsystemBase{
 
   // This method sets a target angle for joints
   public void setTargetAngle(JointPositions target){
+    //elbowLimiter.calculate(target.elbow);
+    //shoulderLimiter.calculate(target.shoulder);
     shoulderMotor.set(ControlMode.Position, target.shoulder);
     elbowMotor.set(ControlMode.Position, target.elbow);
   }
