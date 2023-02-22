@@ -36,19 +36,23 @@ public class AprilTagFinder extends SubsystemBase {
   private ArrayList<AprilTag> tags;
   private Transform3d cameraTransform;
   private DriveSubsystem driveSubsystem;
+  private String tableName;
 
   /** Creates a new AprilTag. */
-  public AprilTagFinder(DriveSubsystem ds) {
+  public AprilTagFinder(DriveSubsystem ds, String tableName, Transform3d cameraTransform) {
     driveSubsystem = ds;
+    this.tableName = tableName;
+    this.cameraTransform = cameraTransform;
     detections = new ArrayList<AprilTagDetection>();
-    apriltagNetwork = NetworkTableInstance.getDefault().getTable("Vision");
+    //apriltagNetwork = NetworkTableInstance.getDefault().getTable("Vision");
+    apriltagNetwork = NetworkTableInstance.getDefault().getTable(tableName);
     apriltagEntry = apriltagNetwork.getEntry("Tags1");
-    AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 1385/1.75, 1385/1.75, 320, 240);
+    AprilTagPoseEstimator.Config config = new AprilTagPoseEstimator.Config(0.1524, 333.3, 333.3, 320, 180);
     poseEstimator = new AprilTagPoseEstimator(config);
     tags = new ArrayList<AprilTag>();
-    cameraTransform = new Transform3d(new Translation3d(0.1143, -0.1397, 0.51435), new Rotation3d(0, 0, 0)); //location of the camera in robot cordinates
+    //cameraTransform = new Transform3d(new Translation3d(0.1143, -0.1397, 0.51435), new Rotation3d(0, 0, 0)); //location of the camera in robot cordinates
     //cameraTransform = new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, Math.PI/2.0, 0)); //location of the camera in robot cordinates
-    //cameraTransform = new Transform3d();
+    //cameraTransform = new Transform3d(); 
   }
    
   
@@ -126,20 +130,19 @@ public class AprilTagFinder extends SubsystemBase {
 
     }
     //End of tag proccesing loop
-    SmartDashboard.putNumber("AprilTag.numTags", numTags);
+    SmartDashboard.putNumber(String.format("%s AprilTag.numTags", tableName), numTags);
     if (closestTag >= 0){
-      SmartDashboard.putNumber("Closest ID", tags.get(closestTag).ID);
-      SmartDashboard.putNumber("Closest Distance", closestDistance);
-      SmartDashboard.putNumber("Closest X", tags.get(closestTag).pose.getX());
-      SmartDashboard.putNumber("Closest Y", tags.get(closestTag).pose.getY());
-      SmartDashboard.putNumber("Closest Z", tags.get(closestTag).pose.getZ());
-      SmartDashboard.putNumber("Tag Rotation X", tags.get(closestTag).pose.getRotation().getX());
-      SmartDashboard.putNumber("Tag Rotation Y", tags.get(closestTag).pose.getRotation().getY());
-      SmartDashboard.putNumber("Tag Rotation Z", tags.get(closestTag).pose.getRotation().getZ());
+      SmartDashboard.putNumber(String.format("%s Closest ID", tableName), tags.get(closestTag).ID);
+      SmartDashboard.putNumber(String.format("%s Closest Distance", tableName), closestDistance);
+      SmartDashboard.putNumber(String.format("%s Closest X", tableName), tags.get(closestTag).pose.getX());
+      SmartDashboard.putNumber(String.format("%s Closest Y", tableName), tags.get(closestTag).pose.getY());
+      SmartDashboard.putNumber(String.format("%s Closest Z", tableName), tags.get(closestTag).pose.getZ());
+      SmartDashboard.putNumber(String.format("%s Tag Rotation X", tableName), tags.get(closestTag).pose.getRotation().getX());
+      SmartDashboard.putNumber(String.format("%s Tag Rotation Y", tableName), tags.get(closestTag).pose.getRotation().getY());
+      SmartDashboard.putNumber(String.format("%s Tag Rotation Z", tableName), tags.get(closestTag).pose.getRotation().getZ());
     }
     
   }
-
 
   public ArrayList<AprilTag> getTags(){
     return tags;
