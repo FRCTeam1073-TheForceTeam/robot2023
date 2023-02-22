@@ -19,10 +19,13 @@ import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
+import frc.robot.commands.EngageBalance;
 import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.UnderglowSetCommand;
+import frc.robot.commands.EngageDriveUp;
+import frc.robot.commands.ParkingBrake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
@@ -55,6 +58,7 @@ public class RobotContainer {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private static final String kNoAuto = "No Autonomous";
   private static final String kBasicEngage = "Basic Engage";
+  private static final String kEngageExperimental = "Experimental Engage";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
@@ -77,6 +81,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
+    m_chooser.setDefaultOption("Experimental Engage", kEngageExperimental);
     m_chooser.addOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
@@ -177,6 +182,8 @@ public class RobotContainer {
         return basicEngage();
       case kEngagePlus:
         return engagePlus();
+      case kEngageExperimental:
+        return engageExperimental();
       case kLeaveCommunity:
         return leaveCommunity();
       case kTestMode:
@@ -210,7 +217,15 @@ public class RobotContainer {
         new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.5),
       new Engage(m_driveSubsystem, 0.5, true));
       //WEEK 0: changed max velocity in both drive through trajectories to 1.0 from 0.5, and set engage max speed to 0.5 from 0.3
-    }
+  }
+
+  public Command engageExperimental()
+  {
+    return new SequentialCommandGroup(
+      new EngageDriveUp(m_driveSubsystem, 0.5, false), 
+      new EngageBalance(m_driveSubsystem, 0.5, false),
+      new ParkingBrake(m_driveSubsystem, true));
+  }
 
   public Command leaveCommunity() {
 

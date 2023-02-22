@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import java.util.ArrayList;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -56,7 +57,8 @@ public class Engage extends CommandBase
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
+  public void execute() 
+  {
     SmartDashboard.putNumber("Drive Phase", drivePhase);
     if (drivePhase == 0) {
       robotPose = drivetrain.getOdometry();
