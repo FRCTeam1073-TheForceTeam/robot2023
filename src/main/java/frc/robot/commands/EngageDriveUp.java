@@ -14,7 +14,6 @@ public class EngageDriveUp extends CommandBase
     boolean inverted;
     private double maxLinearVelocity;
     private double linearVelocity;
-    private int phase;
 
     public EngageDriveUp(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
@@ -36,7 +35,6 @@ public class EngageDriveUp extends CommandBase
         {
             linearVelocity = maxLinearVelocity;
         }
-        phase = 0;
     }
 
     @Override 

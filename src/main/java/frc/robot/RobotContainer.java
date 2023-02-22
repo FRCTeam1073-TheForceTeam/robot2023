@@ -33,7 +33,7 @@ import frc.robot.subsystems.OI;
 import frc.robot.subsystems.OpenMV;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.AprilTagDetection;
-import frc.robot.subsystems.AprilTagFinder;
+//import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.Claw;
@@ -45,7 +45,7 @@ public class RobotContainer {
   private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_bling = new Bling();
   private final BlingTeleopCommand m_blingTeleopCommand = new BlingTeleopCommand(m_bling, m_OI);
-  private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
+  //private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
   private final Arm m_arm = new Arm();
   private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
@@ -224,7 +224,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, 0.5, false), 
       new EngageBalance(m_driveSubsystem, 0.5, false),
-      new ParkingBrake(m_driveSubsystem, true));
+      new ParkingBrake(m_driveSubsystem));
   }
 
   public Command leaveCommunity() {
