@@ -78,9 +78,9 @@ public class TeleopDebugArm extends CommandBase {
 */
     arm.setJointVelocities(arm.new JointVelocities(leftY * maxShoulderVel, rightY * maxElbowVel));
 
-    if(oi.getAButton()){
-      arm.setTargetAngle(arm.new JointPositions(-2.0, 4.7));
-    }
+    //if(oi.getAButton()){
+    //  arm.setTargetAngle(arm.new JointPositions(-2.0, 4.7));
+    //}
   }
 
   // Called once the command ends or is interrupted.
