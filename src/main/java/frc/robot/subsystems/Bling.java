@@ -48,6 +48,8 @@ public class Bling extends SubsystemBase {
     ledG = (int)SmartDashboard.getNumber("G Value", ledG);
     ledB = (int)SmartDashboard.getNumber("B Value", ledB);
     setRGBAll(ledR, ledG, ledB);
+
+    
   }
 
   public void setRGB(int i, int r, int g, int b)
@@ -119,10 +121,13 @@ public class Bling extends SubsystemBase {
     }
   }
 
+  public void setSlot(int slotNumber, int r, int g, int b) {
+    rangeRGB(slotNumber*slotLength, slotLength, r, g, b);
+
+  }
+
   public void batteryBling(int minLEDsVolts, int numberLEDsVolts, double min_volts, double max_volts) {
-    for (int i = minLEDsVolts; i < (minLEDsVolts + numberLEDsVolts); i++) {
-      m_ledBuffer.setRGB(i, 0, 0, 0);
-    }
+    
     
     double volts = RobotController.getBatteryVoltage();
 
