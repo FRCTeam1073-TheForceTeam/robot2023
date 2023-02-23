@@ -35,6 +35,10 @@ public class TeleopDrive extends CommandBase
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
+  //Snap to position thresholds
+  private final static double STOP_THRESHOLD = 30;
+  private final static double SLOW_THRESHOLD = 20;
+
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi){
     super.setName("Teleop Drive");
@@ -55,8 +59,8 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute(){
     //multiples the angle by a number from 1 to the square root of 20:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(20) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(20) - 1));
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(40) - 1));
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(40) - 1));
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -67,9 +71,9 @@ public class TeleopDrive extends CommandBase
     if (Math.abs(rightX) < .05) {rightX = 0;}
 
     //sets the velocity to a number from 0 to 1/20th of the max:
-    leftY *= maximumLinearVelocity * .05;
-    leftX *= maximumLinearVelocity * .05;
-    rightX *= maximumRotationVelocity * .05;
+    leftY *= maximumLinearVelocity * .025;
+    leftX *= maximumLinearVelocity * .025;
+    rightX *= maximumRotationVelocity * .025;
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
@@ -87,11 +91,10 @@ public class TeleopDrive extends CommandBase
     }
     else if (fieldCentric){
       //Snap to cardinal directions
-      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);
-      double cardinalError;
-      SmartDashboard.putNumber("Current Angle within 2 pi", currentAngle);
-
-      rightX = snapToHeading(currentAngle, rightX);
+      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees() % (2 * Math.PI);
+      SmartDashboard.putNumber("Current Angle within 360 degrees", currentAngle);
+      SmartDashboard.putNumber("DPad input", 360 - m_OI.getDPad());
+      rightX = snapToHeading(currentAngle, (360 - m_OI.getDPad()));
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         -leftY * mult1 * mult2,
@@ -121,8 +124,8 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-  public double snapToHeading(double angle, double rotation){
-    double error;
+  public double snapToHeading(double currentAngle, double targetAngle){
+    /* 
     while(angle < 0){
       angle += 2 * Math.PI;
     }
@@ -195,8 +198,22 @@ public class TeleopDrive extends CommandBase
         rotation = -angle - Math.PI / 2;
       }
     }
-    return rotation;
+    */
+    double error = currentAngle - targetAngle;
+    while(error < -180){error += 360;}
+    while(error > 180){error -= 360;}
+    SmartDashboard.putNumber("Angle Error", error);
+    if(Math.abs(error) < STOP_THRESHOLD){
+      return 0;
+    }
+    if(Math.abs(error) < SLOW_THRESHOLD){
+      return error/SLOW_THRESHOLD;
+    }
+    return error;
+    
   }
+
+
 
   // Called once the command ends or is interrupted.
   @Override
