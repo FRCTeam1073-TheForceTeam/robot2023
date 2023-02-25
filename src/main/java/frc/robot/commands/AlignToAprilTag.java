@@ -56,6 +56,7 @@ public class AlignToAprilTag extends CommandBase {
       System.out.println(String.format("AlignToAprilTag Initialized to Tag: %d", closestID));
       targetTagID = closestID;
     } else {
+      targetTagID = -1;
       System.out.println("AlingToAprilTag Initialize Failed: No Tag In Sight!");
     }
   }
@@ -65,19 +66,20 @@ public class AlignToAprilTag extends CommandBase {
   public void execute() {
 
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
-    Pose3d tagPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
+    Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
 
     // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
-    if (closestID == targetTagID && tagPose != null) {
+    if (closestID == targetTagID && targetPose != null) {
       
+      // Robot relative movement:
       chassisSpeeds.vxMetersPerSecond = 0.0;
-      // chassisSpeeds.omegaRadiansPerSecond = tagPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
+      // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
       chassisSpeeds.omegaRadiansPerSecond = 0.0; // For now..
-      chassisSpeeds.vyMetersPerSecond = tagPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
+      chassisSpeeds.vyMetersPerSecond = targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
       chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
       drivetrain.setChassisSpeeds(chassisSpeeds);
       
-      if(Math.abs(tagPose.getTranslation().getY()) < tolerance){
+      if(Math.abs(targetPose.getTranslation().getY()) < tolerance){
         targetTagID = -1;  // Stop tracking when we're close enough.
       }
     }
@@ -96,7 +98,7 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public boolean isFinished() {
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
-    if(targetTagID < 0 || closestID < 0 || closestID != targetTagID){
+    if (targetTagID < 0 || closestID < 0 || closestID != targetTagID){
       System.out.println("AlignToAprilTag Finished.");
       return true;
     } else{

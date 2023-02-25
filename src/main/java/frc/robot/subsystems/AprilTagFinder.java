@@ -64,6 +64,7 @@ public class AprilTagFinder extends SubsystemBase {
     detections.clear();
     tags.clear();
     int numTags = tagData.length/23;
+    // Reset search variables for closest to empty:
     closestDistance = 9999.0;
     closestID = -1;
     closestPose = null; 
@@ -111,48 +112,41 @@ public class AprilTagFinder extends SubsystemBase {
         transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
         new Rotation3d(-transform.getRotation().getX(), -transform.getRotation().getZ(), Math.PI + transform.getRotation().getY()));
       }
-      //Keep track of the closest tag
+
+      //Keep track of the closest tag while we're running through the list.
       if (transform.getTranslation().getNorm() < closestDistance) {
         closestDistance = transform.getTranslation().getNorm();
         closestPose = new Pose3d(transform.getTranslation(), transform.getRotation());
-        closestID = tagData[i*23 + 0].intValue();
+        closestID = detection.getId();
       }
-
-      //Pose3d pose = new Pose3d();
-      //Pose3d pose = driveSubsystem.get3dOdometry();
+      
       Pose3d tagPose = new Pose3d(cameraTransform.getTranslation(), cameraTransform.getRotation());
-      //Pose3d tagPose = new Pose3d(transform.getTranslation(), transform.getRotation());
-      //Pose3d pose = new Pose3d();
-      //Transform3d odoTransform = new Transform3d(driveSubsystem.get3dOdometry().getTranslation(), driveSubsystem.get3dOdometry().getRotation());
       
       tagPose = tagPose.plus(transform);
-      //tagPose = tagPose.plus(cameraTransform);
-      //pose = pose.plus(odoTransform);
 
-      //pose = pose.plus(transform);
       tags.add(new AprilTag(detection.getId(), tagPose));
     }
 
     //End of tag proccesing loop
-    SmartDashboard.putNumber(String.format("%s NumTags", tableName), numTags);
-    if (closestID >= 0 && closestPose != null){
-      SmartDashboard.putNumber(String.format("%s Closest ID", tableName), closestID);
-      SmartDashboard.putNumber(String.format("%s Closest Distance", tableName), closestDistance);
-      SmartDashboard.putNumber(String.format("%s Closest X", tableName), closestPose.getX());
-      SmartDashboard.putNumber(String.format("%s Closest Y", tableName), closestPose.getY());
-      SmartDashboard.putNumber(String.format("%s Closest Z", tableName), closestPose.getZ());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation X", tableName), closestPose.getRotation().getX());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Y", tableName), closestPose.getRotation().getY());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Z", tableName), closestPose.getRotation().getZ());
+    SmartDashboard.putNumber(String.format("%s/NumTags", tableName), numTags);
+    if (closestID >= 0 && closestPose != null) {
+      SmartDashboard.putNumber(String.format("%s/Closest ID", tableName), closestID);
+      SmartDashboard.putNumber(String.format("%s/Closest Distance", tableName), closestDistance);
+      SmartDashboard.putNumber(String.format("%s/Closest X", tableName), closestPose.getX());
+      SmartDashboard.putNumber(String.format("%s/Closest Y", tableName), closestPose.getY());
+      SmartDashboard.putNumber(String.format("%s/Closest Z", tableName), closestPose.getZ());
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation X", tableName), closestPose.getRotation().getX());
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation Y", tableName), closestPose.getRotation().getY());
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation Z", tableName), closestPose.getRotation().getZ());
     } else {
-      SmartDashboard.putNumber(String.format("%s Closest ID", tableName), -1);
-      SmartDashboard.putNumber(String.format("%s Closest Distance", tableName), 99999.0);
-      SmartDashboard.putNumber(String.format("%s Closest X", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s Closest Y", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s Closest Z", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s Closest Rotation X", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Y", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Z", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest ID", tableName), -1);
+      SmartDashboard.putNumber(String.format("%s/Closest Distance", tableName), 99999.0);
+      SmartDashboard.putNumber(String.format("%s/Closest X", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest Y", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest Z", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation X", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation Y", tableName), 0.0);
+      SmartDashboard.putNumber(String.format("%s/Closest Rotation Z", tableName), 0.0);
     }
     
   }
@@ -161,15 +155,28 @@ public class AprilTagFinder extends SubsystemBase {
     return tags;
   }
 
+  // Return april tag with given ID: returns null if ID not currently found/tracked.
+  public AprilTag getTagByID(int ID) {
+    for (int i = 0; i < tags.size(); i++) {
+      if (tags.get(i).ID == ID)
+        return tags.get(i);
+    }
+    return null; // Fell through loop did not find the ID we were looking for.
+  }
+
   // Initialize preferences for this class:
   public static void initPreferences() {
   
   }
 
-  // This method returns the position of the robot based on information from AprilTags
+  // This method returns the position of the robot based on information from AprilTags, null if no april tags are seen.
   public Pose2d getFieldPose() {
-    // TODO: Implement this method when needed.
-    return new Pose2d();
+    if (tags.size() > 0) {
+    // TODO: Implement this method when needed, requires map data of tag location by ID, etc.
+      return null; // Until we implement it.
+    } else {
+      return null;
+    }
   }
 
   // This method returns the position of the passed in AprilTag id relative to the Robot or null if tag is not tracked.
@@ -193,18 +200,15 @@ public class AprilTagFinder extends SubsystemBase {
     return closestDistance; 
   }
 
-  // THIS WILL RETURN NULL is there is no tag detected.
+  // THIS WILL RETURN NULL if there is no tag detected.
   public Pose3d getClosestPose() {
     return closestPose;
   }
 
   //This method returns an array of all the visible AprilTag ids
-  public ArrayList<AprilTagDetection> getVisibleTags()
+  public ArrayList<AprilTagDetection> getDetections()
   {
     return detections;
   }
-  
-
-
   
 }
