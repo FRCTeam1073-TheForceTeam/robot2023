@@ -36,8 +36,8 @@ public class TeleopDrive extends CommandBase
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
   //Snap to position thresholds
-  private final static double STOP_THRESHOLD = 30;
-  private final static double SLOW_THRESHOLD = 20;
+  private final static double STOP_THRESHOLD = 5;
+  private final static double SLOW_THRESHOLD = 30;
 
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi){
@@ -91,10 +91,8 @@ public class TeleopDrive extends CommandBase
     }
     else if (fieldCentric){
       //Snap to cardinal directions
-      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees() % (2 * Math.PI);
-      SmartDashboard.putNumber("Current Angle within 360 degrees", currentAngle);
-      SmartDashboard.putNumber("DPad input", 360 - m_OI.getDPad());
-      rightX = snapToHeading(currentAngle, (360 - m_OI.getDPad()));
+      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
+      rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         -leftY * mult1 * mult2,
@@ -124,81 +122,10 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-  public double snapToHeading(double currentAngle, double targetAngle){
-    /* 
-    while(angle < 0){
-      angle += 2 * Math.PI;
+  public double snapToHeading(double currentAngle, double targetAngle, double defaultVelocity){
+    if(targetAngle == 361){
+      return defaultVelocity;
     }
-    if(m_OI.getDPad() == 0){ //moves battery toward 0
-      error = Math.abs(Math.PI - angle);
-      if(error <= .1){
-        rotation = 0;
-      }
-      else if((angle <= 0 && angle >= -Math.PI) || (angle >= 0 && angle <= Math.PI)){
-        rotation = -angle;
-      }
-      else if(angle >= Math.PI){
-        rotation = -2 * Math.PI - angle;
-      }
-      else if(angle <= -Math.PI){
-        rotation = 2 * Math.PI + angle;
-      }
-    }
-
-    if(m_OI.getDPad() == 90){ //moves battery toward pi/2
-      error = Math.abs(Math.PI / 2 - angle);
-      if(error <= .1){
-        rotation = 0;
-      }
-      else if(angle >= 0 && angle <= Math.PI / 2){
-        rotation = Math.PI / 2 - angle;
-      }
-      else if(angle >= Math.PI / 2){
-        rotation = -angle - (Math.PI / 2);
-      }
-      else if(angle <= 0 && angle >= -3 * Math.PI / 2){
-        rotation = 3 * Math.PI / 2 + angle;
-      }
-      else if(angle <= -3 * Math.PI / 2){
-        rotation = -angle - 3 * Math.PI/2;
-      }
-    }
-
-    if(m_OI.getDPad() == 180){ //moves battery toward pi
-      error = Math.abs(0 - angle);
-      if(error <= .1){
-        rotation = 0;
-      }
-      else if((angle >= 0 && angle <= Math.PI) || (angle <= 0 && angle >= -Math.PI)){
-        rotation = -angle;
-      }
-      else if(angle <= -Math.PI){
-        rotation = -2 * Math.PI + angle;
-      }
-      else if(angle >= Math.PI){
-        rotation = 2 * Math.PI - angle;
-      }
-    }
-
-    if(m_OI.getDPad() == 270){ //moves battery toward 3pi/2
-      error = Math.abs(3/2 * Math.PI - angle);
-      if(error <= .1){
-        rotation = 0;
-      }
-      else if(angle >= 0 && angle <= 3 * Math.PI / 2){
-        rotation = 3 * Math.PI / 2 - angle;
-      }
-      else if(angle >= 3 * Math.PI / 2){
-        rotation = angle - 3 * Math.PI / 2;
-      }
-      else if(angle <= 0 && angle >= -Math.PI / 2){
-        rotation = -angle;
-      }
-      else if(angle <= -Math.PI / 2){
-        rotation = -angle - Math.PI / 2;
-      }
-    }
-    */
     double error = currentAngle - targetAngle;
     while(error < -180){error += 360;}
     while(error > 180){error -= 360;}
@@ -209,11 +136,8 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(error) < SLOW_THRESHOLD){
       return error/SLOW_THRESHOLD;
     }
-    return error;
-    
+    return error * .7;
   }
-
-
 
   // Called once the command ends or is interrupted.
   @Override
