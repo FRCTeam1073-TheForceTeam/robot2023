@@ -37,17 +37,14 @@ public class Bling extends SubsystemBase {
   }
 
   public void initialize() {
-
+      clearLEDs();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     m_led.setData(m_ledBuffer);
-    ledR = (int)SmartDashboard.getNumber("R Value", ledR);
-    ledG = (int)SmartDashboard.getNumber("G Value", ledG);
-    ledB = (int)SmartDashboard.getNumber("B Value", ledB);
-    setRGBAll(ledR, ledG, ledB);
+    batteryBling(0);
   }
 
   public void setRGB(int i, int r, int g, int b)
@@ -119,15 +116,24 @@ public class Bling extends SubsystemBase {
     }
   }
 
-  public void batteryBling(int minLEDsVolts, int numberLEDsVolts, double min_volts, double max_volts) {
-    for (int i = minLEDsVolts; i < (minLEDsVolts + numberLEDsVolts); i++) {
-      m_ledBuffer.setRGB(i, 0, 0, 0);
-    }
+  public void setSlot(int slotNumber, int r, int g, int b) {
+    rangeRGB(slotNumber*slotLength, slotLength, r, g, b);
+
+  }
+
+  public void batteryBling(int slotNumber) {
+    
     
     double volts = RobotController.getBatteryVoltage();
 
-    if (volts > max_volts) {
-      volts = max_volts;
+    if (volts > 12) {
+      setSlot(slotNumber, 0, 255, 0);
+    }
+    else if (volts > 11){
+      setSlot(slotNumber, 0, 0, 255);
+    }
+    else{
+      setSlot(slotNumber, 255, 0, 0);
     }
   }
 
