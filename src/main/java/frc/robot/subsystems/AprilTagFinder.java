@@ -117,7 +117,7 @@ public class AprilTagFinder extends SubsystemBase {
         closestPose = new Pose3d(transform.getTranslation(), transform.getRotation());
         closestID = tagData[i*23 + 0].intValue();
       }
-      
+
       //Pose3d pose = new Pose3d();
       //Pose3d pose = driveSubsystem.get3dOdometry();
       Pose3d tagPose = new Pose3d(cameraTransform.getTranslation(), cameraTransform.getRotation());
@@ -135,15 +135,15 @@ public class AprilTagFinder extends SubsystemBase {
 
     //End of tag proccesing loop
     SmartDashboard.putNumber(String.format("%s NumTags", tableName), numTags);
-    if (closestID >= 0){
-      SmartDashboard.putNumber(String.format("%s Closest ID", tableName), tags.get(closestID).ID);
+    if (closestID >= 0 && closestPose != null){
+      SmartDashboard.putNumber(String.format("%s Closest ID", tableName), closestID);
       SmartDashboard.putNumber(String.format("%s Closest Distance", tableName), closestDistance);
-      SmartDashboard.putNumber(String.format("%s Closest X", tableName), tags.get(closestID).pose.getX());
-      SmartDashboard.putNumber(String.format("%s Closest Y", tableName), tags.get(closestID).pose.getY());
-      SmartDashboard.putNumber(String.format("%s Closest Z", tableName), tags.get(closestID).pose.getZ());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation X", tableName), tags.get(closestID).pose.getRotation().getX());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Y", tableName), tags.get(closestID).pose.getRotation().getY());
-      SmartDashboard.putNumber(String.format("%s Closest Rotation Z", tableName), tags.get(closestID).pose.getRotation().getZ());
+      SmartDashboard.putNumber(String.format("%s Closest X", tableName), closestPose.getX());
+      SmartDashboard.putNumber(String.format("%s Closest Y", tableName), closestPose.getY());
+      SmartDashboard.putNumber(String.format("%s Closest Z", tableName), closestPose.getZ());
+      SmartDashboard.putNumber(String.format("%s Closest Rotation X", tableName), closestPose.getRotation().getX());
+      SmartDashboard.putNumber(String.format("%s Closest Rotation Y", tableName), closestPose.getRotation().getY());
+      SmartDashboard.putNumber(String.format("%s Closest Rotation Z", tableName), closestPose.getRotation().getZ());
     } else {
       SmartDashboard.putNumber(String.format("%s Closest ID", tableName), -1);
       SmartDashboard.putNumber(String.format("%s Closest Distance", tableName), 99999.0);
