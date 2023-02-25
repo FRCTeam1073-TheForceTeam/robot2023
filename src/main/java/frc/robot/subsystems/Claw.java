@@ -8,16 +8,19 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
-  private TalonFX vacuumMotor; 
+  private TalonFX vacuumMotor;
+  private VictorSPX actuator;
 
   /** Creates a new Claw. */
   public Claw() {
     vacuumMotor = new TalonFX(19);
     setUpMotors();
+    actuator = new VictorSPX(0);
   }
 
   @Override
