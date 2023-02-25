@@ -19,14 +19,15 @@ import com.ctre.phoenix.sensors.MagnetFieldStrength;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
   private TalonFX shoulderMotor, elbowMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
-  private SlewRateLimiter elbowLimiter;
-  private SlewRateLimiter shoulderLimiter;
+  //private SlewRateLimiter elbowLimiter;
+  //private SlewRateLimiter shoulderLimiter;
   private boolean isElbowMagnetHealthy;
   private boolean isShoulderMagnetHealthy;
   //set variables below to correct lengths
@@ -38,9 +39,20 @@ public class Arm extends SubsystemBase{
   public final double elbowAbsoluteOffset = 1.73;
   public final double shoulderTicksPerRadian = 26075.9;
   public final double elbowTicksPerRadian = 13037.95;
+  public final double maxShoulderVel = .5;
+  public final double maxElbowVel = .5;
+  public final double maxShoulderAcc = .5;
+  public final double maxElbowAcc = .5;
   public JointPositions minAngles;
   public JointPositions currentJointPositions = new JointPositions();
+  public JointPositions targetPositions;
   public JointVelocities currentJointVelocities = new JointVelocities();
+  public TrapezoidProfile shoulderProfile;
+  public TrapezoidProfile elbowProfile;
+  public TrapezoidProfile.State currentShoulderState;
+  public TrapezoidProfile.State currentElbowState;
+  public double profileStartTime;
+
 
   public class JointPositions{
     double shoulder;
@@ -182,11 +194,13 @@ public class Arm extends SubsystemBase{
     shoulderEncoder = new CANCoder(15);
     elbowEncoder = new CANCoder(17);
 
-    elbowLimiter = new SlewRateLimiter(0.5);
-    shoulderLimiter = new SlewRateLimiter(0.5);
+    //elbowLimiter = new SlewRateLimiter(0.5);
+    //shoulderLimiter = new SlewRateLimiter(0.5);
 
     setUpMotor(shoulderMotor, shoulderEncoder);
     setUpMotor(elbowMotor, elbowEncoder);
+    shoulderMotor.setSensorPhase(true);
+    shoulderMotor.setInverted(true);
 
     shoulderMotor.config_kP(0, 0.1);
     shoulderMotor.config_kI(0, 0);
@@ -203,8 +217,16 @@ public class Arm extends SubsystemBase{
     elbowMotor.setIntegralAccumulator(0);
 
     elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian);
-    shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian);
+    shoulderMotor.setSelectedSensorPosition(-getAbsoluteAngles().shoulder * shoulderTicksPerRadian);
 
+    //Trapezoid trajectory for angles
+    currentShoulderState = new TrapezoidProfile.State(getJointAngles().shoulder, 0.0);
+    currentElbowState = new TrapezoidProfile.State(getJointAngles().elbow, 0.0);
+    shoulderProfile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), currentShoulderState, currentShoulderState);
+    elbowProfile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowState, currentElbowState);
+    profileStartTime = System.currentTimeMillis() / 1000;
     //minAngles = getAbsoluteAngles();
   }
 
@@ -214,8 +236,8 @@ public class Arm extends SubsystemBase{
     currentJointPositions = getAbsoluteAngles();
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
-    SmartDashboard.putNumber("Shoulder Encoder Angle", shoulderMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Elbow Encoder Angle", elbowMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Shoulder Motor Angle", shoulderMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Elbow Motor Angle", elbowMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Shoulder Absolute Angle", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle", currentJointPositions.elbow);
     SmartDashboard.putNumber("Shoulder Velocitiy", currentJointVelocities.shoulder);
@@ -236,6 +258,15 @@ public class Arm extends SubsystemBase{
     else{
       isShoulderMagnetHealthy = true;
     }
+
+    //setting angles with trapezoid trajectories
+     
+    currentElbowState = elbowProfile.calculate((double)(System.currentTimeMillis() / 1000));
+    elbowMotor.set(ControlMode.Position, currentElbowState.position * elbowTicksPerRadian);
+
+    currentShoulderState = shoulderProfile.calculate((double)(System.currentTimeMillis() / 1000));
+    shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
+    
   }
 
   // Initialize preferences for this class:
@@ -292,15 +323,31 @@ public class Arm extends SubsystemBase{
     elbowMotor.set(ControlMode.Position, target.elbow);
   }
 
+  public void setTrapezoidTargetAngle(JointPositions target){
+    targetPositions = target;
+    profileStartTime = (double)(System.currentTimeMillis() / 1000);
+    elbowProfile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), 
+      new TrapezoidProfile.State(targetPositions.elbow, 0),
+      new TrapezoidProfile.State(getJointAngles().elbow, 0)
+    );
+
+    shoulderProfile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), 
+      new TrapezoidProfile.State(targetPositions.shoulder, 0),
+      new TrapezoidProfile.State(getJointAngles().shoulder, 0)
+    );   
+  }
+
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
     if(currentJointPositions.shoulder < -3.77){ //3.79
-      if(speed.shoulder < 0){
+      if(speed.shoulder > 0){
         speed.shoulder = 0;
       }
     }
     if(currentJointPositions.shoulder > 0.98){ //1.0
-      if(speed.shoulder > 0){
+      if(speed.shoulder < 0){
         speed.shoulder = 0;
       }
     }
