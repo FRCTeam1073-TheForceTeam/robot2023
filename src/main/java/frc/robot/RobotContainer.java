@@ -32,7 +32,6 @@ import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
 import frc.robot.subsystems.OpenMV;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.subsystems.AprilTagDetection;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Bling;
@@ -103,7 +102,7 @@ public class RobotContainer {
     // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
-    AprilTagDetection.initPreferences();
+    AprilTagFinder.initPreferences();
     Arm.initPreferences();
     Claw.initPreferences();
     Bling.initPreferences();
