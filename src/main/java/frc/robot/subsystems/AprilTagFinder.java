@@ -69,6 +69,9 @@ public class AprilTagFinder extends SubsystemBase {
     closestID = -1;
     closestPose = null; 
     for (int i = 0; i < numTags; i = i +1){
+
+      if(tagData[i*23].intValue() > 0 && tagData[i*23].intValue() < 9){
+
       double[] homography = new double[9];
       double[] corners = new double[8];
       homography[0] = tagData[i*23 + 4].doubleValue();
@@ -125,6 +128,9 @@ public class AprilTagFinder extends SubsystemBase {
       tagPose = tagPose.plus(transform);
 
       tags.add(new AprilTag(detection.getId(), tagPose));
+
+      }
+      
     }
 
     //End of tag proccesing loop
