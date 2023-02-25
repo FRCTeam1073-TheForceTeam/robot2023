@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.AlignToAprilTag;
 import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
@@ -50,8 +51,8 @@ public class RobotContainer {
   //private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem, null, null);
   private final AprilTagFinder m_frontCamera = new AprilTagFinder(m_driveSubsystem, "FrontVision", 
     new Transform3d(new Translation3d(0.2159, 0.1397, 0.508), new Rotation3d(0, 0.2617, 0)));
-  private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
-    new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
+  //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
+    //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
   private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
@@ -68,6 +69,8 @@ public class RobotContainer {
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
+  private static final String kAprilTagTracker = "AprilTag Tracker";
+
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
@@ -92,6 +95,7 @@ public class RobotContainer {
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
+    m_chooser.addOption("AprilTag Tracker", kAprilTagTracker);
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -198,6 +202,8 @@ public class RobotContainer {
 //        return scoreHybrid();
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
+      case kAprilTagTracker:
+        return aprilTagTracker();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -294,6 +300,10 @@ public class RobotContainer {
 //    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
 //      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 //  }
+
+  public Command aprilTagTracker(){
+    return new AlignToAprilTag(m_driveSubsystem, m_frontCamera , 1.0);
+  }
 
   public void setStartupLighting()
   {
