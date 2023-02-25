@@ -31,6 +31,7 @@ public class DriveSubsystem extends SubsystemBase
   private Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
   private double maximumLinearSpeed = 1.0;
+  private boolean parkingBrakeOn = false;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
@@ -40,7 +41,7 @@ public class DriveSubsystem extends SubsystemBase
     if (error != ErrorCode.OK) {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
     }
-    error = pigeon2.setYaw(0);
+    error = pigeon2.setYaw(180);
 
     // Make space for four swerve modules:
     modules = new SwerveModule[4];
@@ -52,7 +53,7 @@ public class DriveSubsystem extends SubsystemBase
 
     SwerveModuleConfig moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 0;
-    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.217), Preferences.getDouble("Drive.ModulePositions", 0.217));
+    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module0.SteerAngleOffset", 2.879); //2.879;
 
     modules[0] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -64,7 +65,7 @@ public class DriveSubsystem extends SubsystemBase
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 1;
-    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.217), -Preferences.getDouble("Drive.ModulePositions", 0.217));
+    moduleConfig.position = new Translation2d(Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module1.SteerAngleOffset", 1.866); // 1.866;
 
     modules[1] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -76,7 +77,7 @@ public class DriveSubsystem extends SubsystemBase
 
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 2;
-    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.217), Preferences.getDouble("Drive.ModulePositions", 0.217));
+    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), Preferences.getDouble("Drive.ModulePositions", 0.5017));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module2.SteerAngleOffset", 2.422); // 2.422;
 
     modules[2] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -87,7 +88,7 @@ public class DriveSubsystem extends SubsystemBase
     // moduleIDConfig.driveMotorID = 12; // moduleIDConfig.steerMotorID = 8; // moduleIDConfig.steerEncoderID = 4;
     moduleConfig = new SwerveModuleConfig(); // Gets preferences and defaults for fields.
     moduleConfig.moduleNumber = 3;
-    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.217), -Preferences.getDouble("Drive.ModulePositions", 0.217));
+    moduleConfig.position = new Translation2d(-Preferences.getDouble("Drive.ModulePositions", 0.5017), -Preferences.getDouble("Drive.ModulePositions", 0.5017));
     moduleConfig.steerAngleOffset = Preferences.getDouble("Drive.Module3.SteerAngleOffset", 1.109); //1.109;
 
     modules[3] = new SwerveModule(moduleConfig, moduleIDConfig);
@@ -106,7 +107,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
-    odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions);
+    odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getHeading()), modulePositions, new Pose2d(0,0,new Rotation2d(Math.PI)));
 
     // Configure maximum linear speed for limiting:
     maximumLinearSpeed = Preferences.getDouble("Drive.MaximumLinearSpeed", 3.5);
@@ -121,7 +122,7 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
     Preferences.initDouble("Drive.Module3.SteerAngleOffset", 1.109);
     Preferences.initDouble("Drive.MaximumLinearSpeed", 3.5); // Meters/second
-    Preferences.initDouble("Drive.ModulePositions", 0.217);
+    Preferences.initDouble("Drive.ModulePositions", 0.5017);
   }
 
   public String getDiagnostics() {
@@ -131,6 +132,10 @@ public class DriveSubsystem extends SubsystemBase
     result += modules[3].getDiagnostics();
     //Check errors for all hardware
     return result;
+  }
+
+  public void setDebugMode(boolean debug) {
+    this.debug = debug;
   }
 
   //Returns IMU heading in degrees
@@ -146,6 +151,16 @@ public class DriveSubsystem extends SubsystemBase
     return pigeon2.getRoll();
   }
 
+  public double getPitchRate()
+  {
+    return 0.0;
+  }
+
+  public double getRollRate()
+  {
+    return 0.0;
+  }
+
   // Reset IMU heading to zero degrees
   public void zeroHeading() {
     pigeon2.setYaw(0);
@@ -153,6 +168,9 @@ public class DriveSubsystem extends SubsystemBase
 
   // Set the commanded chassis speeds for the drive subsystem.
   public void setChassisSpeeds(ChassisSpeeds speeds){
+    SmartDashboard.putNumber("ChassisSpeed x", speeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("ChassisSpeed y", speeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("ChassisSpeed rotation", speeds.omegaRadiansPerSecond);
     chassisSpeeds = speeds;
   }
 
@@ -177,11 +195,16 @@ public class DriveSubsystem extends SubsystemBase
     return kinematics.toChassisSpeeds(wheelStates);
   }
 
-  public void setBrakes(boolean brakeOn){
+  public void setBrakes(boolean brakeOn)
+  {
     modules[0].setBrake(brakeOn);
     modules[1].setBrake(brakeOn);
     modules[2].setBrake(brakeOn);
     modules[3].setBrake(brakeOn);
+  }
+
+  public SwerveDriveKinematics getKinematics(){
+    return kinematics;
   }
 
   public void updateOdometry() {
@@ -209,7 +232,8 @@ public class DriveSubsystem extends SubsystemBase
   
   @Override
   public void periodic(){
-    if (! debug){
+    if (!debug && !parkingBrakeOn)
+    {
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
       SwerveDriveKinematics.desaturateWheelSpeeds(states, maximumLinearSpeed);
@@ -223,7 +247,10 @@ public class DriveSubsystem extends SubsystemBase
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
     }
-
+    else if(!parkingBrakeOn)
+    { //in debug mode
+      SmartDashboard.putNumber("Module 0 Velocity", modules[0].getDriveRawVelocity());
+    }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
@@ -233,17 +260,28 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Roll", getRoll());
   }
 
-  public void parkingBrake(){
-    modules[0].setSteerAngle(Math.PI / 4);
-    modules[1].setSteerAngle(-Math.PI / 4);
-    modules[2].setSteerAngle(-Math.PI / 4);
-    modules[3].setSteerAngle(Math.PI / 4);
-    modules[0].setDriveVelocity(0);
-    modules[1].setDriveVelocity(0);
-    modules[2].setDriveVelocity(0);
-    modules[3].setDriveVelocity(0);
+  public void parkingBrake(boolean parkingBrakeOn)
+  {
+    this.parkingBrakeOn = parkingBrakeOn;
+    if (parkingBrakeOn)
+    {
+      SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
+      states[0] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[0].getSteeringAngle()));
+      states[1] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[1].getSteeringAngle()));
+      states[2] = optimizeB(new SwerveModuleState(0, new Rotation2d(-Math.PI / 4)), new Rotation2d(modules[2].getSteeringAngle()));
+      states[3] = optimizeB(new SwerveModuleState(0, new Rotation2d(Math.PI / 4)), new Rotation2d(modules[3].getSteeringAngle()));
+
+      modules[0].setCommand(states[0].angle.getRadians(), states[0].speedMetersPerSecond);
+      modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
+      modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
+      modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+    }
   }
-  
+
+  public boolean getParkingBrake(){
+    return parkingBrakeOn;
+  }
+
   public void setDebugSpeed(double speed){
     modules[0].setDriveVelocity(speed);
     modules[1].setDriveVelocity(speed);
@@ -258,6 +296,13 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].setSteerAngle(angle);
     modules[2].setSteerAngle(angle);
     modules[3].setSteerAngle(angle);
+  }
+
+  public void setDebugDrivePower(double power) {
+    modules[0].setDebugTranslate(power);
+    modules[1].setDebugTranslate(power);
+    modules[2].setDebugTranslate(power);
+    modules[3].setDebugTranslate(power);
   }
 
   public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle){
