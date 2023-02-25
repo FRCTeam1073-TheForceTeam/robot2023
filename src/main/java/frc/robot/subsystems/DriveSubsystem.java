@@ -125,7 +125,8 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.ModulePositions", 0.5017);
   }
 
-  public String getDiagnostics() {
+  public String getDiagnostics() 
+  {
     String result = modules[0].getDiagnostics();
     result += modules[1].getDiagnostics();
     result += modules[2].getDiagnostics();
@@ -221,6 +222,16 @@ public class DriveSubsystem extends SubsystemBase
 
   public Pose2d getOdometry(){
     return new Pose2d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(), Rotation2d.fromDegrees(getHeading()));
+  }
+
+  public double getOdometryX()
+  {
+    return odometry.getPoseMeters().getX();
+  }
+
+  public double getOdometryY()
+  {
+    return odometry.getPoseMeters().getX();
   }
 
   public Pose3d get3dOdometry(){
