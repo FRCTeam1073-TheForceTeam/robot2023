@@ -37,7 +37,7 @@ public class Bling extends SubsystemBase {
   }
 
   public void initialize() {
-
+      clearLEDs();
   }
 
   @Override
