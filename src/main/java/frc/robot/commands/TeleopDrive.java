@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -30,6 +31,9 @@ public class TeleopDrive extends CommandBase
   private boolean fieldCentric;
   private boolean parked = false;
   ChassisSpeeds speeds;
+  private double pitchRate;
+  private double loopTime;
+  private double currentPitch;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
@@ -53,10 +57,13 @@ public class TeleopDrive extends CommandBase
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute(){
+  public void execute()
+  {
     double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 1.5);
     double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * 1.0);
 
+    loopTime = Timer.getFPGATimestamp() - loopTime;
+    pitchRate = (m_driveSubsystem.getPitch() - currentPitch) / loopTime;
     //double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.475;
     //double mult2 = m_OI.getDriverRightTrigger() * maximumLinearVelocity * 0.475;
 
@@ -71,6 +78,10 @@ public class TeleopDrive extends CommandBase
     //   velocityMult *= 0.1;  // 10% maximum speed.
     //   rotateMult *= 0.1;
     // }
+    
+    SmartDashboard.putNumber("Pitch Rate", pitchRate);
+    currentPitch = m_driveSubsystem.getPitch();
+    loopTime = Timer.getFPGATimestamp();
 
     // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){

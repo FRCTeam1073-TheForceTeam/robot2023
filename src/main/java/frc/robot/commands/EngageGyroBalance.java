@@ -16,7 +16,7 @@ public class EngageGyroBalance extends CommandBase
     boolean inverted;
     private double maxLinearVelocity;
     private double linearVelocity;
-    private double startTime = 0.0;
+    private double startTime;
     private int phase;
     private double currentPitch;
     private double pitchRate;
@@ -31,36 +31,52 @@ public class EngageGyroBalance extends CommandBase
         addRequirements(ds);
     }
 
-    @Override
-    public void initialize()
+    @Override 
+    public void initialize() 
     {
         phase = 0;
+        startTime = Integer.MAX_VALUE;
         if (inverted)
-        {
-            linearVelocity = -maxLinearVelocity;
+        { 
+            linearVelocity = -maxLinearVelocity; 
         }
         else
-        {
-            linearVelocity = maxLinearVelocity;
+        { 
+            linearVelocity = maxLinearVelocity; 
         }
-    }
-
-    @Override 
-    public void execute()
-    {
+    } 
+ 
+    @Override  
+    public void execute() 
+    { 
         loopTime = Timer.getFPGATimestamp() - loopTime;
         pitchRate = (drivetrain.getPitch() - currentPitch) / loopTime;
-        SmartDashboard.putNumber("Pitch Rate", pitchRate);
-
-        if (Math.abs(drivetrain.getPitch()) < 5 && phase == 0)
-        {
-            phase = 1;
-        }
-
-        if (phase == 1)
-        {
-            if (startTime == 0.0)
-            {
+        SmartDashboard.putNumber("GyroBalance/Pitch Rate", pitchRate);
+        SmartDashboard.putNumber("GyroBalance/Start Time", startTime);
+        SmartDashboard.putNumber("GyroBalance/Loop Time", loopTime); 
+        SmartDashboard.putNumber("GyroBalance/Current Pitch", currentPitch); 
+        SmartDashboard.putNumber("GyroBalance/Phase", phase); 
+ 
+        if (phase == 0) 
+        { 
+            robotPose = drivetrain.getOdometry(); 
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( 
+            linearVelocity, 
+            0,  
+            0, 
+            Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading 
+            drivetrain.setChassisSpeeds(chassisSpeeds); 
+ 
+            if (Math.abs(drivetrain.getPitch()) < 5) 
+            { 
+                phase = 1; 
+            } 
+        } 
+         
+        if (phase == 1) 
+        { 
+            if (startTime == Integer.MAX_VALUE) 
+            { 
                 startTime = Timer.getFPGATimestamp();
             }
             robotPose = drivetrain.getOdometry();
@@ -74,13 +90,14 @@ public class EngageGyroBalance extends CommandBase
     @Override
     public void end(boolean interrupted)
     {
-
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+        drivetrain.setChassisSpeeds(chassisSpeeds);
     }
 
     @Override
     public boolean isFinished()
     {
-        if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(pitchRate) < 0.5)
+        if (Timer.getFPGATimestamp() > (startTime + 0.5) && phase == 1 && Math.abs(pitchRate) > 7)
         {
             return true;
         }
