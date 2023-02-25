@@ -21,199 +21,85 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 
 public class AlignToAprilTag extends CommandBase {
-  /** Creates a new AlignToAprilTag. */
-  ArrayList<Integer> visibleTagIDs; 
-  ChassisSpeeds chassisSpeeds;
-  DriveSubsystem drivetrain;
-  Pose2d robotPose;
-  Pose2d tagPose;
-  double maxVelocity;
-  AprilTagFinder finder;
-  double tolerance;
- // Pose3d difference;
-  //private NetworkTable apriltagConnect;
-  private NetworkTableEntry apriltagConnectEntryID;
-  private NetworkTableEntry apriltagConnectEntryY;
-  //private NetworkTableEntry apriltagConnectEntryYaw;
-  int targetTagID;
-  int targetTagY;
-  int robotYaw;
-  double maxAngularSpeed;
-  double maxSpeed;
-  double xSpeed;
-  double ySpeed;
-  double angularVelocity;
-  int phase = 0;
-  double initialHeading;
-  ArrayList<AprilTag> currentTags;
 
-  //double maxRotationlVelocity;
+  // Saved construction parameters:
+  private DriveSubsystem drivetrain;
+  private AprilTagFinder finder;
+  private double maxVelocity;
+  private double maxAngularVelocity;
+  private double tolerance;
+
+
+  // State variables for execution:
+  int targetTagID;
+  double targetTagDistance;
+  private ChassisSpeeds chassisSpeeds;
+
 
   public AlignToAprilTag(DriveSubsystem drivetrain, AprilTagFinder finder, double maxVelocity) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.maxVelocity = maxVelocity;
     this.finder = finder;
-    maxAngularSpeed = 0.5;
+    this.maxAngularVelocity = 0.5;
+    this.tolerance = 0.05;
+    // Create these just once and reuse them in execute loops.
+    this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     addRequirements(drivetrain);
   }
-
- //   for(int i = 0; i < finder.getVisibleTags().size(); i++){
- //     visibleTagIDs.add(finder.getVisibleTags().get(i).getId());
- //   }
- //   addRequirements(drivetrain);
-
-
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //apriltagConnect = NetworkTableInstance.getDefault().getTable("SmartDashboard");
-    //if (AprilTagFinder.AnyAprilTagVisible() == true){
-    //apriltagConnectEntryID = apriltagConnect.getEntry("Closest ID");
-    //apriltagConnectEntryY = apriltagConnect.getEntry("Closest Y");
-    //apriltagConnectEntryY = apriltagConnect.getEntry("Tag Rotation Y");
-    //robotYaw = (int)apriltagConnectEntryYaw.getDouble(0.0);
-    //targetTagID = (int)apriltagConnectEntryID.getDouble(0.0);
-    //targetTagY = (int)apriltagConnectEntryY.getDouble(0.0);
-    initialHeading = drivetrain.getHeading();
-    
-    currentTags = finder.getTags();
-    double closestDistance = 9999;
-    int closestID = -1;
-
-    for(int i = 0; i < currentTags.size(); i = i + 1){
-      
-      if(currentTags.get(i).pose.getTranslation().getNorm() < closestDistance){
-
-        closestDistance = currentTags.get(i).pose.getTranslation().getNorm();
-        closestID = currentTags.get(i).ID;
-      }
-    }
-    
+    int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
     if(closestID != -1){
-      System.out.println("AlignToAprilTag Initialized");
+      System.out.println(String.format("AlignToAprilTag Initialized to Tag: %d", closestID));
       targetTagID = closestID;
+    } else {
+      System.out.println("AlingToAprilTag Initialize Failed: No Tag In Sight!");
     }
-
-    else{
-      System.out.println("AlingToAprilTag Failed");
-    }
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    currentTags = finder.getTags();
-    robotPose = drivetrain.getOdometry();
+    int closestID = finder.getClosestID();    // Closest tag ID from finder.
+    Pose3d tagPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
 
-    for(int j = 0; j < currentTags.size(); j = j + 1){
+    // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
+    if (closestID == targetTagID && tagPose != null) {
       
-      if(currentTags.get(j).ID == targetTagID){
-        
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0,0,0);
-        chassisSpeeds.vyMetersPerSecond = currentTags.get(j).pose.getTranslation().getY() * 1;
-        drivetrain.setChassisSpeeds(chassisSpeeds);
-        
-        if(Math.abs(currentTags.get(j).pose.getTranslation().getY()) < 0.05){
-          targetTagID = -1;
-        }
-
-        return;
+      chassisSpeeds.vxMetersPerSecond = 0.0;
+      chassisSpeeds.omegaRadiansPerSecond = -tagPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
+      chassisSpeeds.vyMetersPerSecond = tagPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
+      chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
+      drivetrain.setChassisSpeeds(chassisSpeeds);
+      
+      if(Math.abs(tagPose.getTranslation().getY()) < tolerance){
+        targetTagID = -1;  // Stop tracking when we're close enough.
       }
-
-      targetTagID = -1;
     }
-
-    // double difference;
-    // double heading = drivetrain.getOdometry().getRotation().getDegrees();
-    // if (phase == 0){
-    //   //lines the robot up parralel to the grid
-    //   if (drivetrain.getHeading() > 0){
-    //     difference = 180 - heading;
-    //   }else{
-    //     difference = -180 - heading;
-    //   }
-
-    //   if (Math.abs(difference) > .1){
-    //     angularVelocity = - 0.8 * difference;
-    //     angularVelocity = MathUtil.clamp(angularVelocity, -maxAngularSpeed, maxAngularSpeed);
-    //     xSpeed = 0;
-    //     ySpeed = 0;
-    //     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //       xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    //   }else{
-    //     phase = 1;
-    //   }
-    // }
-    
-    // if (phase == 1){
-    //   //Moves sideways until the robot can detect the apriltag again
-    //   if (initialHeading < 0){
-    //     xSpeed = 0;
-    //     ySpeed = .5;
-    //     angularVelocity = 0;
-    //     int currentTagID = (int)apriltagConnectEntryID.getDouble(0.0);
-    //     if (currentTagID != targetTagID){
-    //       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //         xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    //         drivetrain.setChassisSpeeds(speeds);
-    //     }else{
-    //       phase = 2;
-    //     }
-    //   }else{
-    //     xSpeed = 0;
-    //     ySpeed = -.5;
-    //     angularVelocity = 0;
-    //     int currentTagID = (int)apriltagConnectEntryID.getDouble(0.0);
-    //     if (currentTagID != targetTagID){
-    //       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //         xSpeed, ySpeed, angularVelocity, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    //         drivetrain.setChassisSpeeds(speeds);
-    //     }else{
-    //       phase = 2;
-    //     }
-    //   }
-    // }
-
-    // if(phase == 2){
-    //   //Moves to the center of the tag
-    //   double currentY = apriltagConnectEntryY.getDouble(0.0);
-    //   if(Math.abs(currentY) > 0.05){  
-    //     xSpeed = 0;
-    //     ySpeed = -currentY * 0.5;
-    //     angularVelocity = 0;
-    //     ySpeed = MathUtil.clamp(ySpeed, -0.5, 0.5);
-    //     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //       0,ySpeed,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    //     drivetrain.setChassisSpeeds(speeds);
-    //   }else{
-    //     phase = 3;
-    //   }
-    // }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, 
-      Rotation2d.fromDegrees(drivetrain.getHeading()));
-      drivetrain.resetOdometry(new Pose2d());
+    chassisSpeeds.vxMetersPerSecond = 0.0;
+    chassisSpeeds.vyMetersPerSecond = 0.0;
+    chassisSpeeds.omegaRadiansPerSecond = 0.0;
+    drivetrain.setChassisSpeeds(chassisSpeeds); // Stop moving.
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
-    if(targetTagID < 0){
+    int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
+    if(targetTagID < 0 || closestID < 0 || closestID != targetTagID){
+      System.out.println("AlignToAprilTag Finished.");
       return true;
-    }
-    
-    else{
+    } else{
       return false;
     }
-
   }
 }

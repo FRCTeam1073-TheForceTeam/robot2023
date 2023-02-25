@@ -69,7 +69,7 @@ public class RobotContainer {
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
-  private static final String kAprilTagTracker = "AprilTag Tracker";
+  private static final String kAlignToAprilTag = "Align To AprilTag";
 
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
@@ -95,7 +95,7 @@ public class RobotContainer {
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
-    m_chooser.addOption("AprilTag Tracker", kAprilTagTracker);
+    m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -142,47 +142,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    //forward = x, backward = -x, left = y, right = -y
-    /* 
-    return new SequentialCommandGroup(
-      new DriveToPoint(m_driveSubsystem, new Pose2d(0, -3, new Rotation2d()), .5, .5)
-      //new DriveToPoint(m_driveSubsystem, new Pose2d(0, 0, new Rotation2d()), .5, .5)
-      ); //returns robot position and angle to zero
-  }*/
-
-  /*test making last y negative and see results
-  * used for MPR testing
-  */
-//     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-//       waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(1.5, 1.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(2.5, 1.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(3.0, 0.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(3.5, 1.0, new Rotation2d(3)));
-//     return new SequentialCommandGroup(
-//       new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
-//       0.8, 0.5, 0.5)
-//     );
-
-    //used for 107 testing
-    //  ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-     //   waypoints.add(new Pose2d(0.0, 0.0, new Rotation2d()));
-     //   waypoints.add(new Pose2d(0.5, 0.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(2.0, 2.0, new Rotation2d()));
-//     //   waypoints.add(new Pose2d(2.5, 1.0, new Rotation2d()));
-//       waypoints.add(new Pose2d(3.0, 0.0, new Rotation2d()));////
-//       waypoints.add(new Pose2d(1.0, 0.0, new Rotation2d(3)));
-     // return new SequentialCommandGroup(
-     //   new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, new Rotation2d()), waypoints, 0.5, 
-     //   0.8, 0.5, 0.5)
-     // );
-
-   // return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.3));
-
-    //return new DriveTestCommand(m_driveSubsystem, m_OI);
-
-    System.out.println(m_chooser.getSelected());
+   
+    System.out.println(String.format("Autonomous Command Selected: %s", m_chooser.getSelected()));
 
     switch (m_chooser.getSelected()) {
       case kNoAuto:
@@ -202,8 +163,8 @@ public class RobotContainer {
 //        return scoreHybrid();
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
-      case kAprilTagTracker:
-        return aprilTagTracker();
+      case kAlignToAprilTag:
+        return alignToAprilTag();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -249,20 +210,6 @@ public class RobotContainer {
     return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
       new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 
-    // switch (m_robotLocation.getSelected()) {
-    //   case kPose1:
-    //     System.out.println("Leaving Community from position 1");
-    //     return null;
-    //   case kPose2:
-    //     System.out.println("Leaving Community from position 2");
-    //     return null;
-    //   case kPose3:
-    //     System.out.println("Leaving Community from position 3");
-    //     return null;
-    //   default:
-    //     return null;
-    // }
-    //return null;
   }
 
   public Command testMode() {
@@ -301,7 +248,7 @@ public class RobotContainer {
 //      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 //  }
 
-  public Command aprilTagTracker(){
+  public Command alignToAprilTag(){
     return new AlignToAprilTag(m_driveSubsystem, m_frontCamera , 1.0);
   }
 
