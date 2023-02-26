@@ -6,33 +6,33 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.OI;
 
-public class ArmSetPosition extends CommandBase {
-  /** Creates a new ArmSetPosition. */
+public class TeleopSetArm extends CommandBase {
+  /** Creates a new TeleopSetArm. */
   private Arm arm;
-  private double shoulderAng;
-  private double elbowAng;
-  private final double shoulderTolerance = 0.3;
-  private final double elbowTolerance = 0.3;
+  private OI oi;
 
-  public ArmSetPosition(Arm arm, double shoulderAng, double elbowAng) {
+  public TeleopSetArm(Arm arm, OI oi) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
-    this.shoulderAng = shoulderAng;
-    this.elbowAng = elbowAng;
+    this.oi = oi;
     addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    arm.setTrapezoidTargetAngle(arm.new JointPositions(shoulderAng, elbowAng));
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+    if(oi.getOperatorAButton()){
+      arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.84, 2.9) );
+    }
+    if(oi.getOperatorBButton()){
+      arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.8));
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -42,12 +42,6 @@ public class ArmSetPosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    double shoulderError = Math.abs(arm.getJointAngles().getShoulderAngle() - shoulderAng);
-    double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
-
-    if(shoulderError <= shoulderTolerance && elbowError <= elbowTolerance){
-      return true;
-    }
     return false;
   }
 }

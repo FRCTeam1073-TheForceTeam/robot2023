@@ -23,6 +23,7 @@ import frc.robot.commands.Engage;
 import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -45,7 +46,8 @@ public class RobotContainer {
   private final BlingTeleopCommand m_blingTeleopCommand = new BlingTeleopCommand(m_bling, m_OI);
   private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem);
   private final Arm m_arm = new Arm();
-  private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
+  //private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
+  private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
@@ -74,7 +76,8 @@ public class RobotContainer {
     // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
-    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
@@ -244,7 +247,7 @@ public class RobotContainer {
   }
 
   public Command armSetTest(){
-    return new ArmSetPosition(m_arm, 0, 0);
+    return new ArmSetPosition(m_arm, -1.5, 4.1);
   }
 
   public Command testMode() {

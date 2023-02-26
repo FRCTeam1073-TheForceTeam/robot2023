@@ -39,10 +39,10 @@ public class Arm extends SubsystemBase{
   public final double elbowAbsoluteOffset = 1.73;
   public final double shoulderTicksPerRadian = 26931.24;
   public final double elbowTicksPerRadian = 13465.62;
-  public final double maxShoulderVel = .5;
-  public final double maxElbowVel = .5;
-  public final double maxShoulderAcc = .5;
-  public final double maxElbowAcc = .5;
+  public final double maxShoulderVel = 1.5;
+  public final double maxElbowVel = 2.1;
+  public final double maxShoulderAcc = 1.5;
+  public final double maxElbowAcc = 2.1;
   public JointPositions minAngles;
   public JointPositions currentJointPositions = new JointPositions();
   public JointPositions targetPositions;
@@ -202,27 +202,35 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setSensorPhase(true);
     shoulderMotor.setInverted(true);
 
-    shoulderMotor.config_kP(0, 0.1);
+    shoulderMotor.config_kP(0, 0.2);
     shoulderMotor.config_kI(0, 0);
     shoulderMotor.config_kD(0, 0);
     shoulderMotor.config_kF(0, 0);
     shoulderMotor.configMaxIntegralAccumulator(0, 0);
     shoulderMotor.setIntegralAccumulator(0);
 
-    elbowMotor.config_kP(0, 0.1);
+    elbowMotor.config_kP(0, 0.2);
     elbowMotor.config_kI(0, 0);
     elbowMotor.config_kD(0, 0);
     elbowMotor.config_kF(0, 0);
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
 
-    elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian);
-    shoulderMotor.setSelectedSensorPosition(-getAbsoluteAngles().shoulder * shoulderTicksPerRadian);
+    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 200);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
 
+    SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
+    SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
+
+    SmartDashboard.putNumber("Shoulder Angle on init", getJointAngles().shoulder);
+    SmartDashboard.putNumber("Elbow Angle on init", getJointAngles().elbow);
+
+    SmartDashboard.putNumber("Shoulder Absolute Angle on init", getAbsoluteAngles().shoulder);
+    SmartDashboard.putNumber("Elbow Absolute Angle on init", getAbsoluteAngles().elbow);
     //Trapezoid trajectory for angles
     
-    currentShoulderState = new TrapezoidProfile.State(getJointAngles().shoulder, 0.0);
-    currentElbowState = new TrapezoidProfile.State(getJointAngles().elbow, 0.0);
+    currentShoulderState = new TrapezoidProfile.State(getAbsoluteAngles().shoulder, 0.0);
+    currentElbowState = new TrapezoidProfile.State(getAbsoluteAngles().elbow, 0.0);
     //targetPositions = new JointPositions(getJointAngles().shoulder, getJointAngles().elbow);
      
     shoulderProfile = new TrapezoidProfile(
@@ -231,21 +239,26 @@ public class Arm extends SubsystemBase{
       new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowState, currentElbowState);
     profileStartTime = System.currentTimeMillis() / 1000.0;
     
+    SmartDashboard.putNumber("Shoulder State on init", currentShoulderState.position);
+    SmartDashboard.putNumber("Elbow State on int", currentElbowState.position);
     //minAngles = getAbsoluteAngles();
   }
 
   @Override
   public void periodic(){
-
+    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - profileStartTime;
     //setting angles with trapezoid trajectories
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
-    currentElbowState = elbowProfile.calculate(((double)System.currentTimeMillis() / 1000.0) - profileStartTime);
-    //elbowMotor.set(ControlMode.Position, currentElbowState.position * elbowTicksPerRadian);
-    //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
-
-    currentShoulderState = shoulderProfile.calculate(((double)System.currentTimeMillis() / 1000.0) - profileStartTime);
-    //shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
+    if(!elbowProfile.isFinished(trajectoryTime)){
+      currentElbowState = elbowProfile.calculate(trajectoryTime);
+      elbowMotor.set(ControlMode.Position, currentElbowState.position * elbowTicksPerRadian);
+      //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
+    }
+    if(!shoulderProfile.isFinished(trajectoryTime)){
+      currentShoulderState = shoulderProfile.calculate(trajectoryTime);
+      shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
+    }
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Elbow State", currentElbowState.position);
@@ -290,7 +303,7 @@ public class Arm extends SubsystemBase{
     // motor.configRemoteFeedbackFilter(encoder, 0);
     // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
     // motor.setSensorPhase(true);
-    motor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 17, 0.1));
+    motor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 25, 0.1));
   }
   
   public String getDiagnostics() {
@@ -329,8 +342,8 @@ public class Arm extends SubsystemBase{
   public void setTargetAngle(JointPositions target){
     //elbowLimiter.calculate(target.elbow);
     //shoulderLimiter.calculate(target.shoulder);
-    shoulderMotor.set(ControlMode.Position, target.shoulder);
-    elbowMotor.set(ControlMode.Position, target.elbow);
+  //  shoulderMotor.set(ControlMode.Position, target.shoulder);
+  //  elbowMotor.set(ControlMode.Position, target.elbow);
   }
 
   public void setTrapezoidTargetAngle(JointPositions target){
@@ -373,8 +386,8 @@ public class Arm extends SubsystemBase{
       }
     }
 
-    shoulderMotor.set(ControlMode.Velocity, -speed.shoulder * 26075.9 / 10);
-    elbowMotor.set(ControlMode.Velocity, speed.elbow * 13037.95 / 10);
+    //shoulderMotor.set(ControlMode.Velocity, -speed.shoulder * 26075.9 / 10);
+    //elbowMotor.set(ControlMode.Velocity, speed.elbow * 13037.95 / 10);
     currentJointVelocities.shoulder = speed.shoulder;
     currentJointVelocities.elbow = speed.elbow;
   }
