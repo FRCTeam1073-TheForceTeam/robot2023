@@ -34,7 +34,7 @@ public class AlignToAprilTag extends CommandBase {
   int targetTagID;
   double targetTagDistance;
   private ChassisSpeeds chassisSpeeds;
-
+  int glitchCounter;
 
   public AlignToAprilTag(DriveSubsystem drivetrain, AprilTagFinder finder, double maxVelocity) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -82,7 +82,16 @@ public class AlignToAprilTag extends CommandBase {
       if(Math.abs(targetPose.getTranslation().getY()) < tolerance){
         targetTagID = -1;  // Stop tracking when we're close enough.
       }
+      //resets glitch counter
+      glitchCounter = 0;
+
     }
+
+    //increases glitch counter to track 
+    else{
+      glitchCounter ++;
+    }
+
   }
 
   // Called once the command ends or is interrupted.
@@ -97,11 +106,18 @@ public class AlignToAprilTag extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
-    if (targetTagID < 0 || closestID < 0 || closestID != targetTagID){
+
+    //de-bouncing glitch "signal"
+    if (targetTagID < 0 || glitchCounter > 3){
+
       System.out.println("AlignToAprilTag Finished.");
+      
       return true;
-    } else{
+    } 
+
+    else{
       return false;
     }
   }
