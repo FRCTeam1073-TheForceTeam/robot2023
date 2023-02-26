@@ -65,9 +65,10 @@ public class AprilTagFinder extends SubsystemBase {
     tags.clear();
     int numTags = tagData.length/23;
     // Reset search variables for closest to empty:
-    closestDistance = 9999.0;
     closestID = -1;
+    closestDistance = 9999.0;
     closestPose = null; 
+
     for (int i = 0; i < numTags; i = i +1){
 
       // Checks to see if the tag ID is between 1-8 (by excluding 0 and 9) to reduce false positives.
