@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.ArmSetPosition;
 import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
@@ -58,6 +59,7 @@ public class RobotContainer {
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
+  private static final String kArmTest = "Arm Test Command";
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
@@ -81,6 +83,7 @@ public class RobotContainer {
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
+    m_chooser.addOption("Arm Set Position test", kArmTest);
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -185,6 +188,8 @@ public class RobotContainer {
 //        return scoreHybrid();
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
+      case kArmTest:
+        return armSetTest();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -236,6 +241,10 @@ public class RobotContainer {
     //     return null;
     // }
     //return null;
+  }
+
+  public Command armSetTest(){
+    return new ArmSetPosition(m_arm, 0, 0);
   }
 
   public Command testMode() {
