@@ -220,6 +220,14 @@ public class OI extends SubsystemBase
         return operatorController.getRawButton(2);
     }
 
+    public boolean getOperatorDPad270(){
+        return (operatorController.getPOV() == 270);
+    }
+
+    public boolean getOperatorDPad180(){
+        return (operatorController.getPOV() == 180);
+    }
+
     // public void setRumble(double val){
     //     operatorController.setRumble(RumbleType.kLeftRumble, val);
     //     operatorController.setRumble(RumbleType.kRightRumble, val);

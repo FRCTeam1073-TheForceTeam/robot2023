@@ -5,16 +5,20 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmSetPosition;
 import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
@@ -96,6 +100,7 @@ public class RobotContainer {
   //   m_robotLocation.addOption("Position 2", kPose2);
   //   m_robotLocation.addOption("Position 3", kPose3);
   //   SmartDashboard.putData("Robot Position Selector", m_robotLocation);
+    configureBindings();
   // 
   }
 
@@ -122,6 +127,16 @@ public class RobotContainer {
 
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
+
+    //Trigger for the arm to stow
+    Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
+    stowTrigger.onTrue(armStowCommand());
+
+    Trigger highTrigger = new Trigger(m_OI::getOperatorDPad270);
+    highTrigger.onTrue(highNodeCommand());
+
+    Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorDPad180);
+    doubleSubstationTrigger.onTrue(doubleSubstationCommand());
   }
 
     public void setTestMode() {
@@ -197,6 +212,20 @@ public class RobotContainer {
         System.out.println("No Auto Selected -_-");
         return null;
     }
+  }
+
+  public Command armStowCommand(){
+      return new SequentialCommandGroup(
+        new ArmSetPosition(m_arm, -1.9, 3.3),
+        new ArmSetPosition(m_arm, -3.84, 2.95));
+  }
+  
+  public Command doubleSubstationCommand(){
+    return new ArmSetPosition(m_arm, -1.9, 3.7);
+  }
+
+  public Command highNodeCommand(){
+    return new ArmSetPosition(m_arm, -0.66, 3.31);
   }
 
   public Command basicEngage() {

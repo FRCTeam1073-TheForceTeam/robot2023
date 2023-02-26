@@ -33,7 +33,7 @@ public class Claw extends SubsystemBase {
     actuator1 = new TalonSRX(20);
     actuator2 = new TalonSRX(21);
     setUpActuators();
-    vacuumRateLimiter = new SlewRateLimiter(2000.0); //ticks per second per second
+    vacuumRateLimiter = new SlewRateLimiter(6000.0); //ticks per second per second
     targetVacuumSpeed = 0;
   }
 
