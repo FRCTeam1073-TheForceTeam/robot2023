@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,6 +22,8 @@ public class Claw extends SubsystemBase {
   private final double openedPosition = 0;
   private final double conePosition = 0;
   private final double cubePosition = 0;
+  private SlewRateLimiter vacuumRateLimiter;
+  private double targetVacuumSpeed;
   //private final boolean debug = true;
 
   /** Creates a new Claw. */
@@ -30,6 +33,8 @@ public class Claw extends SubsystemBase {
     actuator1 = new TalonSRX(20);
     actuator2 = new TalonSRX(21);
     setUpActuators();
+    vacuumRateLimiter = new SlewRateLimiter(2000.0); //ticks per second per second
+    targetVacuumSpeed = 0;
   }
 
   @Override
@@ -37,10 +42,13 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
     SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
+    double vacuumSpeed =vacuumRateLimiter.calculate(targetVacuumSpeed);
+    vacuumMotor.set(ControlMode.Velocity, vacuumSpeed);
+
   }
 
   public void setVacuumSpeed(double speed){
-    vacuumMotor.set(ControlMode.Velocity, speed * 325.94/10); //converted to ticks per second
+    targetVacuumSpeed = speed * 325.94/10; //converted to ticks per second
   }
 
   // Initialize preferences for this class:
