@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
   private TalonFX vacuumMotor;
-  private TalonSRX actuator;
+  private TalonSRX actuator1;
+  private TalonSRX actuator2;
   private final double closedPosition = 0;
   private final double openedPosition = 0;
   private final double conePosition = 0;
@@ -26,14 +27,16 @@ public class Claw extends SubsystemBase {
   public Claw() {
     vacuumMotor = new TalonFX(19);
     setUpMotors();
-    actuator = new TalonSRX(20);
+    actuator1 = new TalonSRX(20);
+    actuator2 = new TalonSRX(21);
     setUpActuators();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Actuator Position", getActuatorPosition());
+    SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
+    SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
   }
 
   public void setVacuumSpeed(double speed){
@@ -55,34 +58,43 @@ public class Claw extends SubsystemBase {
 
   // This method will open the claw
   public void openClaw(){
-    actuator.set(ControlMode.Position, openedPosition);
+    actuator1.set(ControlMode.Position, openedPosition);
+    actuator2.set(ControlMode.Position, openedPosition);
   }
 
   // This method will close the claw
   public void closeClaw(){
-    actuator.set(ControlMode.Position, closedPosition);
+    actuator1.set(ControlMode.Position, closedPosition);
+    actuator2.set(ControlMode.Position, closedPosition);
   }
 
   // This method closes enough to fit a cone
   public void closeOnCone(){
-    actuator.set(ControlMode.Position, conePosition);
+    actuator1.set(ControlMode.Position, conePosition);
+    actuator2.set(ControlMode.Position, conePosition);
   }
 
   // This method closes enough to fit a cube
   public void closeOnCube(){
-    actuator.set(ControlMode.Position, cubePosition);
+    actuator1.set(ControlMode.Position, cubePosition);
+    actuator2.set(ControlMode.Position, cubePosition);
   }
 
-  public double getActuatorPosition(){
-    return actuator.getSelectedSensorPosition();
+  public double getActuatorPosition(int actuatorNum){
+    if(actuatorNum == 1){
+      return actuator1.getSelectedSensorPosition();
+    }
+    return actuator2.getSelectedSensorPosition();
   }
 
   public void setActuatorSensorPosition(double position){
-    actuator.setSelectedSensorPosition(position);
+    actuator1.setSelectedSensorPosition(position);
+    actuator2.setSelectedSensorPosition(position);
   }
 
-  public void setActuatorDebugVelocity(double speed){
-    actuator.set(ControlMode.Velocity, speed);
+  public void setActuatorDebugPercent(double speed){
+    actuator1.set(ControlMode.PercentOutput, speed);
+    actuator2.set(ControlMode.PercentOutput, -speed);
   }
 
   public void setUpMotors(){
@@ -102,7 +114,8 @@ public class Claw extends SubsystemBase {
   }
 
   public void setUpActuators(){
-    actuator.configFactoryDefault();
+    actuator1.configFactoryDefault();
+    actuator2.configFactoryDefault();
   }
 
 }
