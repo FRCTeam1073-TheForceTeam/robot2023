@@ -8,21 +8,35 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
-  private TalonFX vacuumMotor; 
+  private TalonFX vacuumMotor;
+  private TalonSRX actuator1;
+  private TalonSRX actuator2;
+  private final double closedPosition = 0;
+  private final double openedPosition = 0;
+  private final double conePosition = 0;
+  private final double cubePosition = 0;
+  //private final boolean debug = true;
 
   /** Creates a new Claw. */
   public Claw() {
     vacuumMotor = new TalonFX(19);
     setUpMotors();
+    actuator1 = new TalonSRX(20);
+    actuator2 = new TalonSRX(21);
+    setUpActuators();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
+    SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
   }
 
   public void setVacuumSpeed(double speed){
@@ -32,7 +46,7 @@ public class Claw extends SubsystemBase {
   // Initialize preferences for this class:
   public static void initPreferences() 
   {
-  
+    
   }
 
   public String getDiagnostics() {
@@ -44,22 +58,43 @@ public class Claw extends SubsystemBase {
 
   // This method will open the claw
   public void openClaw(){
-
+    actuator1.set(ControlMode.Position, openedPosition);
+    actuator2.set(ControlMode.Position, openedPosition);
   }
 
   // This method will close the claw
   public void closeClaw(){
-
+    actuator1.set(ControlMode.Position, closedPosition);
+    actuator2.set(ControlMode.Position, closedPosition);
   }
 
   // This method closes enough to fit a cone
   public void closeOnCone(){
-
+    actuator1.set(ControlMode.Position, conePosition);
+    actuator2.set(ControlMode.Position, conePosition);
   }
 
   // This method closes enough to fit a cube
   public void closeOnCube(){
+    actuator1.set(ControlMode.Position, cubePosition);
+    actuator2.set(ControlMode.Position, cubePosition);
+  }
 
+  public double getActuatorPosition(int actuatorNum){
+    if(actuatorNum == 1){
+      return actuator1.getSelectedSensorPosition();
+    }
+    return actuator2.getSelectedSensorPosition();
+  }
+
+  public void setActuatorSensorPosition(double position){
+    actuator1.setSelectedSensorPosition(position);
+    actuator2.setSelectedSensorPosition(position);
+  }
+
+  public void setActuatorDebugPercent(double speed){
+    actuator1.set(ControlMode.PercentOutput, speed);
+    actuator2.set(ControlMode.PercentOutput, -speed);
   }
 
   public void setUpMotors(){
@@ -76,6 +111,11 @@ public class Claw extends SubsystemBase {
     vacuumMotor.config_kF(0, 0);
     vacuumMotor.configMaxIntegralAccumulator(0, 0);
     vacuumMotor.setIntegralAccumulator(0);
+  }
+
+  public void setUpActuators(){
+    actuator1.configFactoryDefault();
+    actuator2.configFactoryDefault();
   }
 
 }

@@ -174,6 +174,13 @@ public class OI extends SubsystemBase
     }
 
     //-------- Operator Controller Below
+    public double getOperatorRightTrigger(){
+        return driverController.getRawAxis(3);
+    }
+
+    public double getOperatorLeftTrigger(){
+        return driverController.getRawAxis(2);
+    }
 
     public boolean getOperatorLeftBumper()
     {
