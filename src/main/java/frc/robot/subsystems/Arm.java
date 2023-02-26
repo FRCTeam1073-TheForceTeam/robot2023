@@ -37,8 +37,8 @@ public class Arm extends SubsystemBase{
   public final double shoulderAbsoluteOffset = 2.42;
   public final double elbowOffset = 0.0;
   public final double elbowAbsoluteOffset = 1.73;
-  public final double shoulderTicksPerRadian = 26075.9;
-  public final double elbowTicksPerRadian = 13037.95;
+  public final double shoulderTicksPerRadian = 26931.24;
+  public final double elbowTicksPerRadian = 13465.62;
   public final double maxShoulderVel = .5;
   public final double maxElbowVel = .5;
   public final double maxShoulderAcc = .5;
@@ -220,18 +220,36 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setSelectedSensorPosition(-getAbsoluteAngles().shoulder * shoulderTicksPerRadian);
 
     //Trapezoid trajectory for angles
+    
     currentShoulderState = new TrapezoidProfile.State(getJointAngles().shoulder, 0.0);
     currentElbowState = new TrapezoidProfile.State(getJointAngles().elbow, 0.0);
+    //targetPositions = new JointPositions(getJointAngles().shoulder, getJointAngles().elbow);
+     
     shoulderProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), currentShoulderState, currentShoulderState);
     elbowProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowState, currentElbowState);
-    profileStartTime = System.currentTimeMillis() / 1000;
+    profileStartTime = System.currentTimeMillis() / 1000.0;
+    
     //minAngles = getAbsoluteAngles();
   }
 
   @Override
   public void periodic(){
+
+    //setting angles with trapezoid trajectories
+    //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
+    //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
+    currentElbowState = elbowProfile.calculate(((double)System.currentTimeMillis() / 1000.0) - profileStartTime);
+    //elbowMotor.set(ControlMode.Position, currentElbowState.position * elbowTicksPerRadian);
+    //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
+
+    currentShoulderState = shoulderProfile.calculate(((double)System.currentTimeMillis() / 1000.0) - profileStartTime);
+    //shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
+    //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
+    SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
+    SmartDashboard.putNumber("Elbow State", currentElbowState.position);
+
     // This method will be called once per scheduler run
     currentJointPositions = getAbsoluteAngles();
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
@@ -259,14 +277,6 @@ public class Arm extends SubsystemBase{
       isShoulderMagnetHealthy = true;
     }
 
-    //setting angles with trapezoid trajectories
-     
-    currentElbowState = elbowProfile.calculate((double)(System.currentTimeMillis() / 1000));
-    elbowMotor.set(ControlMode.Position, currentElbowState.position * elbowTicksPerRadian);
-
-    currentShoulderState = shoulderProfile.calculate((double)(System.currentTimeMillis() / 1000));
-    shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
-    
   }
 
   // Initialize preferences for this class:
@@ -325,7 +335,7 @@ public class Arm extends SubsystemBase{
 
   public void setTrapezoidTargetAngle(JointPositions target){
     targetPositions = target;
-    profileStartTime = (double)(System.currentTimeMillis() / 1000);
+    profileStartTime = ((double)System.currentTimeMillis() / 1000.0);
     elbowProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), 
       new TrapezoidProfile.State(targetPositions.elbow, 0),

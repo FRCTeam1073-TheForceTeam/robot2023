@@ -79,7 +79,7 @@ public class TeleopDebugArm extends CommandBase {
     arm.setJointVelocities(arm.new JointVelocities(leftY * maxShoulderVel, rightY * maxElbowVel));
 
     if(oi.getOperatorAButton()){
-      arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.3, 2.3));
+      arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.5, 2.7));
     }
   }
 
