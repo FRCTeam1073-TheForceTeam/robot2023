@@ -31,7 +31,7 @@ public class TeleopSetArm extends CommandBase {
       arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.84, 2.9) );
     }
     if(oi.getOperatorBButton()){
-      arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.8));
+      arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.9));
     }
   }
 

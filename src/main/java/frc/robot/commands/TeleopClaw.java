@@ -33,10 +33,10 @@ public class TeleopClaw extends CommandBase {
     if(oi.getOperatorRightBumper()){
       claw.setVacuumSpeed(628.4); //intial: 314.2 rps
     }
-    if(oi.getOperatorAButton()){
+    if(oi.getOperatorXButton()){
       claw.setActuatorDebugPercent(1);
     }
-    else if(oi.getOperatorBButton()){
+    else if(oi.getOperatorYButton()){
       claw.setActuatorDebugPercent(-1);
     }
     else{
