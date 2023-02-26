@@ -8,24 +8,32 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
   private TalonFX vacuumMotor;
-  private VictorSPX actuator;
+  private TalonSRX actuator;
+  private final double closedPosition = 0;
+  private final double openedPosition = 0;
+  private final double conePosition = 0;
+  private final double cubePosition = 0;
+  //private final boolean debug = true;
 
   /** Creates a new Claw. */
   public Claw() {
     vacuumMotor = new TalonFX(19);
     setUpMotors();
-    actuator = new VictorSPX(0);
+    actuator = new TalonSRX(20);
+    setUpActuators();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Actuator Position", getActuatorPosition());
   }
 
   public void setVacuumSpeed(double speed){
@@ -35,7 +43,7 @@ public class Claw extends SubsystemBase {
   // Initialize preferences for this class:
   public static void initPreferences() 
   {
-  
+    
   }
 
   public String getDiagnostics() {
@@ -47,22 +55,34 @@ public class Claw extends SubsystemBase {
 
   // This method will open the claw
   public void openClaw(){
-
+    actuator.set(ControlMode.Position, openedPosition);
   }
 
   // This method will close the claw
   public void closeClaw(){
-
+    actuator.set(ControlMode.Position, closedPosition);
   }
 
   // This method closes enough to fit a cone
   public void closeOnCone(){
-
+    actuator.set(ControlMode.Position, conePosition);
   }
 
   // This method closes enough to fit a cube
   public void closeOnCube(){
+    actuator.set(ControlMode.Position, cubePosition);
+  }
 
+  public double getActuatorPosition(){
+    return actuator.getSelectedSensorPosition();
+  }
+
+  public void setActuatorSensorPosition(double position){
+    actuator.setSelectedSensorPosition(position);
+  }
+
+  public void setActuatorDebugVelocity(double speed){
+    actuator.set(ControlMode.Velocity, speed);
   }
 
   public void setUpMotors(){
@@ -79,6 +99,10 @@ public class Claw extends SubsystemBase {
     vacuumMotor.config_kF(0, 0);
     vacuumMotor.configMaxIntegralAccumulator(0, 0);
     vacuumMotor.setIntegralAccumulator(0);
+  }
+
+  public void setUpActuators(){
+    actuator.configFactoryDefault();
   }
 
 }
