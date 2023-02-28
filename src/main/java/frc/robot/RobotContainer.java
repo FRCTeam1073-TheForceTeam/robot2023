@@ -123,6 +123,7 @@ public class RobotContainer {
 
   public void teleopInit(){
     m_driveSubsystem.parkingBrake(false);
+    m_arm.initializeShoulder();
   }
 
   private void configureBindings() {
@@ -132,14 +133,29 @@ public class RobotContainer {
     Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
     stowTrigger.onTrue(armStowCommand());
 
-    Trigger highTrigger = new Trigger(m_OI::getOperatorDPad270);
+    Trigger midTrigger = new Trigger(m_OI::getOperatorXButton);
+    midTrigger.onTrue(middleNodeCommand());
+
+    //Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
+    //midCubeTrigger.onTrue(midCubeNodeCommand());
+
+    Trigger highTrigger = new Trigger(m_OI::getOperatorYButton);
     highTrigger.onTrue(highNodeCommand());
 
-    Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorDPad180);
+    //Trigger highCubeTrigger = new Trigger(m_OI::getOperatorDPadUp);
+    //highCubeTrigger.onTrue(highCubeNodeCommand());
+
+    Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorBButton);
     doubleSubstationTrigger.onTrue(doubleSubstationCommand());
+
+    Trigger cubeAimTrigger = new Trigger(m_OI::getOperatorDPadUp);
+    cubeAimTrigger.onTrue(cubeGroundAim());
+
+    Trigger cubePickTrigger = new Trigger(m_OI::getOperatorDPadLeft);
+    cubePickTrigger.onTrue(cubeGroundPick());
   }
 
-    public void setTestMode() {
+  public void setTestMode() {
     DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
     dtc.schedule();
     m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
@@ -221,13 +237,33 @@ public class RobotContainer {
   }
   
   public Command doubleSubstationCommand(){
-    return new ArmSetPosition(m_arm, -1.9, 3.7);
+    return new ArmSetPosition(m_arm, -2.0576, 3.73);
+  }
+
+  public Command middleNodeCommand(){
+    return new ArmSetPosition(m_arm, -1.51, 3.75);
   }
 
   public Command highNodeCommand(){
-    return new ArmSetPosition(m_arm, -0.66, 3.31);
+    return new ArmSetPosition(m_arm, -0.652, 3.3086);
   }
 
+  //public Command highCubeNodeCommand(){
+  //  return new ArmSetPosition(m_arm, -1.018, 3.764);
+  //}
+
+  //public Command midCubeNodeCommand(){
+  //  return new ArmSetPosition(m_arm, -1.573, 3.9);
+  //}
+
+  public Command cubeGroundAim(){
+    return new ArmSetPosition(m_arm, -0.949, 5.1665);
+  }
+
+  public Command cubeGroundPick(){
+    return new ArmSetPosition(m_arm, -0.7096, 5.315);
+  }
+  
   public Command basicEngage() {
     return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
   }

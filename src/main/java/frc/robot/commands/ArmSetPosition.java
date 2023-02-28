@@ -12,8 +12,8 @@ public class ArmSetPosition extends CommandBase {
   private Arm arm;
   private double shoulderAng;
   private double elbowAng;
-  private final double shoulderTolerance = 0.3;
-  private final double elbowTolerance = 0.3;
+  private final double shoulderTolerance = 0.1;
+  private final double elbowTolerance = 0.1;
 
   public ArmSetPosition(Arm arm, double shoulderAng, double elbowAng) {
     // Use addRequirements() here to declare subsystem dependencies.
