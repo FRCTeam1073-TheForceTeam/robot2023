@@ -163,7 +163,7 @@ public class DriveSubsystem extends SubsystemBase
 
   // Reset IMU heading to zero degrees
   public void zeroHeading() {
-    pigeon2.setYaw(0);
+    pigeon2.setYaw(180);
   }
 
   // Set the commanded chassis speeds for the drive subsystem.

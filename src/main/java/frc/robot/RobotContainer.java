@@ -268,7 +268,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(1),
-        new AlignToAprilTag(m_driveSubsystem, m_frontCamera, 0.5),
+        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new VacuumActivateCommand(m_claw, true)),
       highNodeCommand(),
       new VacuumActivateCommand(m_claw, false),
