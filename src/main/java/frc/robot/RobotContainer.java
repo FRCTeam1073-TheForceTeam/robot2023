@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AlignToAprilTag;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -34,6 +36,7 @@ import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
+import frc.robot.commands.VacuumActivateCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.ParkingBrake;
 import frc.robot.subsystems.DriveSubsystem;
@@ -77,6 +80,7 @@ public class RobotContainer {
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
   private static final String kAlignToAprilTag = "Align To AprilTag";
+  private static final String kScoreCube = "Score Cube";
 
   private static final String kArmTest = "Arm Test Command";
 //  private static final String kScoreHybrid = "Score Hybrid";
@@ -106,6 +110,7 @@ public class RobotContainer {
     m_chooser.addOption("Test Mode", kTestMode);
     m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
     m_chooser.addOption("Arm Set Position test", kArmTest);
+    m_chooser.addOption("Score Cube", kScoreCube);
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -207,6 +212,8 @@ public class RobotContainer {
         return alignToAprilTag();
       case kArmTest:
         return armSetTest();
+      case kScoreCube:
+        return scoreHighCubeCommand();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -249,6 +256,19 @@ public class RobotContainer {
   
   public Command basicEngage() {
     return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
+  }
+
+  public Command scoreHighCubeCommand(){
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new WaitCommand(1),
+        new AlignToAprilTag(m_driveSubsystem, m_frontCamera, 0.5),
+        new VacuumActivateCommand(m_claw, true)),
+      highNodeCommand(),
+      new VacuumActivateCommand(m_claw, false),
+      new WaitCommand(1),
+      armStowCommand()
+    );
   }
 
   public Command engagePlus() 
