@@ -217,10 +217,10 @@ public class Arm extends SubsystemBase{
     elbowMotor.setIntegralAccumulator(0);
 
     ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 200);
-    //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
 
     SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
-    //SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
+    SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
 
     SmartDashboard.putNumber("Shoulder Angle on init", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle on init", getJointAngles().elbow);
