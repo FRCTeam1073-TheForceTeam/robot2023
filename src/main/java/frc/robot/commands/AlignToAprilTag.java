@@ -6,11 +6,14 @@ package frc.robot.commands;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.sensors.Pigeon2;
+
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.AprilTagFinder;
@@ -19,6 +22,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class AlignToAprilTag extends CommandBase {
@@ -32,13 +36,15 @@ public class AlignToAprilTag extends CommandBase {
   private double tolerance;
 
 
+
   // State variables for execution:
   int targetTagID;
   double targetTagDistance;
   private ChassisSpeeds chassisSpeeds;
   int glitchCounter;
+  double yOffset;
 
-  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity, double yOffset) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
@@ -46,6 +52,7 @@ public class AlignToAprilTag extends CommandBase {
     this.finder = finder;
     this.maxAngularVelocity = 0.5;
     this.tolerance = 0.05;
+    this.yOffset = yOffset;
     // Create these just once and reuse them in execute loops.
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     addRequirements(drivetrain);
@@ -72,14 +79,20 @@ public class AlignToAprilTag extends CommandBase {
 
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
+    double currentHeading = drivetrain.getHeading();
+    //apply offset to target pose
+    targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
+
 
     // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
     if (closestID == targetTagID && targetPose != null) {
       
       // Robot relative movement:
       chassisSpeeds.vxMetersPerSecond = 0.0;
+      double rotationSpeed = (180 - currentHeading)* Math.PI/180 * 0.5;
+      rotationSpeed = MathUtil.clamp(rotationSpeed, -0.3, 0.3);
       // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
-      chassisSpeeds.omegaRadiansPerSecond = 0.0; // For now..
+      chassisSpeeds.omegaRadiansPerSecond = rotationSpeed; // For now..
       chassisSpeeds.vyMetersPerSecond = targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
       chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
       drivetrain.setChassisSpeeds(chassisSpeeds);
