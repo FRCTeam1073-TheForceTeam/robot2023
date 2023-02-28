@@ -169,6 +169,11 @@ public class OI extends SubsystemBase
         return driverController.getRawButton(1);
     }
 
+    public boolean getYButton()
+    {
+        return driverController.getRawButton(4);
+    }
+
     public int getDPad(){
         return driverController.getPOV();
     }
