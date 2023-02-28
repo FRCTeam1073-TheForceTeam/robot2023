@@ -175,7 +175,13 @@ public class RobotContainer {
     cubePickTrigger.onTrue(cubeGroundPick());
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
-    alignToAprilTag.onTrue(alignToAprilTag());
+    alignToAprilTag.onTrue(alignToAprilTag(0));
+    
+    Trigger leftAlignToAprilTag = new Trigger(m_OI::getXButton);
+    leftAlignToAprilTag.onTrue(alignToAprilTag(-0.55));
+
+    Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
+    rightAlignToAprilTag.onTrue(alignToAprilTag(0.55));
   }
 
   public void setTestMode() {
@@ -209,7 +215,7 @@ public class RobotContainer {
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
       case kAlignToAprilTag:
-        return alignToAprilTag();
+        return alignToAprilTag(0);
       case kArmTest:
         return armSetTest();
       case kScoreCube:
@@ -348,8 +354,8 @@ public class RobotContainer {
 //      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 //  }
 
-  public Command alignToAprilTag(){
-    return new AlignToAprilTag(m_driveSubsystem, m_frontCamera , 0.5);
+  public Command alignToAprilTag(double offset){
+    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
   }
 
   public void setStartupLighting()

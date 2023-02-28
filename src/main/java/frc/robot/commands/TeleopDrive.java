@@ -80,7 +80,7 @@ public class TeleopDrive extends CommandBase
       fieldCentric = !fieldCentric;
     }
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
-    if(m_OI.getXButton()){
+    if(m_OI.getLeftBumper()){
       parked = !parked;
     }
     if(parked && !m_driveSubsystem.getParkingBrake()){
