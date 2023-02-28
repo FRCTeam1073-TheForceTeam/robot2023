@@ -76,13 +76,13 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void execute() {
     bling.setColorRGBAll(255, 255, 255);
-
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
     double currentHeading = drivetrain.getHeading();
     //apply offset to target pose
+    if (targetPose != null){
     targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
-
+    }
 
     // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
     if (closestID == targetTagID && targetPose != null) {
@@ -119,13 +119,13 @@ public class AlignToAprilTag extends CommandBase {
     chassisSpeeds.vyMetersPerSecond = 0.0;
     chassisSpeeds.omegaRadiansPerSecond = 0.0;
     drivetrain.setChassisSpeeds(chassisSpeeds); // Stop moving.
+    bling.clearLEDs();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
-    bling.clearLEDs();
     //de-bouncing glitch "signal"
     if (targetTagID < 0 || glitchCounter > 3){
 

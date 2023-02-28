@@ -173,10 +173,10 @@ public class RobotContainer {
     alignToAprilTag.onTrue(alignToAprilTag(0));
     
     Trigger leftAlignToAprilTag = new Trigger(m_OI::getXButton);
-    leftAlignToAprilTag.onTrue(alignToAprilTag(-0.5));
+    leftAlignToAprilTag.onTrue(alignToAprilTag(-0.55));
 
     Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
-    rightAlignToAprilTag.onTrue(alignToAprilTag(0.5));
+    rightAlignToAprilTag.onTrue(alignToAprilTag(0.55));
   }
 
   public void setTestMode() {
