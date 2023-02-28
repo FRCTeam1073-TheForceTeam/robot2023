@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,12 +14,16 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AlignToAprilTag;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ArmSetPosition;
 import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
@@ -27,6 +32,7 @@ import frc.robot.commands.EngageBalance;
 import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.ParkingBrake;
@@ -54,7 +60,8 @@ public class RobotContainer {
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
-  private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
+  //private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
+  private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
@@ -71,6 +78,7 @@ public class RobotContainer {
   private static final String kTestMode = "Test Mode";
   private static final String kAlignToAprilTag = "Align To AprilTag";
 
+  private static final String kArmTest = "Arm Test Command";
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
@@ -85,7 +93,8 @@ public class RobotContainer {
     // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
-    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
@@ -96,6 +105,7 @@ public class RobotContainer {
     m_chooser.addOption("Leave Community", kLeaveCommunity);
     m_chooser.addOption("Test Mode", kTestMode);
     m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
+    m_chooser.addOption("Arm Set Position test", kArmTest);
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -105,6 +115,7 @@ public class RobotContainer {
   //   m_robotLocation.addOption("Position 2", kPose2);
   //   m_robotLocation.addOption("Position 3", kPose3);
   //   SmartDashboard.putData("Robot Position Selector", m_robotLocation);
+    configureBindings();
   // 
   }
 
@@ -127,13 +138,39 @@ public class RobotContainer {
 
   public void teleopInit(){
     m_driveSubsystem.parkingBrake(false);
+    m_arm.initializeShoulder();
   }
 
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
+
+    //Trigger for the arm to stow
+    Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
+    stowTrigger.onTrue(armStowCommand());
+
+    Trigger midTrigger = new Trigger(m_OI::getOperatorXButton);
+    midTrigger.onTrue(middleNodeCommand());
+
+    //Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
+    //midCubeTrigger.onTrue(midCubeNodeCommand());
+
+    Trigger highTrigger = new Trigger(m_OI::getOperatorYButton);
+    highTrigger.onTrue(highNodeCommand());
+
+    //Trigger highCubeTrigger = new Trigger(m_OI::getOperatorDPadUp);
+    //highCubeTrigger.onTrue(highCubeNodeCommand());
+
+    Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorBButton);
+    doubleSubstationTrigger.onTrue(doubleSubstationCommand());
+
+    Trigger cubeAimTrigger = new Trigger(m_OI::getOperatorDPadUp);
+    cubeAimTrigger.onTrue(cubeGroundAim());
+
+    Trigger cubePickTrigger = new Trigger(m_OI::getOperatorDPadLeft);
+    cubePickTrigger.onTrue(cubeGroundPick());
   }
 
-    public void setTestMode() {
+  public void setTestMode() {
     DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
     dtc.schedule();
     m_underglow.setLEDIntensity(0.7, 0.7, 0.0); // Orangeish.
@@ -165,12 +202,48 @@ public class RobotContainer {
 //        return trajectoryWaypoint();
       case kAlignToAprilTag:
         return alignToAprilTag();
+      case kArmTest:
+        return armSetTest();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
     }
   }
 
+  public Command armStowCommand(){
+      return new SequentialCommandGroup(
+        new ArmSetPosition(m_arm, -1.9, 3.3),
+        new ArmSetPosition(m_arm, -3.84, 2.95));
+  }
+  
+  public Command doubleSubstationCommand(){
+    return new ArmSetPosition(m_arm, -2.0576, 3.73);
+  }
+
+  public Command middleNodeCommand(){
+    return new ArmSetPosition(m_arm, -1.51, 3.75);
+  }
+
+  public Command highNodeCommand(){
+    return new ArmSetPosition(m_arm, -0.652, 3.3086);
+  }
+
+  //public Command highCubeNodeCommand(){
+  //  return new ArmSetPosition(m_arm, -1.018, 3.764);
+  //}
+
+  //public Command midCubeNodeCommand(){
+  //  return new ArmSetPosition(m_arm, -1.573, 3.9);
+  //}
+
+  public Command cubeGroundAim(){
+    return new ArmSetPosition(m_arm, -0.949, 5.1665);
+  }
+
+  public Command cubeGroundPick(){
+    return new ArmSetPosition(m_arm, -0.7096, 5.315);
+  }
+  
   public Command basicEngage() {
     return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
   }
@@ -210,6 +283,10 @@ public class RobotContainer {
     return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
       new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 
+  }
+
+  public Command armSetTest(){
+    return new ArmSetPosition(m_arm, -1.5, 4.1);
   }
 
   public Command testMode() {

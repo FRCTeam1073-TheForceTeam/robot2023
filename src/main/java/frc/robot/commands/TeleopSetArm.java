@@ -5,44 +5,39 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Bling;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.OI;
 
-public class BlingTeleopCommand extends CommandBase {
-  Bling bling;
-  OI oi;
+public class TeleopSetArm extends CommandBase {
+  /** Creates a new TeleopSetArm. */
+  private Arm arm;
+  private OI oi;
 
-  /** Creates a new BlingTeleopComman. */
-  public BlingTeleopCommand(Bling bling_, OI oi_) {
+  public TeleopSetArm(Arm arm, OI oi) {
     // Use addRequirements() here to declare subsystem dependencies.
-    bling = bling_;
-    oi = oi_;
-    addRequirements(bling);
+    this.arm = arm;
+    this.oi = oi;
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    bling.clearLEDs();
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(oi.getOperatorViewButton()) {
-      bling.setSlot(7, 128, 0, 128); //purple for cube
+    //if(oi.getOperatorAButton()){
+    //  arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.84, 2.9) );
+    //}
+    if(oi.getOperatorBButton()){
+      arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.9));
     }
-    else if(oi.getOperatorMenuButton()){
-      bling.setSlot(7, 255, 255, 0); //yellow for cone
-    }
-    
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    bling.setSlot(7, 0, 0, 0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
