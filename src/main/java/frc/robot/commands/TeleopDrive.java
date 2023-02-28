@@ -35,10 +35,6 @@ public class TeleopDrive extends CommandBase
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
-  //Snap to position thresholds
-  private final static double STOP_THRESHOLD = 5;
-  private final static double SLOW_THRESHOLD = 30;
-
   /** Creates a new Teleop. */
   public TeleopDrive(DriveSubsystem ds, OI oi){
     super.setName("Teleop Drive");
@@ -58,58 +54,24 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    //multiples the angle by a number from 1 to the square root of 20:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(40) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(40) - 1));
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * 1.5);
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * 1.0);
 
-    double leftY = m_OI.getDriverLeftY();
-    double leftX = m_OI.getDriverLeftX();
-    double rightX = m_OI.getDriverRightX();
-    //sets deadzones on the controller to extend to .05:
-    if(Math.abs(leftY) < .05) {leftY = 0;}
-    if (Math.abs(leftX) < .05) {leftX = 0;}
-    if (Math.abs(rightX) < .05) {rightX = 0;}
+    //double mult1 = m_OI.getDriverLeftTrigger() * maximumLinearVelocity * 0.475;
+    //double mult2 = m_OI.getDriverRightTrigger() * maximumLinearVelocity * 0.475;
 
-    //sets the velocity to a number from 0 to 1/20th of the max:
-    leftY *= maximumLinearVelocity * .025;
-    leftX *= maximumLinearVelocity * .025;
-    rightX *= maximumRotationVelocity * .025;
+    // if (m_OI.getLeftBumper()){
+    //   velocityMult *= 0.5; // 50% maximum speed
+    //   rotateMult *= 0.5;
+    // }
+    // else if (m_OI.getRightBumper()){
+    //   velocityMult *= 1.0; // Maximum speed
+    //   rotateMult *= 1.0;
+    // } else {
+    //   velocityMult *= 0.1;  // 10% maximum speed.
+    //   rotateMult *= 0.1;
+    // }
 
-    // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
-    if (m_OI.getFieldCentricToggle()){
-      fieldCentric = !fieldCentric;
-    }
-    SmartDashboard.putBoolean("Field Centric", fieldCentric);
-    if(m_OI.getXButton()){
-      parked = !parked;
-    }
-    if(parked && !m_driveSubsystem.getParkingBrake()){
-      m_driveSubsystem.parkingBrake(true);
-    }
-    if(!parked && m_driveSubsystem.getParkingBrake()){
-      m_driveSubsystem.parkingBrake(false);
-    }
-    else if (fieldCentric){
-      //Snap to cardinal directions
-      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
-      rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
-
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        -leftY * mult1 * mult2,
-        -leftX * mult1 * mult2,
-        -rightX * mult1 * mult2,
-        Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
-        m_driveSubsystem.setChassisSpeeds(speeds);
-    }
-    else{
-      // Robot centric driving.
-      speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = -leftY * mult1 * mult2; 
-      speeds.vyMetersPerSecond = -leftX * mult1 * mult2; 
-      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2;
-      m_driveSubsystem.setChassisSpeeds(speeds); 
-    }
-    
     // Allow driver to zero the drive subsystem heading for field-centric control.
     if(m_OI.getMenuButton()){
       m_driveSubsystem.zeroHeading();
@@ -120,34 +82,108 @@ public class TeleopDrive extends CommandBase
       Pose2d zero = new Pose2d(0.0, 0.0, zeroRotate);
       m_driveSubsystem.resetOdometry(zero);
     }
-  }
 
-    //PAST snap-to vars
-    // double leftY = m_OI.getDriverLeftY();
-    // double leftX = m_OI.getDriverLeftX();
-    // double rightX = m_OI.getDriverRightX();
-    // if (Math.abs(leftY) < .1) {leftY = 0;}
-    // if (Math.abs(leftX) < .1) {leftX = 0;}
-    // if (Math.abs(rightX) < .1) {rightX = 0;}
+    double leftY = m_OI.getDriverLeftY();
+    double leftX = m_OI.getDriverLeftX();
+    double rightX = m_OI.getDriverRightX();
+    if (Math.abs(leftY) < .1) {leftY = 0;}
+    if (Math.abs(leftX) < .1) {leftX = 0;}
+    if (Math.abs(rightX) < .1) {rightX = 0;}
 
-    // if(m_OI.getXButton()){
-    //   parked = !parked;
+    if(m_OI.getXButton()){
+      parked = !parked;
+    }
 
-  public double snapToHeading(double currentAngle, double targetAngle, double defaultVelocity){
-    if(targetAngle == 361){
-      return defaultVelocity;
+    // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
+    if (m_OI.getFieldCentricToggle()){
+      fieldCentric = !fieldCentric;
     }
-    double error = currentAngle - targetAngle;
-    while(error < -180){error += 360;}
-    while(error > 180){error -= 360;}
-    SmartDashboard.putNumber("Angle Error", error);
-    if(Math.abs(error) < STOP_THRESHOLD){
-      return 0;
+
+    SmartDashboard.putBoolean("Field Centric", fieldCentric);
+
+    if(parked && !m_driveSubsystem.getParkingBrake()){
+      m_driveSubsystem.parkingBrake(true);
     }
-    if(Math.abs(error) < SLOW_THRESHOLD){
-      return error/SLOW_THRESHOLD;
+    
+    if(!parked && m_driveSubsystem.getParkingBrake()){
+      m_driveSubsystem.parkingBrake(false);
     }
-    return error * .7;
+    
+    else if (fieldCentric){
+      //Snap to cardinal directions
+      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);
+      double cardinalError;
+      SmartDashboard.putNumber("Current Angle within 2 pi", currentAngle);
+
+      if(m_OI.getDPad() == 0){
+        //cardinalError = Math.abs()
+        if(currentAngle == 0){
+          rightX = 0;
+        }
+        if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+          rightX = -.5;
+        }
+        else if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 90){ //90 is 270 on the robot
+        if(currentAngle == 3/2 * Math.PI){
+          rightX = 0;
+        }
+        if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+          (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+          rightX = -.5;
+        }
+        else if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 180){
+        if(currentAngle == Math.PI){
+          rightX = 0;
+        }
+        if(currentAngle > Math.PI || (currentAngle < 0 && currentAngle >= -Math.PI)){
+          rightX = -.5;
+        }
+        else if((currentAngle > 0 && currentAngle <= Math.PI) || (currentAngle < -Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      if(m_OI.getDPad() == 270){ //270 is 90 on the robot
+        if(currentAngle == Math.PI / 2){
+          rightX = 0;
+        }
+        if(Math.abs(currentAngle) > Math.PI / 2 && Math.abs(currentAngle) <= Math.PI){
+          rightX = -.5;
+        }
+        else if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
+                (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
+          rightX = .5;
+        }
+      }
+
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        -leftY * mult1 * mult2,
+        -leftX * mult1 * mult2,
+        -rightX * mult1 * mult2,
+        Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
+        m_driveSubsystem.setChassisSpeeds(speeds);
+    }
+    
+    else{
+      // Robot centric driving.
+      speeds = new ChassisSpeeds();
+      speeds.vxMetersPerSecond = -leftY * mult1 * mult2; 
+      speeds.vyMetersPerSecond = -leftX * mult1 * mult2; 
+      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2;
+      m_driveSubsystem.setChassisSpeeds(speeds); 
+    }
+    
+    
   }
 
   // Called once the command ends or is interrupted.
