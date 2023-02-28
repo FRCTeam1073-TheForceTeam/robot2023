@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.AprilTagFinder;
+import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -24,6 +25,7 @@ public class AlignToAprilTag extends CommandBase {
 
   // Saved construction parameters:
   private DriveSubsystem drivetrain;
+  private Bling bling;
   private AprilTagFinder finder;
   private double maxVelocity;
   private double maxAngularVelocity;
@@ -36,9 +38,10 @@ public class AlignToAprilTag extends CommandBase {
   private ChassisSpeeds chassisSpeeds;
   int glitchCounter;
 
-  public AlignToAprilTag(DriveSubsystem drivetrain, AprilTagFinder finder, double maxVelocity) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
+    this.bling = bling;
     this.maxVelocity = maxVelocity;
     this.finder = finder;
     this.maxAngularVelocity = 0.5;
@@ -52,6 +55,7 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void initialize() {
     int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
+    bling.clearLEDs();
     if(closestID != -1){
       System.out.println(String.format("AlignToAprilTag Initialized to Tag: %d", closestID));
       targetTagID = closestID;
@@ -64,6 +68,7 @@ public class AlignToAprilTag extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    bling.setColorRGBAll(255, 255, 255);
 
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
@@ -106,9 +111,8 @@ public class AlignToAprilTag extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
-
+    bling.clearLEDs();
     //de-bouncing glitch "signal"
     if (targetTagID < 0 || glitchCounter > 3){
 
