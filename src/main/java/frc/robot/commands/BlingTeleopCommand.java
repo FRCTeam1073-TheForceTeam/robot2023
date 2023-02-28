@@ -22,26 +22,26 @@ public class BlingTeleopCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    bling.clearLEDs();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if(oi.getOperatorViewButton()) {
-      bling.setRGBAll(128, 0, 128); //purple for cube
+      bling.setSlot(7, 128, 0, 128); //purple for cube
     }
     else if(oi.getOperatorMenuButton()){
-      bling.setRGBAll(255, 255, 0); //yellow for cone
+      bling.setSlot(7, 255, 255, 0); //yellow for cone
     }
-    else {
-      bling.setRGBAll(0, 0, 0);
-    }
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    bling.setRGBAll(0, 0, 0);
+    bling.setSlot(7, 0, 0, 0);
   }
 
   // Returns true when the command should end.
