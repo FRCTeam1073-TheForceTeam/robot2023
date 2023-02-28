@@ -73,7 +73,7 @@ public class AprilTagFinder extends SubsystemBase {
 
       // Checks to see if the tag ID is between 1-8 (by excluding 0 and 9) to reduce false positives.
       // If not, it won't send information to the tagData array.
-      
+
       if(tagData[i*23].intValue() > 0 && tagData[i*23].intValue() < 9){
 
       double[] homography = new double[9];
@@ -110,27 +110,35 @@ public class AprilTagFinder extends SubsystemBase {
       detections.add(detection);
       //Transform3d transform = poseEstimator.estimate(detection);
       //AprilTagPoseEstimate poseEstimate = poseEstimator.estimateOrthogonalIteration(detection, 50);
-      Transform3d transform = poseEstimator.estimate(detection);
+      //Transform3d transform = poseEstimator.estimate(detection);
+      Transform3d transform = poseEstimator.estimateHomography(detection);
 
       // Set rotation to 0, lied to robot. 
       // TODO: Go back and do transform calibration after Week 1
 
-      if (transform.getZ() < 0.0){
-        // transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
-        // new Rotation3d(transform.getRotation().getX(), 1 + transform.getRotation().getZ(), -transform.getRotation().getY()));
+      // if (transform.getZ() < 0.0){
+      //   // transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
+      //   // new Rotation3d(transform.getRotation().getX(), 1 + transform.getRotation().getZ(), -transform.getRotation().getY()));
 
-        transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
-        new Rotation3d(0, 0,0));
+      //   transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
+      //   new Rotation3d(0, 0,0));
 
-      }else{
-        // transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
-        // new Rotation3d(-transform.getRotation().getX(), -transform.getRotation().getZ(), Math.PI + transform.getRotation().getY()));
+      // }else{
+      //   // transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
+      //   // new Rotation3d(-transform.getRotation().getX(), -transform.getRotation().getZ(), Math.PI + transform.getRotation().getY()));
 
-        transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
-        new Rotation3d(0, 0, 0));
-      }
+      //   transform = new Transform3d(new Translation3d(-transform.getZ(), transform.getX(), transform.getY()), 
+      //   new Rotation3d(0, 0, 0));
+      // }
 
       // Location of tag in camera coords rotated into robot orientation as a pose3d. Tranform3d and Pose3d are compatiable with certain conditions
+
+      
+      //set transform to 0
+
+      transform = new Transform3d(new Translation3d(transform.getZ(), -transform.getX(), -transform.getY()), 
+      new Rotation3d(0,0,0));
+      //new Rotation3d(transform.getRotation().getZ(), -transform.getRotation().getX(), -transform.getRotation().getY()));
 
       Pose3d tagPose = new Pose3d(transform.getTranslation(), transform.getRotation());
       //Pose3d cameraPose = new Pose3d(cameraTransform.getTranslation(), cameraTransform.getRotation());
@@ -142,6 +150,8 @@ public class AprilTagFinder extends SubsystemBase {
       //Keep track of the closest tag while we're running through the list.
       if (transform.getTranslation().getNorm() < closestDistance) {
         closestDistance = transform.getTranslation().getNorm();
+        
+        //took out transform to test rotation
         //closestPose = new Pose3d(transform.getTranslation(), transform.getRotation());
         closestPose = tagPose;
         closestID = detection.getId();

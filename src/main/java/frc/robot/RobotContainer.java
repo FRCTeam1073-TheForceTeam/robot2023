@@ -249,7 +249,7 @@ public class RobotContainer {
 //  }
 
   public Command alignToAprilTag(){
-    return new AlignToAprilTag(m_driveSubsystem, m_frontCamera , 1.0);
+    return new AlignToAprilTag(m_driveSubsystem, m_frontCamera , 0.5);
   }
 
   public void setStartupLighting()
