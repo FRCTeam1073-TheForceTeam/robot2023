@@ -75,7 +75,7 @@ public class RobotContainer {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private static final String kNoAuto = "No Autonomous";
   private static final String kBasicEngage = "Basic Engage";
-  private static final String kEngageExperimental = "Experimental Engage";
+  private static final String kSplitEngage = "Split Engage";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
@@ -103,7 +103,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
-    m_chooser.setDefaultOption("Experimental Engage", kEngageExperimental);
+    m_chooser.setDefaultOption("Split Engage", kSplitEngage);
     m_chooser.addOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Engage Plus", kEngagePlus);
     m_chooser.addOption("Leave Community", kLeaveCommunity);
@@ -204,8 +204,10 @@ public class RobotContainer {
         return basicEngage();
       case kEngagePlus:
         return engagePlus();
-      case kEngageExperimental:
-        return engageExperimental();
+      //case kEngageExperimental:
+      //  return engageExperimental();
+      case kSplitEngage:
+        return splitEngage();
       case kLeaveCommunity:
         return leaveCommunity();
       case kTestMode:
@@ -294,7 +296,7 @@ public class RobotContainer {
       //WEEK 0: changed max velocity in both drive through trajectories to 1.0 from 0.5, and set engage max speed to 0.5 from 0.3
   }
 
-  public Command engageExperimental()
+  public Command splitEngage()
   {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, 0.5, false), 

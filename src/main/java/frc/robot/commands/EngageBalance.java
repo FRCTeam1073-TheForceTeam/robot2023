@@ -15,7 +15,8 @@ public class EngageBalance extends CommandBase
     boolean inverted;
     private double maxLinearVelocity;
     private double linearVelocity;
-    private double startTime;
+    private double startTime = 0.0;
+    private int phase;
 
     public EngageBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
@@ -29,6 +30,7 @@ public class EngageBalance extends CommandBase
     @Override
     public void initialize()
     {
+        phase = 0;
         if (inverted)
         {
             linearVelocity = -maxLinearVelocity;
@@ -37,19 +39,26 @@ public class EngageBalance extends CommandBase
         {
             linearVelocity = maxLinearVelocity;
         }
-        startTime = Timer.getFPGATimestamp();
     }
 
     @Override 
     public void execute()
     {
-        if (Math.abs(drivetrain.getPitch()) < 5)
+        if (Math.abs(drivetrain.getPitch()) < 5 && phase == 0)
         {
-            
+            phase = 1;
         }
-        robotPose = drivetrain.getOdometry();
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-        drivetrain.setChassisSpeeds(chassisSpeeds);
+
+        if (phase == 1)
+        {
+            if (startTime == 0.0)
+            {
+                startTime = Timer.getFPGATimestamp();
+            }
+            robotPose = drivetrain.getOdometry();
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+            drivetrain.setChassisSpeeds(chassisSpeeds);
+        } 
     }
 
     @Override
