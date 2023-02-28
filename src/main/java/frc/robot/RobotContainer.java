@@ -168,6 +168,9 @@ public class RobotContainer {
 
     Trigger cubePickTrigger = new Trigger(m_OI::getOperatorDPadLeft);
     cubePickTrigger.onTrue(cubeGroundPick());
+
+    Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
+    alignToAprilTag.onTrue(alignToAprilTag());
   }
 
   public void setTestMode() {
