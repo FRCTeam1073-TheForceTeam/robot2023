@@ -8,8 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class EngageGyroBalance extends CommandBase
-{
+public class EngageGyroBalance extends CommandBase {
     DriveSubsystem drivetrain;
     ChassisSpeeds chassisSpeeds;
     Pose2d robotPose;
@@ -17,13 +16,11 @@ public class EngageGyroBalance extends CommandBase
     private double maxLinearVelocity;
     private double linearVelocity;
     private double startTime;
-    private int phase;
     private double currentPitch;
     private double pitchRate;
     private double loopTime;
 
-    public EngageGyroBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
-    {
+    public EngageGyroBalance(DriveSubsystem ds, double maxSpeed, boolean inverted){
         // Use addRequirements() here to declare subsystem dependencies.
         this.drivetrain = ds;
         maxLinearVelocity = maxSpeed;
@@ -32,33 +29,27 @@ public class EngageGyroBalance extends CommandBase
     }
 
     @Override 
-    public void initialize() 
-    {
-        phase = 0;
+    public void initialize(){
         startTime = Integer.MAX_VALUE;
-        if (inverted)
-        { 
+        if (inverted){ 
             linearVelocity = -maxLinearVelocity; 
         }
-        else
-        { 
+        else{ 
             linearVelocity = maxLinearVelocity; 
         }
+
+        System.out.println("GryoBalance Initialized");
     } 
  
     @Override  
-    public void execute() 
-    { 
+    public void execute(){ 
         loopTime = Timer.getFPGATimestamp() - loopTime;
         pitchRate = (drivetrain.getPitch() - currentPitch) / loopTime;
         SmartDashboard.putNumber("GyroBalance/Pitch Rate", pitchRate);
         SmartDashboard.putNumber("GyroBalance/Start Time", startTime);
         SmartDashboard.putNumber("GyroBalance/Loop Time", loopTime); 
         SmartDashboard.putNumber("GyroBalance/Current Pitch", currentPitch); 
-        SmartDashboard.putNumber("GyroBalance/Phase", phase); 
  
-        if (phase == 0) 
-        { 
             robotPose = drivetrain.getOdometry(); 
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( 
             linearVelocity, 
@@ -67,42 +58,30 @@ public class EngageGyroBalance extends CommandBase
             Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading 
             drivetrain.setChassisSpeeds(chassisSpeeds); 
  
-            if (Math.abs(drivetrain.getPitch()) < 5) 
-            { 
-                phase = 1; 
-            } 
-        } 
-         
-        if (phase == 1) 
-        { 
-            if (startTime == Integer.MAX_VALUE) 
-            { 
-                startTime = Timer.getFPGATimestamp();
+            if (Math.abs(drivetrain.getPitch()) < 5){ 
+                if (startTime == Integer.MAX_VALUE){ 
+                    startTime = Timer.getFPGATimestamp();
+                }
+                robotPose = drivetrain.getOdometry();
+                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+                drivetrain.setChassisSpeeds(chassisSpeeds); 
             }
-            robotPose = drivetrain.getOdometry();
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-            drivetrain.setChassisSpeeds(chassisSpeeds);
-        } 
         currentPitch = drivetrain.getPitch();
         loopTime = Timer.getFPGATimestamp();
     }
 
     @Override
-    public void end(boolean interrupted)
-    {
+    public void end(boolean interrupted){
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, Rotation2d.fromDegrees(drivetrain.getHeading()));
         drivetrain.setChassisSpeeds(chassisSpeeds);
     }
 
     @Override
-    public boolean isFinished()
-    {
-        if (Timer.getFPGATimestamp() > (startTime + 0.5) && phase == 1 && Math.abs(pitchRate) > 7)
-        {
-            return true;
+    public boolean isFinished(){
+        if (Timer.getFPGATimestamp() > (startTime + 0.5) && Math.abs(pitchRate) < 7){
+            return false; //change back to true after check if will go backwards
         }
-        else
-        {
+        else{
             return false;
         }
     }
