@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.ErrorCode;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.RobotController;
@@ -25,15 +28,24 @@ public class Bling extends SubsystemBase {
   public int ledR = 0;
   public int ledG = 0;
   public int ledB = 0;
+  private NetworkTable blingNetworkTable;
+  private double blingEntry;
+  private double blingEntry2;
+  Arm arm;
 
   public Bling() {
     m_led = new AddressableLED(0);
+    blingNetworkTable = NetworkTableInstance.getDefault().getTable("SmartDashboard");
+    blingEntry = blingNetworkTable.getEntry("Shoulder Angle").getDouble(0.0);
+    //blingEntry2 = blingNetworkTable.getEntry("Shoulder Angle on init").getDouble(0.0);
+   // blingEntry = arm.getJointAngles().shoulder;
     // TODO: change for the actual length
     m_ledBuffer = new AddressableLEDBuffer(24);//0 as placeholder
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
     slotLength = (int) (m_ledBuffer.getLength() / (8));//1 as placeholder
+
   }
 
   public void initialize() {
@@ -45,6 +57,17 @@ public class Bling extends SubsystemBase {
     // This method will be called once per scheduler run
     m_led.setData(m_ledBuffer);
     batteryBling(0);
+    if (System.currentTimeMillis()/1000.0 >= 3)
+    {
+      if (blingEntry < -3)
+      {
+        clearLEDs();
+        setColorRGBAll(0, 255, 0);
+      }else if (blingEntry > 3){
+        clearLEDs();
+        setColorRGBAll(255, 0, 0);
+      }
+    }
   }
 
   public void setRGB(int i, int r, int g, int b)
