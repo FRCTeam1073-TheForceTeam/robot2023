@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.ActuateClaw;
 import frc.robot.commands.AlignToAprilTag;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -221,7 +222,7 @@ public class RobotContainer {
       case kArmTest:
         return armSetTest();
       case kScoreCube:
-        return scoreHighCubeCommand();
+        return scoreHighCubeAndEngageCommand();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -266,6 +267,23 @@ public class RobotContainer {
     return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
   }
 
+  public Command scoreHighCubeAndEngageCommand(){
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new WaitCommand(1),
+        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
+        new VacuumActivateCommand(m_claw, true)),
+      highNodeCommand(),
+      new VacuumActivateCommand(m_claw, false),
+      new ActuateClaw(m_claw, true, 1),
+      new ParallelDeadlineGroup( 
+        new EngageDriveUp(m_driveSubsystem, 0.5, false),
+        armStowCommand()),
+      new EngageBalance(m_driveSubsystem, 0.5, false),
+      new ParkingBrake(m_driveSubsystem, true)
+    );
+  }
+
   public Command scoreHighCubeCommand(){
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -274,7 +292,7 @@ public class RobotContainer {
         new VacuumActivateCommand(m_claw, true)),
       highNodeCommand(),
       new VacuumActivateCommand(m_claw, false),
-      new WaitCommand(1),
+      new ActuateClaw(m_claw, true, 1),
       armStowCommand()
     );
   }
