@@ -6,39 +6,38 @@ import frc.robot.subsystems.DriveSubsystem;
 public class ParkingBrake extends CommandBase
 {
     DriveSubsystem drivetrain;
-    boolean isOn;
 
-    public ParkingBrake(DriveSubsystem ds, boolean isOn)
+
+    public ParkingBrake(DriveSubsystem ds)
     {
         this.drivetrain = ds;
         addRequirements(ds);
-        this.isOn = isOn;
     }
 
     @Override
     public void initialize()
     {
-        
+        drivetrain.parkingBrake(true);
     }
 
     @Override
     public void execute()
     {
-        if (!isOn)
-        {
-            drivetrain.parkingBrake(true);
-        }
-        else
-        {
-            drivetrain.parkingBrake(false);
-        }
-        //isParkingBrakeOn = true;
+        // if (!isOn)
+        // {
+        //     drivetrain.parkingBrake(true);
+        // }
+        // else
+        // {
+        //     drivetrain.parkingBrake(false);
+        // }
+        // //isParkingBrakeOn = true;
     }
 
     @Override
     public void end(boolean interrupted)
     {
-
+        drivetrain.parkingBrake(false);
     }
 
     @Override

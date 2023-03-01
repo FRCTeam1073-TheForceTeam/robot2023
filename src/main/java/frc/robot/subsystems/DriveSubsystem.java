@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -28,7 +29,7 @@ public class DriveSubsystem extends SubsystemBase
   private SwerveModule[] modules;
   private ChassisSpeeds chassisSpeeds;
   private boolean debug = false;
-  private Pigeon2 pigeon2;
+  private WPI_Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
   private double maximumLinearSpeed = 1.0;
   private boolean parkingBrakeOn = false;
@@ -36,7 +37,7 @@ public class DriveSubsystem extends SubsystemBase
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem()
   {
-    pigeon2 = new Pigeon2(13);
+    pigeon2 = new WPI_Pigeon2(13);
     var error = pigeon2.configFactoryDefault();
     if (error != ErrorCode.OK) {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
@@ -153,12 +154,7 @@ public class DriveSubsystem extends SubsystemBase
 
   public double getPitchRate()
   {
-    return 0.0;
-  }
-
-  public double getRollRate()
-  {
-    return 0.0;
+    return pigeon2.getRate();
   }
 
   // Reset IMU heading to zero degrees
@@ -258,6 +254,7 @@ public class DriveSubsystem extends SubsystemBase
 
     SmartDashboard.putNumber("Pitch", getPitch());
     SmartDashboard.putNumber("Roll", getRoll());
+    SmartDashboard.putNumber("Rate", getPitchRate());
   }
 
   public void parkingBrake(boolean parkingBrakeOn)
