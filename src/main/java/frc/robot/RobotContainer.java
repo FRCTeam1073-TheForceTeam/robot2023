@@ -105,7 +105,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
-    //m_chooser.setDefaultOption("Split Engage", kSplitEngage);
+    m_chooser.setDefaultOption("Split Engage", kSplitEngage);
     m_chooser.addOption("3_A_2023_1073", kLeaveCommunity);
     m_chooser.addOption("1_B_2023_1073", kScoreCube);
     m_chooser.addOption("2_B_2023_1073", kScoreCube);
@@ -283,7 +283,8 @@ public class RobotContainer {
         new VacuumActivateCommand(m_claw, true)),
       highNodeCommand(),
       new VacuumActivateCommand(m_claw, false),
-      new ActuateClaw(m_claw, true, 1),
+      //new ActuateClaw(m_claw, true, 1),
+      new WaitCommand(1),
       new ParallelDeadlineGroup( 
         new EngageDriveUp(m_driveSubsystem, 0.5, false),
         armStowCommand()),

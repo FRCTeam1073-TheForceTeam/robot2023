@@ -11,13 +11,14 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
   private TalonFX vacuumMotor;
-  private TalonSRX actuator1;
-  private TalonSRX actuator2;
+  private PWMTalonSRX actuator1;
+  private PWMTalonSRX actuator2;
   private final double closedPosition = 0;
   private final double openedPosition = 0;
   private final double conePosition = 0;
@@ -29,10 +30,10 @@ public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
   public Claw() {
     vacuumMotor = new TalonFX(19);
-    setUpMotors();
-    actuator1 = new TalonSRX(20);
-    actuator2 = new TalonSRX(21);
-    setUpActuators();
+    //setUpMotors();
+    actuator1 = new PWMTalonSRX(8);
+    actuator2 = new PWMTalonSRX(9);
+    //setUpActuators();
     vacuumRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
     targetVacuumSpeed = 0;
   }
@@ -40,8 +41,8 @@ public class Claw extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
-    SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
+    //SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
+    //SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
     double vacuumSpeed =vacuumRateLimiter.calculate(targetVacuumSpeed);
     vacuumMotor.set(ControlMode.Velocity, vacuumSpeed);
 
@@ -56,7 +57,7 @@ public class Claw extends SubsystemBase {
   {
     
   }
-
+/* 
   public String getDiagnostics() {
     ErrorCode error;
     String result = new String();
@@ -99,10 +100,10 @@ public class Claw extends SubsystemBase {
     actuator1.setSelectedSensorPosition(position);
     actuator2.setSelectedSensorPosition(position);
   }
-
+*/
   public void setActuatorDebugPercent(double speed){
-    actuator1.set(ControlMode.PercentOutput, speed);
-    actuator2.set(ControlMode.PercentOutput, -speed);
+    actuator1.set(speed);
+    actuator2.set(-speed);
   }
 
   public void setUpMotors(){
@@ -122,8 +123,8 @@ public class Claw extends SubsystemBase {
   }
 
   public void setUpActuators(){
-    actuator1.configFactoryDefault();
-    actuator2.configFactoryDefault();
+    //actuator1.();
+    //actuator2.configFactoryDefault();
   }
 
 }
