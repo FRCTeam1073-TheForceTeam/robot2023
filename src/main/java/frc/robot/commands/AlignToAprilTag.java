@@ -92,7 +92,7 @@ public class AlignToAprilTag extends CommandBase {
       double rotationSpeed = (180 - currentHeading)* Math.PI/180 * 0.5;
       rotationSpeed = MathUtil.clamp(rotationSpeed, -0.3, 0.3);
       // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
-      chassisSpeeds.omegaRadiansPerSecond = rotationSpeed; // For now..
+      chassisSpeeds.omegaRadiansPerSecond = 0; // For now..
       chassisSpeeds.vyMetersPerSecond = targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
       chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
       drivetrain.setChassisSpeeds(chassisSpeeds);
