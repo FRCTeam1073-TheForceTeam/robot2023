@@ -143,7 +143,7 @@ public class RobotContainer {
 
   public void teleopInit(){
     m_driveSubsystem.parkingBrake(false);
-    m_arm.initializeShoulder();
+    //m_arm.initializeShoulder();
   }
 
   private void configureBindings() {

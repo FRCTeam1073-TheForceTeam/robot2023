@@ -216,8 +216,8 @@ public class Arm extends SubsystemBase{
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
 
-    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 200);
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
+    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 400);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 400);
 
     SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
     SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
