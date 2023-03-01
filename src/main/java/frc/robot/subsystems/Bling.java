@@ -49,7 +49,7 @@ public class Bling extends SubsystemBase {
   }
 
   public void initialize() {
-      clearLEDs();
+    clearLEDs();
   }
 
   @Override
@@ -57,17 +57,7 @@ public class Bling extends SubsystemBase {
     // This method will be called once per scheduler run
     m_led.setData(m_ledBuffer);
     batteryBling(0);
-    if (System.currentTimeMillis()/1000.0 >= 3)
-    {
-      if (blingEntry < -3)
-      {
-        clearLEDs();
-        setColorRGBAll(0, 255, 0);
-      }else if (blingEntry > 3){
-        clearLEDs();
-        setColorRGBAll(255, 0, 0);
-      }
-    }
+    
   }
 
   public void setRGB(int i, int r, int g, int b)

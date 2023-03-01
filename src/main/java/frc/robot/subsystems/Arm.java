@@ -52,11 +52,12 @@ public class Arm extends SubsystemBase{
   public TrapezoidProfile.State currentShoulderState;
   public TrapezoidProfile.State currentElbowState;
   public double profileStartTime;
+  Bling bling;
 
 
   public class JointPositions{
-    double shoulder;
-    double elbow;
+   public double shoulder;
+   public double elbow;
 
     public JointPositions(double shoulderAng, double elbowAng){
       //showing angles in relation to the flat robot chassis and not the angle between two arm segments
@@ -66,7 +67,7 @@ public class Arm extends SubsystemBase{
 
     public JointPositions(){
       //showing angles in relation to the flat robot chassis and not the angle between two arm segments
-      shoulder = 0.0;
+       shoulder = 0.0;
       elbow = 0.0;
     }
 
@@ -98,8 +99,8 @@ public class Arm extends SubsystemBase{
   }
 
   public class JointVelocities{
-    double shoulder;
-    double elbow;
+    public double shoulder;
+    public double elbow;
 
     public JointVelocities(double shoulderVel, double elbowVel){
       shoulder = shoulderVel;
