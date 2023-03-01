@@ -120,7 +120,7 @@ public class TeleopDrive extends CommandBase
       m_driveSubsystem.parkingBrake(false);
     }
     
-    else if (fieldCentric){
+    /*else if (fieldCentric){
       //Snap to cardinal directions
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getRadians() % (2 * Math.PI);
       double cardinalError;
@@ -174,7 +174,7 @@ public class TeleopDrive extends CommandBase
         else if((Math.abs(currentAngle) > 0 && Math.abs(currentAngle) <= Math.PI / 2) ||
                 (Math.abs(currentAngle) > 3/2 * Math.PI && Math.abs(currentAngle) < 2 * Math.PI)){
           rightX = .5;
-        }
+        } */
       }
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
