@@ -102,9 +102,12 @@ public class Claw extends SubsystemBase {
     actuator2.setSelectedSensorPosition(position);
   }
 */
-  public void setActuatorDebugPercent(double speed){
+  public void setActuator1Angle(double speed){
     actuator1.set(speed);
-    actuator2.set(1 - speed);
+  }
+
+  public void setActuator2Angle(double speed){
+    actuator2.set(speed);
   }
 
   public void setUpMotors(){

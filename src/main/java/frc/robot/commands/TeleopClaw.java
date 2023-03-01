@@ -36,11 +36,20 @@ public class TeleopClaw extends CommandBase {
     if(oi.getOperatorRightBumper()){
       claw.setVacuumSpeed(628.4); //intial: 314.2 rps
     }
+    //cube preset
     if(oi.getOperatorDPadRight()){
-      claw.setActuatorDebugPercent(1.0);
+      claw.setActuator1Angle(0.53);
+      claw.setActuator2Angle(0.47);
     }
+    //open
+    else if(Math.abs(oi.getOperatorLeftX()) > 0.25 || Math.abs(oi.getOperatorLeftY()) > 0.25){
+      claw.setActuator1Angle(1.0);
+      claw.setActuator2Angle(0.0);
+    }
+    //cone preset
     else if(oi.getOperatorDPadDown()){
-      claw.setActuatorDebugPercent(0.0);
+      claw.setActuator1Angle(0.42);
+      claw.setActuator2Angle(0.58);
     }
     //else{
       //claw.setActuatorDebugPercent(0.3);

@@ -25,12 +25,14 @@ public class ActuateClaw extends CommandBase {
   @Override
   public void initialize() {
     //startTime = System.currentTimeMillis() / 1000.0;
+    /* 
     if(open){
       claw.setActuatorDebugPercent(0.5);
     }
     if(!open){
       claw.setActuatorDebugPercent(0.3);
     }
+    */
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,7 +42,7 @@ public class ActuateClaw extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    claw.setActuatorDebugPercent(0);
+    //claw.setActuatorDebugPercent(0);
   }
 
   // Returns true when the command should end.
