@@ -317,9 +317,9 @@ public class RobotContainer {
   public Command splitEngage()
   {
     return new SequentialCommandGroup(
-      new EngageDriveUp(m_driveSubsystem, 0.5, false), 
-      new EngageBalance(m_driveSubsystem, 0.5, false),
-      new ParkingBrake(m_driveSubsystem, true));
+      new EngageDriveUp(m_driveSubsystem, 0.9, false), 
+      new EngageBalance(m_driveSubsystem, 0.75, false),
+      new ParkingBrake(m_driveSubsystem));
   }
 
   public Command leaveCommunity() {

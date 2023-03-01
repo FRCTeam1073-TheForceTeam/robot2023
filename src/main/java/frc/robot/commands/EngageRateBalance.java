@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class EngageBalance extends CommandBase
+public class EngageRateBalance extends CommandBase
 {
     DriveSubsystem drivetrain;
     ChassisSpeeds chassisSpeeds;
@@ -18,7 +18,7 @@ public class EngageBalance extends CommandBase
     private double startTime = 0.0;
     private int phase;
 
-    public EngageBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
+    public EngageRateBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
         // Use addRequirements() here to declare subsystem dependencies.
         this.drivetrain = ds;
@@ -70,7 +70,7 @@ public class EngageBalance extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Timer.getFPGATimestamp() > startTime + 0.25 && Math.abs(drivetrain.getPitch()) < 5)
+        if (Timer.getFPGATimestamp() > startTime + 0.25 && Math.abs(drivetrain.getPitchRate()) > 15)
         {
             return true;
         }
