@@ -11,14 +11,15 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Claw extends SubsystemBase {
   private TalonFX vacuumMotor;
-  private PWMTalonSRX actuator1;
-  private PWMTalonSRX actuator2;
+  private Servo actuator1;
+  private Servo actuator2;
   private final double closedPosition = 0;
   private final double openedPosition = 0;
   private final double conePosition = 0;
@@ -31,8 +32,8 @@ public class Claw extends SubsystemBase {
   public Claw() {
     vacuumMotor = new TalonFX(19);
     //setUpMotors();
-    actuator1 = new PWMTalonSRX(8);
-    actuator2 = new PWMTalonSRX(9);
+    actuator1 = new Servo(8);
+    actuator2 = new Servo(9);
     //setUpActuators();
     vacuumRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
     targetVacuumSpeed = 0;
@@ -103,7 +104,7 @@ public class Claw extends SubsystemBase {
 */
   public void setActuatorDebugPercent(double speed){
     actuator1.set(speed);
-    actuator2.set(-speed);
+    actuator2.set(1 - speed);
   }
 
   public void setUpMotors(){
@@ -123,8 +124,9 @@ public class Claw extends SubsystemBase {
   }
 
   public void setUpActuators(){
-    //actuator1.();
-    //actuator2.configFactoryDefault();
+    //actuator1.setBounds(1,1,0,-1,-1);
+    //actuator2.setBounds(1,1,0,-1,-1);
+    
   }
 
 }

@@ -37,14 +37,14 @@ public class TeleopClaw extends CommandBase {
       claw.setVacuumSpeed(628.4); //intial: 314.2 rps
     }
     if(oi.getOperatorDPadRight()){
-      claw.setActuatorDebugPercent(1);
+      claw.setActuatorDebugPercent(1.0);
     }
     else if(oi.getOperatorDPadDown()){
-      claw.setActuatorDebugPercent(-1);
+      claw.setActuatorDebugPercent(0.0);
     }
-    else{
-      claw.setActuatorDebugPercent(0);
-    }
+    //else{
+      //claw.setActuatorDebugPercent(0.3);
+    //}
   }
 
   // Called once the command ends or is interrupted.
