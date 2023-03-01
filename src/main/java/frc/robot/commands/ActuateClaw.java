@@ -9,27 +9,27 @@ import frc.robot.subsystems.Claw;
 
 public class ActuateClaw extends CommandBase {
   /** Creates a new ActuateClaw. */
-  private Claw claw;
-  private double time;
-  private double startTime;
+  private Claw claw; 
+  //private double time;
+  //private double startTime;
   private boolean open;
 
-  public ActuateClaw(Claw claw, boolean open, double timeSeconds) {
+  public ActuateClaw(Claw claw, boolean open) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
     this.open = open;
-    time = timeSeconds;
+    //time = timeSeconds;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    startTime = System.currentTimeMillis() / 1000.0;
+    //startTime = System.currentTimeMillis() / 1000.0;
     if(open){
-      claw.setActuatorDebugPercent(-1);
+      claw.setActuatorDebugPercent(0.5);
     }
     if(!open){
-      claw.setActuatorDebugPercent(1);
+      claw.setActuatorDebugPercent(0.3);
     }
   }
 
@@ -46,6 +46,7 @@ public class ActuateClaw extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((System.currentTimeMillis() / 1000.0) - startTime) >= time;
+    //return ((System.currentTimeMillis() / 1000.0) - startTime) >= time;
+    return false;
   }
 }

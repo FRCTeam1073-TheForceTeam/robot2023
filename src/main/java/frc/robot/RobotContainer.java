@@ -301,7 +301,7 @@ public class RobotContainer {
         new VacuumActivateCommand(m_claw, true)),
       highNodeCommand(),
       new VacuumActivateCommand(m_claw, false),
-      new ActuateClaw(m_claw, true, 1),
+      //new ActuateClaw(m_claw, true, 1),
       armStowCommand()
     );
   }
