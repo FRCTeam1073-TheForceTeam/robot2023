@@ -82,6 +82,7 @@ public class RobotContainer {
   private static final String kTestMode = "Test Mode";
   private static final String kAlignToAprilTag = "Align To AprilTag";
   private static final String kScoreCube = "Score Cube";
+  private static final String kScoreCubeAndEngage = "Score Cube and Engage";
 
   private static final String kArmTest = "Arm Test Command";
 //  private static final String kScoreHybrid = "Score Hybrid";
@@ -103,15 +104,20 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
    
-    m_chooser.setDefaultOption("Basic Engage", kBasicEngage);
-    m_chooser.setDefaultOption("Split Engage", kSplitEngage);
-    m_chooser.addOption("No Autonomous", kNoAuto);
-    m_chooser.addOption("Engage Plus", kEngagePlus);
-    m_chooser.addOption("Leave Community", kLeaveCommunity);
-    m_chooser.addOption("Test Mode", kTestMode);
-    m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
-    m_chooser.addOption("Arm Set Position test", kArmTest);
-    m_chooser.addOption("Score Cube", kScoreCube);
+    m_chooser.setDefaultOption("No Autonomous", kNoAuto);
+    //m_chooser.setDefaultOption("Split Engage", kSplitEngage);
+    m_chooser.addOption("3_A_2023_1073", kLeaveCommunity);
+    m_chooser.addOption("1_B_2023_1073", kScoreCube);
+    m_chooser.addOption("2_B_2023_1073", kScoreCube);
+    m_chooser.addOption("3_B_2023_1073", kScoreCube);
+    m_chooser.addOption("2_C_2023_1073", kBasicEngage);
+    m_chooser.addOption("2_D_2023_1073", kEngagePlus);
+    m_chooser.addOption("2_E_2023_1073", kScoreCubeAndEngage);
+    //m_chooser.addOption("Test Mode", kTestMode);
+    //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
+    //m_chooser.addOption("Arm Set Position test", kArmTest);
+    
+    
 //    WEEK 0: commented out superfluous auto choices so DT wouldn't accidentally choose them 
 //    m_chooser.addOption("Score Hybrid", kScoreHybrid);
 //    m_chooser.addOption("Traj Waypoint", kTrajectoryWaypoint);
@@ -222,6 +228,8 @@ public class RobotContainer {
       case kArmTest:
         return armSetTest();
       case kScoreCube:
+        return scoreHighCubeCommand();
+      case kScoreCubeAndEngage:
         return scoreHighCubeAndEngageCommand();
       default:
         System.out.println("No Auto Selected -_-");
