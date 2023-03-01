@@ -280,7 +280,7 @@ public class RobotContainer {
         new EngageDriveUp(m_driveSubsystem, 0.5, false),
         armStowCommand()),
       new EngageBalance(m_driveSubsystem, 0.5, false),
-      new ParkingBrake(m_driveSubsystem, true)
+      new ParkingBrake(m_driveSubsystem)
     );
   }
 
