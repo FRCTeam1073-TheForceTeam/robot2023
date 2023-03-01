@@ -78,7 +78,7 @@ public class AlignToAprilTag extends CommandBase {
     bling.setColorRGBAll(255, 255, 255);
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
-    double currentHeading = drivetrain.getHeading();
+    double currentHeading = drivetrain.getWrappedHeading();
     //apply offset to target pose
     if (targetPose != null){
     targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());

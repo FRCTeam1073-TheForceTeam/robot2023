@@ -55,8 +55,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final OI m_OI = new OI();
-  private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI);
   private final Bling m_bling = new Bling();
+  private final TeleopDrive m_teleopCommand = new TeleopDrive(m_driveSubsystem, m_OI, m_bling);
   private final BlingTeleopCommand m_blingTeleopCommand = new BlingTeleopCommand(m_bling, m_OI);
   //private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem, null, null);
   private final AprilTagFinder m_frontCamera = new AprilTagFinder(m_driveSubsystem, "FrontVision", 
