@@ -142,7 +142,7 @@ public class Bling extends SubsystemBase {
     if (volts > 12) {
       setSlot(slotNumber, 0, 255, 0);
     }
-    else if (volts > 11){
+    else if (volts > 10){
       setSlot(slotNumber, 0, 0, 255);
     }
     else{
