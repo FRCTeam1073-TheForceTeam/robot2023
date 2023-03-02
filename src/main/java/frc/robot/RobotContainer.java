@@ -182,13 +182,13 @@ public class RobotContainer {
     cubePickTrigger.onTrue(cubeGroundPick());
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
-    alignToAprilTag.onTrue(alignToAprilTag(0));
+    alignToAprilTag.whileTrue(alignToAprilTag(0));
     
     Trigger leftAlignToAprilTag = new Trigger(m_OI::getXButton);
-    leftAlignToAprilTag.onTrue(alignToAprilTag(-0.59));
+    leftAlignToAprilTag.whileTrue(alignToAprilTag(-0.59));
 
     Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
-    rightAlignToAprilTag.onTrue(alignToAprilTag(0.57));
+    rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
   }
 
   public void setTestMode() {
