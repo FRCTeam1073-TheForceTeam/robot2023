@@ -144,6 +144,18 @@ public class DriveSubsystem extends SubsystemBase
     return pigeon2.getYaw();
   }
 
+  public double getWrappedHeading(){
+    double heading = getHeading() % 360;
+
+    if(heading >= 0){
+      return heading;
+    }
+
+    else{
+      return -heading;
+    }
+  }
+
   public double getPitch(){
     return pigeon2.getPitch();
   }
@@ -208,6 +220,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
+    double heading = getHeading();
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
@@ -251,6 +264,7 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Odometry.Y", odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Odometry.Heading", this.getHeading());
+    SmartDashboard.putNumber("Odometry.Wrapped.Heading", this.getWrappedHeading());
 
     SmartDashboard.putNumber("Pitch", getPitch());
     SmartDashboard.putNumber("Roll", getRoll());

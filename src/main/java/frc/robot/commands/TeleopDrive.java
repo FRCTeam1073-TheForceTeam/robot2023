@@ -15,7 +15,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
+import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
 
@@ -27,6 +27,7 @@ public class TeleopDrive extends CommandBase
   Pose2d robotRotation;
   DriveSubsystem m_driveSubsystem;
   OI m_OI;
+  Bling m_bling;
   private boolean fieldCentric;
   private boolean parked = false;
   ChassisSpeeds speeds;
@@ -40,10 +41,11 @@ public class TeleopDrive extends CommandBase
   private final static double SLOW_THRESHOLD = 30;
 
   /** Creates a new Teleop. */
-  public TeleopDrive(DriveSubsystem ds, OI oi){
+  public TeleopDrive(DriveSubsystem ds, OI oi, Bling bling){
     super.setName("Teleop Drive");
     m_driveSubsystem = ds;
     m_OI = oi;
+    m_bling = bling;
     fieldCentric = true;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
@@ -85,9 +87,18 @@ public class TeleopDrive extends CommandBase
     }
     if(parked && !m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(true);
+      m_bling.clearLEDs();
+      m_bling.setSlot(1, 255, 0, 0);
+      m_bling.setSlot(2, 255, 160, 0);
+      m_bling.setSlot(3, 255, 255, 0);
+      m_bling.setSlot(4, 0, 255, 0);
+      m_bling.setSlot(5, 0, 0, 255);
+      m_bling.setSlot(6, 255, 0, 255);
+      m_bling.setSlot(7, 255, 255, 255);
     }
     if(!parked && m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(false);
+      m_bling.clearLEDs();
     }
     else if (fieldCentric){
       //Snap to cardinal directions

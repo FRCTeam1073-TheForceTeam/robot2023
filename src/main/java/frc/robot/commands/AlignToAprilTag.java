@@ -78,7 +78,7 @@ public class AlignToAprilTag extends CommandBase {
     bling.setColorRGBAll(255, 255, 255);
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
-    double currentHeading = drivetrain.getHeading();
+    double currentHeading = drivetrain.getWrappedHeading();
     //apply offset to target pose
     if (targetPose != null){
     targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
@@ -92,7 +92,7 @@ public class AlignToAprilTag extends CommandBase {
       double rotationSpeed = (180 - currentHeading)* Math.PI/180 * 0.5;
       rotationSpeed = MathUtil.clamp(rotationSpeed, -0.3, 0.3);
       // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
-      chassisSpeeds.omegaRadiansPerSecond = rotationSpeed; // For now..
+      chassisSpeeds.omegaRadiansPerSecond = rotationSpeed;
       chassisSpeeds.vyMetersPerSecond = targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
       chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
       drivetrain.setChassisSpeeds(chassisSpeeds);
