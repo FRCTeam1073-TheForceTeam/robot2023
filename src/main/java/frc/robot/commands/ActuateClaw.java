@@ -12,12 +12,14 @@ public class ActuateClaw extends CommandBase {
   private Claw claw; 
   //private double time;
   //private double startTime;
-  private boolean open;
+  private double actuator1Val;
+  private double actuator2Val;
 
-  public ActuateClaw(Claw claw, boolean open) {
+  public ActuateClaw(Claw claw, double actuator1Val, double actuator2Val) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
-    this.open = open;
+    this.actuator1Val = actuator1Val;
+    this.actuator2Val = actuator2Val;
     //time = timeSeconds;
   }
 
@@ -33,6 +35,8 @@ public class ActuateClaw extends CommandBase {
       claw.setActuatorDebugPercent(0.3);
     }
     */
+    claw.setActuator1Angle(actuator1Val);
+    claw.setActuator2Angle(actuator2Val);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
