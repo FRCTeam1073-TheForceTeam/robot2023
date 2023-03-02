@@ -440,6 +440,9 @@ public class RobotContainer {
     }else if (m_arm.getJointAngles().shoulder < -3.0){
       m_bling.clearLEDs();
       m_bling.setColorRGBAll(0, 255, 0);
+    }else{
+      m_bling.clearLEDs();
+      m_bling.setColorRGBAll(0, 0, 255);
     }
   }
 
