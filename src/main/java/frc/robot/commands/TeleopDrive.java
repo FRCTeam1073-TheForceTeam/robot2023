@@ -60,9 +60,9 @@ public class TeleopDrive extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    //multiples the angle by a number from 1 to the square root of 20:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(40) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(40) - 1));
+    //multiples the angle by a number from 1 to the square root of 30:
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(30) - 1));
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(30) - 1));
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -72,10 +72,10 @@ public class TeleopDrive extends CommandBase
     if (Math.abs(leftX) < .05) {leftX = 0;}
     if (Math.abs(rightX) < .05) {rightX = 0;}
 
-    //sets the velocity to a number from 0 to 1/20th of the max:
-    leftY *= maximumLinearVelocity * .025;
-    leftX *= maximumLinearVelocity * .025;
-    rightX *= maximumRotationVelocity * .025;
+    //sets the velocity to a number from 0 to 1/30th of the max:
+    leftY *= maximumLinearVelocity / 30;
+    leftX *= maximumLinearVelocity / 30;
+    rightX *= maximumRotationVelocity / 30;
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
