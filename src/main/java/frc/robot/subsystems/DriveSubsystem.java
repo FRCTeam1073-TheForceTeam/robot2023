@@ -144,6 +144,11 @@ public class DriveSubsystem extends SubsystemBase
     return pigeon2.getYaw();
   }
 
+  public double getWrappedHeading(){
+    double heading = getHeading();
+    return heading % Math.PI * 2;
+  }
+
   public double getPitch(){
     return pigeon2.getPitch();
   }
@@ -208,6 +213,7 @@ public class DriveSubsystem extends SubsystemBase
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
     modules[3].updatePosition(modulePositions[3]);
+    double heading = getHeading();
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
