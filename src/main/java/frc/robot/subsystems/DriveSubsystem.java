@@ -146,7 +146,7 @@ public class DriveSubsystem extends SubsystemBase
 
   public double getWrappedHeading(){
     double heading = getHeading();
-    return heading % Math.PI * 2;
+    return heading % 360;
   }
 
   public double getPitch(){
