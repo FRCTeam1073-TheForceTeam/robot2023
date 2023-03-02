@@ -280,11 +280,12 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new VacuumActivateCommand(m_claw, true)),
+        new ActuateClaw(m_claw, 0.53, 0.47)),
+        //new VacuumActivateCommand(m_claw, true)),
+     // new VacuumActivateCommand(m_claw, false),
       highNodeCommand(),
-      new VacuumActivateCommand(m_claw, false),
-      //new ActuateClaw(m_claw, true, 1),
-      new WaitCommand(1),
+      new ActuateClaw(m_claw, 1.0, 0.0),
+      new WaitCommand(1.5),
       new ParallelDeadlineGroup( 
         new EngageDriveUp(m_driveSubsystem, 0.5, false),
         armStowCommand()),

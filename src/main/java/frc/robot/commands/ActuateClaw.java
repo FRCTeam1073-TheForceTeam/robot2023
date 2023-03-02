@@ -53,6 +53,6 @@ public class ActuateClaw extends CommandBase {
   @Override
   public boolean isFinished() {
     //return ((System.currentTimeMillis() / 1000.0) - startTime) >= time;
-    return false;
+    return true;
   }
 }
