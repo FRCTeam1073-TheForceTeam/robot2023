@@ -88,7 +88,13 @@ public class TeleopDrive extends CommandBase
     if(parked && !m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(true);
       m_bling.clearLEDs();
-      m_bling.setRGBAll(255, 160, 0);
+      m_bling.setSlot(1, 255, 0, 0);
+      m_bling.setSlot(2, 255, 160, 0);
+      m_bling.setSlot(3, 255, 255, 0);
+      m_bling.setSlot(4, 0, 255, 0);
+      m_bling.setSlot(5, 0, 0, 255);
+      m_bling.setSlot(6, 255, 0, 255);
+      m_bling.setSlot(7, 255, 255, 255);
     }
     if(!parked && m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(false);
