@@ -83,6 +83,7 @@ public class RobotContainer {
   private static final String kAlignToAprilTag = "Align To AprilTag";
   private static final String kScoreCube = "Score Cube";
   private static final String kScoreCubeAndEngage = "Score Cube and Engage";
+  private static final String kcubeEngageLeaveCommand = "Score Cube, Leave Community, Engage";
 
   private static final String kArmTest = "Arm Test Command";
 //  private static final String kScoreHybrid = "Score Hybrid";
@@ -113,6 +114,7 @@ public class RobotContainer {
     m_chooser.addOption("2_C_2023_1073", kBasicEngage);
     m_chooser.addOption("2_D_2023_1073", kEngagePlus);
     m_chooser.addOption("2_E_2023_1073", kScoreCubeAndEngage);
+    m_chooser.addOption("2_F_2023_1073", kcubeEngageLeaveCommand);
     //m_chooser.addOption("Test Mode", kTestMode);
     //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
     //m_chooser.addOption("Arm Set Position test", kArmTest);
@@ -231,6 +233,8 @@ public class RobotContainer {
         return scoreHighCubeCommand();
       case kScoreCubeAndEngage:
         return scoreHighCubeAndEngageCommand();
+      case kcubeEngageLeaveCommand:
+        return cubeEngageLeaveCommand();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -287,11 +291,37 @@ public class RobotContainer {
       new ActuateClaw(m_claw, 1.0, 0.0),
       new WaitCommand(1.5),
       new ParallelDeadlineGroup( 
-        new EngageDriveUp(m_driveSubsystem, 0.5, false),
+        new EngageDriveUp(m_driveSubsystem, 0.5, true),
         armStowCommand()),
-      new EngageBalance(m_driveSubsystem, 0.5, false),
+      new EngageBalance(m_driveSubsystem, 0.5, true),
       new ParkingBrake(m_driveSubsystem)
     );
+  }
+
+  public Command cubeEngageLeaveCommand(){
+
+    ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
+
+    communityWaypoints.add(new Pose2d(2.25, 0, new Rotation2d(3.14)));
+
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new WaitCommand(0.5),
+        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
+        new ActuateClaw(m_claw, 0.53, 0.47)),
+      highNodeCommand(),
+      new ActuateClaw(m_claw, 1.0, 0.0),
+      new WaitCommand(0.5),
+      new ParallelDeadlineGroup( 
+        new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
+        new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.5), 
+        armStowCommand()), 
+      new EngageDriveUp(m_driveSubsystem, 0.9, false), 
+      new EngageBalance(m_driveSubsystem, 0.75, false),
+      new ParkingBrake(m_driveSubsystem)
+      
+    );
+
   }
 
   public Command scoreHighCubeCommand(){
