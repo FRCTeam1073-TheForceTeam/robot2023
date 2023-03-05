@@ -34,7 +34,8 @@ public class TeleopClaw extends CommandBase {
       claw.setVacuumSpeed(0);
     }
     if(oi.getOperatorRightBumper()){
-      claw.setVacuumSpeed(628.4); //intial: 314.2 rps
+      claw.setVacuumSpeed(620.0); //intial: 314.2 rps
+      //TODO: Week 1 set from 628.4 to current value
     }
     //cube preset
     if(oi.getOperatorDPadRight()){

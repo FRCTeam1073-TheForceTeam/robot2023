@@ -32,6 +32,7 @@ public class DriveSubsystem extends SubsystemBase
   private WPI_Pigeon2 pigeon2;
   private SwerveModulePosition[] modulePositions;
   private double maximumLinearSpeed = 1.0;
+  private double[] rates = new double[3];
   private boolean parkingBrakeOn = false;
 
   /** Creates a new DriveSubsystem. */
@@ -166,7 +167,8 @@ public class DriveSubsystem extends SubsystemBase
 
   public double getPitchRate()
   {
-    return pigeon2.getRate();
+    pigeon2.getRawGyro(rates);
+    return rates[1];
   }
 
   // Reset IMU heading to zero degrees

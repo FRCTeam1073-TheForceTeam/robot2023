@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -39,6 +40,7 @@ import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.commands.VacuumActivateCommand;
 import frc.robot.commands.EngageDriveUp;
+import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -109,9 +111,9 @@ public class RobotContainer {
    
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
     m_chooser.setDefaultOption("Split Engage", kSplitEngage);
-    m_chooser.addOption("3_A_2023_1073", kLeaveCommunity);
+    m_chooser.addOption("Leave (All)", kLeaveCommunity);
     m_chooser.addOption("Cube and Engage (2)", kScoreCubeAndEngage);
-    m_chooser.addOption("Cube and Leave (1/2/3)", kCubeLeaveCommand);
+    m_chooser.addOption("Cube and Leave (B1, R3)", kCubeLeaveCommand);
     m_chooser.addOption("Cube, Leave, and Engage (2)", kCubeEngageLeaveCommand);
     m_chooser.addOption("1_B_2023_1073", kScoreCube);
     m_chooser.addOption("2_B_2023_1073", kScoreCube);
@@ -254,7 +256,7 @@ public class RobotContainer {
   }
   
   public Command doubleSubstationCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.73);
+    return new ArmSetPosition(m_arm, -2.0576, 3.69);
   }
 
   public Command middleNodeCommand(){
@@ -296,11 +298,13 @@ public class RobotContainer {
       highNodeCommand(),
       new ActuateClaw(m_claw, 1.0, 0.0),
       new WaitCommand(1.5),
-      new ParallelDeadlineGroup( 
-        new EngageDriveUp(m_driveSubsystem, 0.5, false),
-        armStowCommand()),
-      new EngageBalance(m_driveSubsystem, 0.5, false),
-      new ParkingBrake(m_driveSubsystem)
+      new ParallelCommandGroup(
+        armStowCommand(),
+        new SequentialCommandGroup(
+      new EngageDriveUp(m_driveSubsystem, 0.9, false),
+      new EngageForward(m_driveSubsystem, 0.7, false),
+      new EngageBalance(m_driveSubsystem, 0.7, false),
+      new ParkingBrake(m_driveSubsystem, m_bling)))
     );
   }
 
@@ -320,11 +324,13 @@ public class RobotContainer {
       new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
+        new Rotation2d()), communityWaypoints, 1.5,
+         1.0, 0.5, 0.9), 
         armStowCommand()), 
       new EngageDriveUp(m_driveSubsystem, 0.9, true), 
-      new EngageBalance(m_driveSubsystem, 0.4, true),
-      new ParkingBrake(m_driveSubsystem)
+      new EngageForward(m_driveSubsystem, 0.7, true),
+      new EngageBalance(m_driveSubsystem, 0.7, true),
+      new ParkingBrake(m_driveSubsystem, m_bling)
     );
 
   }
@@ -333,7 +339,7 @@ public class RobotContainer {
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
 
-    communityWaypoints.add(new Pose2d(2.4, 0.2, new Rotation2d(3.14)));
+    communityWaypoints.add(new Pose2d(2.4, 0.15, new Rotation2d(0)));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -384,8 +390,9 @@ public class RobotContainer {
   {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, 0.9, false), 
-      new EngageBalance(m_driveSubsystem, 0.75, false),
-      new ParkingBrake(m_driveSubsystem));
+      new EngageForward(m_driveSubsystem, 0.7, false),
+      new EngageBalance(m_driveSubsystem, 0.7, false),
+      new ParkingBrake(m_driveSubsystem, m_bling));
   }
 
   public Command leaveCommunity() {
