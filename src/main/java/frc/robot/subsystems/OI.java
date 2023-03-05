@@ -13,7 +13,7 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
-    Debouncer parkingBreakDebouncer;
+    Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
 
 
 
@@ -144,8 +144,7 @@ public class OI extends SubsystemBase
 
     public boolean getLeftBumper()
     {
-        parkingBreakDebouncer = new Debouncer(0.5); 
-        return driverController.getRawButton(5);
+        return parkingBrakeDebouncer.calculate(driverController.getRawButton(5));
     }
 
     public boolean getRightBumper()
