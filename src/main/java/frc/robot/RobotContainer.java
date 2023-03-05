@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -151,6 +152,9 @@ public class RobotContainer {
     OI.initPreferences();
     SwerveModule.initPreferences();
     Underglow.initPreferences();
+    EngageBalance.initPreferences();
+    EngageDriveUp.initPreferences();
+    EngageForward.initPreferences();
 
     // Initialize Preferences For Command Classes:
 
@@ -301,9 +305,9 @@ public class RobotContainer {
       new ParallelCommandGroup(
         armStowCommand(),
         new SequentialCommandGroup(
-      new EngageDriveUp(m_driveSubsystem, 0.9, false),
-      new EngageForward(m_driveSubsystem, 0.7, false),
-      new EngageBalance(m_driveSubsystem, 0.7, false),
+      new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false),
+      new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
+      new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling)))
     );
   }
@@ -327,9 +331,9 @@ public class RobotContainer {
         new Rotation2d()), communityWaypoints, 1.5,
          1.0, 0.5, 0.9), 
         armStowCommand()), 
-      new EngageDriveUp(m_driveSubsystem, 0.9, true), 
-      new EngageForward(m_driveSubsystem, 0.7, true),
-      new EngageBalance(m_driveSubsystem, 0.7, true),
+      new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
+      new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
+      new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
       new ParkingBrake(m_driveSubsystem, m_bling)
     );
 
@@ -389,9 +393,9 @@ public class RobotContainer {
   public Command splitEngage()
   {
     return new SequentialCommandGroup(
-      new EngageDriveUp(m_driveSubsystem, 0.9, false), 
-      new EngageForward(m_driveSubsystem, 0.7, false),
-      new EngageBalance(m_driveSubsystem, 0.7, false),
+      new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false), 
+      new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForawrd.maxSpeed", 0.7), false),
+      new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling));
   }
 
