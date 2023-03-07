@@ -54,20 +54,29 @@ public class Arm extends SubsystemBase{
   public double profileStartTime;
   Bling bling;
 
+  /**
+   * Creates a joint position class for shoulder and elbow in arm subsystem
+   *  
+   *  @param shoulder       The public shoulder variable of the subsystem
+   *  @param elbow          The public elbow variable of the subsystem
+   *  @param shoulderAng    The local shoulder angle in relation to chassis
+   *  @param elbowAng       The local elbow angle in relation to chassis
+   *  @return               The angle of the shoulder and the angle of the elbow
+   */
 
   public class JointPositions{
    public double shoulder;
    public double elbow;
 
     public JointPositions(double shoulderAng, double elbowAng){
-      //showing angles in relation to the flat robot chassis and not the angle between two arm segments
+      // Showing angles in relation to the flat robot chassis and not the angle between two arm segments
       shoulder = shoulderAng;
       elbow = elbowAng;
     }
 
     public JointPositions(){
-      //showing angles in relation to the flat robot chassis and not the angle between two arm segments
-       shoulder = 0.0;
+      // Showing angles in relation to the flat robot chassis and not the angle between two arm segments
+      shoulder = 0.0;
       elbow = 0.0;
     }
 
@@ -113,6 +122,7 @@ public class Arm extends SubsystemBase{
     }
   }
 
+  // Arm coordinates
   public class CartesianPosition{
     double x;
     double z;
@@ -131,6 +141,7 @@ public class Arm extends SubsystemBase{
     }
   }
 
+  /** Creates the arm trajectory class */
 
   public class ArmTrajectory{
 
@@ -142,7 +153,6 @@ public class Arm extends SubsystemBase{
     double[] shoulderPositions;
     double[] times;
 
-
     public ArmTrajectory(ArrayList<JointWaypoints> waypoints, double maxVelocity, double maxAcceleration){
       this.waypoints = waypoints;
       trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
@@ -150,7 +160,8 @@ public class Arm extends SubsystemBase{
       elbowPositions = new double[waypoints.size()];
       shoulderPositions = new double[waypoints.size()];
       times = new double[waypoints.size()];
-
+      
+      //Creates a control loop for elbow and shoulder waypoints 
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i] = waypoints.get(i).elbow;
         shoulderPositions[i] = waypoints.get(i).shoulder;
@@ -174,21 +185,22 @@ public class Arm extends SubsystemBase{
     }
 */
     public JointVelocities getVelocityAtTime(double time){
-      //get derivative of elbow spline
+      // Get derivative of elbow spline
       double elbowVelocity = elbowSplines.derivative().value(time);
-      //get derivative of shoulder spline
+      // Get derivative of shoulder spline
       double shoulderVelocity = shoulderSplines.derivative().value(time);
       return new JointVelocities(shoulderVelocity, elbowVelocity);
     }
 
     public JointPositions getTrajectoryAtTime(double time){
-      //placeholder for joint angles
+      // Placeholder for joint angles
       return new JointPositions(shoulderSplines.value(time), elbowSplines.value(time));
     }
   }
 
   /** Creates a new Arm. */
-  //Set height limiter
+
+  // Set height limiter
   public Arm() {
     shoulderMotor = new TalonFX(16);
     elbowMotor = new TalonFX(18);
@@ -218,6 +230,7 @@ public class Arm extends SubsystemBase{
     elbowMotor.setIntegralAccumulator(0);
 
     ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 400);
+    // -3.84 is the arm stow encoder position, DO NOT CHANGE
     ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
 
     SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
@@ -228,27 +241,28 @@ public class Arm extends SubsystemBase{
 
     SmartDashboard.putNumber("Shoulder Absolute Angle on init", getAbsoluteAngles().shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle on init", getAbsoluteAngles().elbow);
-    //Trapezoid trajectory for angles
     
+    // Trapezoid trajectory for angles
     currentShoulderState = new TrapezoidProfile.State(getAbsoluteAngles().shoulder, 0.0);
     currentElbowState = new TrapezoidProfile.State(getAbsoluteAngles().elbow, 0.0);
     //targetPositions = new JointPositions(getJointAngles().shoulder, getJointAngles().elbow);
      
+    // Contstructs a trapezoid-shaped velocity profile for the shoulder and arm
     shoulderProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), currentShoulderState, currentShoulderState);
     elbowProfile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowState, currentElbowState);
     profileStartTime = System.currentTimeMillis() / 1000.0;
     
-    SmartDashboard.putNumber("Shoulder State on init", currentShoulderState.position);
-    SmartDashboard.putNumber("Elbow State on int", currentElbowState.position);
+    SmartDashboard.putNumber("Shoulder State on Init", currentShoulderState.position);
+    SmartDashboard.putNumber("Elbow State on Init", currentElbowState.position);
     //minAngles = getAbsoluteAngles();
   }
 
   @Override
   public void periodic(){
     double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - profileStartTime;
-    //setting angles with trapezoid trajectories
+    // Setting angles with trapezoid trajectories
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     //SmartDashboard.putNumber("Elbow State", currentElbowState.position);
     if(!elbowProfile.isFinished(trajectoryTime)){
@@ -277,6 +291,7 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putBoolean("Is Elbow Magnet Healthy", isElbowMagnetHealthy);
     SmartDashboard.putBoolean("Is Shoulder Magnet Healthy", isShoulderMagnetHealthy);
     
+    // Bling for encoder state. NOTE: If encoder lights on robot are yellow, bling will return red.
     if(elbowEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
       isElbowMagnetHealthy = false;
     }
@@ -310,11 +325,11 @@ public class Arm extends SubsystemBase{
   public String getDiagnostics() {
     ErrorCode error;
     String result = new String();
-    //Check errors for all hardware
+    // Check errors for all hardware
     return result;
   }
 
-  // This methods returns the angle of each joint
+  // This method returns the angle of each joint
   public JointPositions getJointAngles(){
     //sensor angles should be divided by the appropriate ticks per radian
     double shoulderRawAngle = (shoulderMotor.getSelectedSensorPosition()/shoulderTicksPerRadian);
@@ -323,6 +338,7 @@ public class Arm extends SubsystemBase{
     return new JointPositions(shoulderRawAngle, elbowRawAngle);
   }
 
+  // This method creates an error code for the shoulder. If there is no error, it is 0. 
   public void initializeShoulder(){
     ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
   }

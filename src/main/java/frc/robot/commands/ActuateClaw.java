@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw;
 
 public class ActuateClaw extends CommandBase {
-  /** Creates a new ActuateClaw. */
+  /** Creates a new ActuateClaw. 
+   * 
+  */
   private Claw claw; 
   //private double time;
   //private double startTime;

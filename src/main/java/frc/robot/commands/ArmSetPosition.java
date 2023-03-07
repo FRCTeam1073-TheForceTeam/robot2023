@@ -7,8 +7,23 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
 
+/**
+ * Creates a new ArmSetPosition with tolerances of 0.1 with the absolute value
+ * of the shoulder angle
+ * 
+ * @param arm               The local variable for the arm subsystem
+ * @param shoulderAng       The local variable for the shoulder angle
+ * @param elbowAng          The local variable for the elbow angle
+ * @param shoulderTolerance The variable of 0.1 used to compare to the absolute
+ *                          value of the shoulder angle
+ * @param elbowTolerance    The variable of 0.1 used to compare to the absolute
+ *                          value of the shoulder angle
+ * @return Should return true when the command ends
+ */
+
+
 public class ArmSetPosition extends CommandBase {
-  /** Creates a new ArmSetPosition. */
+
   private Arm arm;
   private double shoulderAng;
   private double elbowAng;
@@ -32,12 +47,14 @@ public class ArmSetPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
+
 
   // Returns true when the command should end.
   @Override
@@ -45,7 +62,7 @@ public class ArmSetPosition extends CommandBase {
     double shoulderError = Math.abs(arm.getJointAngles().getShoulderAngle() - shoulderAng);
     double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
 
-    if(shoulderError <= shoulderTolerance && elbowError <= elbowTolerance){
+    if (shoulderError <= shoulderTolerance && elbowError <= elbowTolerance) {
       return true;
     }
     return false;
