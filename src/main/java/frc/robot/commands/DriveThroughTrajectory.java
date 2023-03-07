@@ -39,6 +39,18 @@ public class DriveThroughTrajectory extends CommandBase {
   double maxVelocity;
   double maxAngularVelocity;
   double alpha;
+
+  /**Constructs a DriveThroughTrajectory
+   * 
+   * @param ds variable for driveSubsystem
+   * @param start start position
+   * @param wayPointList list of waypoints the robot should go through
+   * @param end end position
+   * @param maxVelocity maximum robot velocity
+   * @param maxAngularVelocity maximum angular velocity
+   * @param maxAcceleration maximum robot acceleration
+   * @param alpha speed multiplier
+   */
   public DriveThroughTrajectory(DriveSubsystem ds, Pose2d start, ArrayList<Translation2d> wayPointList, Pose2d end, 
   double maxVelocity, double maxAngularVelocity, double maxAcceleration, double alpha) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -54,6 +66,16 @@ public class DriveThroughTrajectory extends CommandBase {
     addRequirements(ds);
   }
 
+  /** Constructs a DriveThroughTrajectory
+   * 
+   * @param ds variable for driveSubsystem
+   * @param start start position
+   * @param posePointList list of waypoints the robot should go through
+   * @param maxVelocity maximum robot velocity
+   * @param maxAngularVelocity maximum angular velocity
+   * @param maxAcceleration maximum robot acceleration
+   * @param alpha speed multiplier
+   */
   public DriveThroughTrajectory(DriveSubsystem ds, Pose2d start, ArrayList<Pose2d> posePointList, 
   double maxVelocity, double maxAngularVelocity, double maxAcceleration, double alpha) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -74,6 +96,12 @@ public class DriveThroughTrajectory extends CommandBase {
     addRequirements(ds);
   }
 
+  /** Generates trajectory for robot to go through by creating different trajectory states for each waypoints
+   * 
+   * @param wayPoints list of waypoints the robot should go through
+   * @param trajecotryCfg trajectory config of max acceleration and max velocity
+   * @return generated trajectory for robot to follow
+   */
   public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints, TrajectoryConfig trajecotryCfg){
     List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
     double trajectoryTime = 0;
@@ -99,6 +127,7 @@ public class DriveThroughTrajectory extends CommandBase {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  //interpolates the trajectory to get the desired pose at a given time and sets speed proportional to the difference
   @Override
   public void execute() {
     robotPose = drivetrain.getOdometry();

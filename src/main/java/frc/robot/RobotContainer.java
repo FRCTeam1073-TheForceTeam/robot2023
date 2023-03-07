@@ -98,10 +98,10 @@ public class RobotContainer {
   // private static final String kPose2 = "Position 2";
   // private static final String kPose3 = "Position 3";
 
-
+  /**Robot container constructor
+   * Set default commands, adds options to the auto chooser.
+   */
   public RobotContainer() {
-
-    // Set default commands
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
@@ -140,9 +140,9 @@ public class RobotContainer {
   // 
   }
 
+  // Initialize Preferences For Subsystem Classes:
   public static void initPreferences() {
     System.out.println("RobotContainer: init Preferences.");
-    // Initialize Preferences For Subsystem Classes:
     SwerveModuleConfig.initPreferences();
     DriveSubsystem.initPreferences();
     AprilTagFinder.initPreferences();
@@ -160,11 +160,13 @@ public class RobotContainer {
 
   }
 
+  // called when robot initializes. Sets parking brake to false
   public void teleopInit(){
     m_driveSubsystem.parkingBrake(false);
     //m_arm.initializeShoulder();
   }
 
+  //Configures the button mappings for controllers
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
 
@@ -203,6 +205,8 @@ public class RobotContainer {
     rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
   }
 
+  /**Sets test mode
+   */
   public void setTestMode() {
     DriveTestCommand dtc = new DriveTestCommand(m_driveSubsystem, m_OI);    
     dtc.schedule();
@@ -211,6 +215,10 @@ public class RobotContainer {
     System.out.println("Robot Container: Test mode set");
   }
 
+  /**Uses autonomous commands stored in auto chooser to run the command that is chosen from shuffleboard
+   * 
+   * @return Autonomous command that is intended to be run
+   */
   public Command getAutonomousCommand() {
    
     System.out.println(String.format("Autonomous Command Selected: %s", m_chooser.getSelected()));
@@ -253,20 +261,37 @@ public class RobotContainer {
     }
   }
 
+  /** First positions the arm to higher position to avoid clipping ridges on nodes or human player stations. After, 
+   * it stows the arm to resting position.
+   * 
+   * @return Command that sets arm position
+   */
   public Command armStowCommand(){
       return new SequentialCommandGroup(
         new ArmSetPosition(m_arm, -1.9, 3.3),
         new ArmSetPosition(m_arm, -3.84, 2.95));
   }
   
+  /** Positions arm to pick up from double substation
+   * 
+   * @return Command that sets arm position
+   */
   public Command doubleSubstationCommand(){
     return new ArmSetPosition(m_arm, -2.0576, 3.69);
   }
 
+  /**Positions arm to score in the middle node for both cone and cube
+   * 
+   * @return Command that sets arm position
+   */
   public Command middleNodeCommand(){
     return new ArmSetPosition(m_arm, -1.48, 3.75);
   }
 
+  /**Positions the arm to score in the high node for both cone and cube.
+   * 
+   * @return Command that sets arm position
+   */
   public Command highNodeCommand(){
     return new ArmSetPosition(m_arm, -0.652, 3.3086);
   }
@@ -279,18 +304,34 @@ public class RobotContainer {
   //  return new ArmSetPosition(m_arm, -1.573, 3.9);
   //}
 
+  /**First step in the sequence to pick a cube off of the ground. Positions arm above cube to aim before grabbing
+   * 
+   * @return Command that sets arm position
+   */
   public Command cubeGroundAim(){
     return new ArmSetPosition(m_arm, -0.949, 5.1665);
   }
 
+  /** Second step in the sequence to pick up a cube off of the ground. Positions arm so that end effector is up against the cube
+   * 
+   * @return Command that sets arm position
+   */
   public Command cubeGroundPick(){
     return new ArmSetPosition(m_arm, -0.7096, 5.315);
   }
   
+  /**An autonomous command to drive up and engage on the charging station using the Engage command
+   * 
+   * @return Command to do the autonomous outlined above
+   */
   public Command basicEngage() {
     return new SequentialCommandGroup(new Engage(m_driveSubsystem, 0.5, false));
   }
 
+  /**Autonomous command that aligns to april tag, scores a cube in high node, and then engages on the charge station.
+   * 
+   * @return Command to do the autonomous outlined above
+   */
   public Command scoreHighCubeAndEngageCommand(){
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -312,6 +353,10 @@ public class RobotContainer {
     );
   }
 
+  /** Autonomous command that aligns to april tags, scores a cube, leaves community, and then comes back to engage.
+   *  
+   * @return Command to do the autonomous outlined above
+   */
   public Command cubeEngageLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
@@ -338,7 +383,12 @@ public class RobotContainer {
     );
 
   }
-
+  /**Autonomous command to score a cube, and then leaves the community. Drives slightly diagonally 
+   * to avoid clipping the charging station. Ends up with robot turned 180 degrees in order to pick up cube 
+   * after moving into teleop.
+   * 
+   * @return Command to score cube and leave community
+   */
   public Command cubeLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
@@ -360,6 +410,11 @@ public class RobotContainer {
     );
   }
 
+  /**Autonomous command that aligns to April Tag and activates vacuum in parallel, extends arm to high node position, deactivates
+   * vacuum, and stows arm.
+   *  
+   * @return  Command that scores a cube after aligning to the april tag and then stows
+   */
   public Command scoreHighCubeCommand(){
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -373,6 +428,11 @@ public class RobotContainer {
     );
   }
 
+  /**Moves robot back to score a preloaded game piece onto hybrid node, drives over the charging station to leave community, 
+   * then moves backwards onto the charging station and engages using the Engage command
+   * 
+   * @return Command that scores preload into hybrid node, leaves community, and engages
+   */
   public Command engagePlus() 
   {
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
@@ -390,6 +450,11 @@ public class RobotContainer {
       //WEEK 0: changed max velocity in both drive through trajectories to 1.0 from 0.5, and set engage max speed to 0.5 from 0.3
   }
 
+  /**Engages the robot on the charging station using a split up version of the engage command. First the 
+   * robot drives up to charging station, then drives up the charging station, then goes to balance, and then parks
+   * 
+   * @return a command to engage the robot on the charging station.
+   */
   public Command splitEngage()
   {
     return new SequentialCommandGroup(
@@ -399,6 +464,10 @@ public class RobotContainer {
       new ParkingBrake(m_driveSubsystem, m_bling));
   }
 
+  /**Autonomous command to leave the community. Uses DrivethroughTrajectory to carry robot out of community.
+   * 
+   * @return a sequential command group containing a DrivethroughTrajectory command
+   */
   public Command leaveCommunity() {
 
     System.out.println("Leave Community");
@@ -411,10 +480,18 @@ public class RobotContainer {
 
   }
 
+  /**Tests ArmSetPosition 
+   * 
+   * @return an ArmSetPosition Command
+   */
   public Command armSetTest(){
     return new ArmSetPosition(m_arm, -1.5, 4.1);
   }
 
+  /**A way to test OI and DriveSubsystem while debug mode in DriveSubsystem is on
+   * 
+   * @return the Command that tests the subsystems
+   */
   public Command testMode() {
     System.out.println("Test Mode on");
     return new DriveTestCommand(m_driveSubsystem, m_OI);
@@ -451,10 +528,18 @@ public class RobotContainer {
 //      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 //  }
 
+  /** Uses AlignToAprilTag to align to an AprilTag
+   * 
+   * @param offset - the lateral distance away from the AprilTag the Robot should align to
+   * @return A command that moves the robot to the correct alignment
+   */
   public Command alignToAprilTag(double offset){
     return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
   }
 
+  /** Sets the bling and underglow of the Robot on startup. Underglow to the color of the alliance.
+   * bling to green if shoulder angle initializes correctly and red if it doesn't.
+   */
   public void setStartupLighting()
   {
     // Pick intensity based on driver station connection.
