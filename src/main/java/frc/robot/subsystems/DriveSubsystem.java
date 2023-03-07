@@ -40,7 +40,8 @@ public class DriveSubsystem extends SubsystemBase
   {
     pigeon2 = new WPI_Pigeon2(13);
     var error = pigeon2.configFactoryDefault();
-    if (error != ErrorCode.OK) {
+    if (error != ErrorCode.OK) 
+    {
       System.out.println(String.format("PIGEON IMU ERROR: %s", error.toString()));
     }
     error = pigeon2.setYaw(180);
@@ -118,7 +119,8 @@ public class DriveSubsystem extends SubsystemBase
   }
 
   // Initialize preferences for this class:
-  public static void initPreferences() {
+  public static void initPreferences() 
+  {
     Preferences.initDouble("Drive.Module0.SteerAngleOffset", 2.879); // Radians.
     Preferences.initDouble("Drive.Module1.SteerAngleOffset", 1.866);
     Preferences.initDouble("Drive.Module2.SteerAngleOffset", 2.422);
@@ -127,7 +129,8 @@ public class DriveSubsystem extends SubsystemBase
     Preferences.initDouble("Drive.ModulePositions", 0.5017);
   }
 
-  public String getDiagnostics() {
+  public String getDiagnostics() 
+  {
     String result = modules[0].getDiagnostics();
     result += modules[1].getDiagnostics();
     result += modules[2].getDiagnostics();
@@ -136,32 +139,40 @@ public class DriveSubsystem extends SubsystemBase
     return result;
   }
 
-  public void setDebugMode(boolean debug) {
+  public void setDebugMode(boolean debug) 
+  {
     this.debug = debug;
   }
 
   //Returns IMU heading in degrees
-  public double getHeading() {
+  public double getHeading() 
+  {
     return pigeon2.getYaw();
   }
 
-  public double getWrappedHeading(){
+  // Wraps the heading
+  public double getWrappedHeading()
+  {
     double heading = getHeading() % 360;
 
-    if(heading >= 0){
+    if(heading >= 0)
+    {
       return heading;
     }
 
-    else{
+    else
+    {
       return -heading;
     }
   }
 
-  public double getPitch(){
+  public double getPitch()
+  {
     return pigeon2.getPitch();
   }
 
-  public double getRoll(){
+  public double getRoll()
+  {
     return pigeon2.getRoll();
   }
 
@@ -172,12 +183,14 @@ public class DriveSubsystem extends SubsystemBase
   }
 
   // Reset IMU heading to zero degrees
-  public void zeroHeading() {
+  public void zeroHeading() 
+  {
     pigeon2.setYaw(180);
   }
 
   // Set the commanded chassis speeds for the drive subsystem.
-  public void setChassisSpeeds(ChassisSpeeds speeds){
+  public void setChassisSpeeds(ChassisSpeeds speeds)
+  {
     SmartDashboard.putNumber("ChassisSpeed x", speeds.vxMetersPerSecond);
     SmartDashboard.putNumber("ChassisSpeed y", speeds.vyMetersPerSecond);
     SmartDashboard.putNumber("ChassisSpeed rotation", speeds.omegaRadiansPerSecond);
@@ -185,7 +198,8 @@ public class DriveSubsystem extends SubsystemBase
   }
 
   // Return the measured chassis speeds for the drive subsystem.
-  public ChassisSpeeds getChassisSpeeds(){
+  public ChassisSpeeds getChassisSpeeds()
+  {
     SwerveModuleState[] wheelStates = new SwerveModuleState[4];
     wheelStates[0] = new SwerveModuleState();
     wheelStates[1] = new SwerveModuleState();
@@ -205,6 +219,7 @@ public class DriveSubsystem extends SubsystemBase
     return kinematics.toChassisSpeeds(wheelStates);
   }
 
+  // puts the motors in brake mode
   public void setBrakes(boolean brakeOn)
   {
     modules[0].setBrake(brakeOn);
@@ -213,11 +228,14 @@ public class DriveSubsystem extends SubsystemBase
     modules[3].setBrake(brakeOn);
   }
 
-  public SwerveDriveKinematics getKinematics(){
+  // returns the wheel positions
+  public SwerveDriveKinematics getKinematics()
+  {
     return kinematics;
   }
 
-  public void updateOdometry() {
+  public void updateOdometry() 
+  {
     modules[0].updatePosition(modulePositions[0]);
     modules[1].updatePosition(modulePositions[1]);
     modules[2].updatePosition(modulePositions[2]);
@@ -226,15 +244,18 @@ public class DriveSubsystem extends SubsystemBase
     odometry.update(Rotation2d.fromDegrees(getHeading()), modulePositions);
   }
 
-  public void resetOdometry(Pose2d where){
+  public void resetOdometry(Pose2d where)
+  {
     odometry.resetPosition(Rotation2d.fromDegrees(getHeading()), modulePositions, where);
   }
 
-  public Pose2d getOdometry(){
+  public Pose2d getOdometry()
+  {
     return new Pose2d(odometry.getPoseMeters().getX(), odometry.getPoseMeters().getY(), Rotation2d.fromDegrees(getHeading()));
   }
 
-  public Pose3d get3dOdometry(){
+  public Pose3d get3dOdometry()
+  {
     // return odometry position as a pose 3d
     Pose2d odo = getOdometry();
     //TODO: use internal roll and pitch methods later
@@ -242,8 +263,9 @@ public class DriveSubsystem extends SubsystemBase
   }
   
   @Override
-  public void periodic(){
-    if (!debug && !parkingBrakeOn)
+  public void periodic()
+  {
+    if (!debug && !parkingBrakeOn) //disables motors when parking brakes are active
     {
       // This method will be called once per scheduler run
       SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
@@ -273,7 +295,9 @@ public class DriveSubsystem extends SubsystemBase
     SmartDashboard.putNumber("Rate", getPitchRate());
   }
 
-  public void parkingBrake(boolean parkingBrakeOn)
+
+  // rotates all the wheels to be facing inwards and stops the motors to hold position
+  public void parkingBrake(boolean parkingBrakeOn) 
   {
     this.parkingBrakeOn = parkingBrakeOn;
     if (parkingBrakeOn)
@@ -291,18 +315,21 @@ public class DriveSubsystem extends SubsystemBase
     }
   }
 
-  public boolean getParkingBrake(){
+  public boolean getParkingBrake()
+  {
     return parkingBrakeOn;
   }
 
-  public void setDebugSpeed(double speed){
+  public void setDebugSpeed(double speed) // sets the speed directly
+  {
     modules[0].setDriveVelocity(speed);
     modules[1].setDriveVelocity(speed);
     modules[2].setDriveVelocity(speed);
     modules[3].setDriveVelocity(speed);
   }
 
-  public void setDebugAngle(double angle){
+  public void setDebugAngle(double angle) // sets the angle directly
+  {
     SmartDashboard.putNumber("Debug Angle", angle);
 
     modules[0].setSteerAngle(angle);
@@ -311,51 +338,68 @@ public class DriveSubsystem extends SubsystemBase
     modules[3].setSteerAngle(angle);
   }
 
-  public void setDebugDrivePower(double power) {
+  public void setDebugDrivePower(double power) // sets the power directly
+  {
     modules[0].setDebugTranslate(power);
     modules[1].setDebugTranslate(power);
     modules[2].setDebugTranslate(power);
     modules[3].setDebugTranslate(power);
   }
 
-  public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle){
+
+  // optimizes the module states to take the shortest path to the desired position
+  public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle)
+  {
     double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
     double targetSpeed = desiredState.speedMetersPerSecond;
     double delta = targetAngle - currentAngle.getDegrees();
-    if (Math.abs(delta) > 90){
-        targetSpeed = -targetSpeed;
-        targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
+    if (Math.abs(delta) > 90)
+    {
+      targetSpeed = -targetSpeed;
+      targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
     }        
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
   }
 
   /**
-     * @param scopeReference Current Angle
-     * @param newAngle Target Angle
-     * @return Closest angle within scope
-     */
-    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-      double lowerBound;
-      double upperBound;
-      double lowerOffset = scopeReference % 360;
-      if (lowerOffset >= 0){
-          lowerBound = scopeReference - lowerOffset;
-          upperBound = scopeReference + (360 - lowerOffset);
-      } else{
-          upperBound = scopeReference - lowerOffset;
-          lowerBound = scopeReference - (360 + lowerOffset);
-      }
-      while (newAngle < lowerBound){
-          newAngle += 360;
-      }
-      while (newAngle > upperBound){
-          newAngle -= 360;
-      }
-      if (newAngle - scopeReference > 180){
-          newAngle -= 360;
-      } else if (newAngle - scopeReference < -180) {
-          newAngle += 360;
-      }
-      return newAngle;
+   * @param scopeReference Current Angle
+   * @param newAngle Target Angle
+   * @return Closest angle within scope
+   */
+  
+
+  // places the desired angle to be in a 0 to 360 scope to minimize distance for wheels to rotate 
+  private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) 
+  {
+    double lowerBound;
+    double upperBound;
+    double lowerOffset = scopeReference % 360;
+    if (lowerOffset >= 0)
+    {
+      lowerBound = scopeReference - lowerOffset;
+      upperBound = scopeReference + (360 - lowerOffset);
+    } 
+    else
+    {
+      upperBound = scopeReference - lowerOffset;
+      lowerBound = scopeReference - (360 + lowerOffset);
+    }
+    while (newAngle < lowerBound)
+    {
+      newAngle += 360;
+    }
+    while (newAngle > upperBound)
+    {
+      newAngle -= 360;
+    }
+    if (newAngle - scopeReference > 180)
+    {
+      newAngle -= 360;
+    } 
+    else if (newAngle - scopeReference < -180) 
+    {
+      newAngle += 360;
+    }
+    return newAngle;
   }
 }
