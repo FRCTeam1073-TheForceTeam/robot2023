@@ -44,7 +44,7 @@ public class EngageRateBalance extends CommandBase
     @Override 
     public void execute()
     {
-        if (Math.abs(drivetrain.getPitch()) < 5 && phase == 0) // activates once the robot nears the halfway mark
+        /*if (Math.abs(drivetrain.getPitch()) < 5 && phase == 0) // activates once the robot nears the halfway mark
         {
             phase = 1;
         }
@@ -58,7 +58,10 @@ public class EngageRateBalance extends CommandBase
             robotPose = drivetrain.getOdometry();
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
             drivetrain.setChassisSpeeds(chassisSpeeds); // makes the robot back up at half speed
-        } 
+        } */
+        robotPose = drivetrain.getOdometry();
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
+        drivetrain.setChassisSpeeds(chassisSpeeds);
     }
 
     @Override
@@ -70,8 +73,12 @@ public class EngageRateBalance extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Timer.getFPGATimestamp() > startTime + 0.25 && Math.abs(drivetrain.getPitchRate()) > 15)
+        /*if (Timer.getFPGATimestamp() > startTime + 0.25 && Math.abs(drivetrain.getPitchRate()) > 15)
         { // triggers once the robot starts nearing the middle
+            return true;
+        }*/
+        if (Math.abs(drivetrain.getPitchRate()) > 10)
+        {
             return true;
         }
         else
