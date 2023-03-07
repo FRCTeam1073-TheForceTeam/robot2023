@@ -38,6 +38,11 @@ public class SwerveModule
     private CANCoder steerEncoder;
     public Translation2d position;
     
+    /** Constructs a swerve module class. Initializes drive and steer motors
+     * 
+     * @param cfg swerve module configuration values for this module
+     * @param ids Can Ids for this module
+     */
     public SwerveModule(SwerveModuleConfig cfg, SwerveModuleIDConfig ids)
     {
         this.position = cfg.position;
@@ -55,6 +60,7 @@ public class SwerveModule
   
     }
 
+    //Returns diagnostics
     public String getDiagnostics() {
         ErrorCode error;
         String result = new String();
@@ -96,6 +102,7 @@ public class SwerveModule
         return -driveMotor.getSelectedSensorVelocity()/cfg.tickPerMeter*10.0;
     }
 
+    // Returns the velocity from the motor itself
     public double getDriveRawVelocity() {
         return driveMotor.getSelectedSensorVelocity();
     }
@@ -150,6 +157,7 @@ public class SwerveModule
         // SmartDashboard.putNumber(String.format(" Difference %d", ids.steerEncoderID), difference);
     }
 
+    //Sets the velocity for the drive motors
     public void setDriveVelocity(double driveVelocity)
     {
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
@@ -162,6 +170,10 @@ public class SwerveModule
         steerMotor.set(ControlMode.Position, (steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian);
     }
 
+    /**Sets motors in the module to brake or coast mode
+     * 
+     * @param brake a boolean to indicate if motors should be in brake mode or not
+     */
     public void setBrake(boolean brake){
         if(brake){
             steerMotor.setNeutralMode(NeutralMode.Brake);
@@ -173,6 +185,7 @@ public class SwerveModule
         }
     }
 
+    // configures motors with PIDF values, if it is inverted or not, current limits
     public void setUpMotors()
     {
         var error = steerMotor.configFactoryDefault();
@@ -234,11 +247,19 @@ public class SwerveModule
         driveMotor.setIntegralAccumulator(0);
     }
 
+    /**Sets the percent output velocity to power
+     * 
+     * @param power the percentage the motor should operate at
+     */
     public void setDebugTranslate(double power)
     {
         driveMotor.set(ControlMode.PercentOutput, power);
     }
 
+    /**Sets the percent output velocit of wheel angle to power
+     * 
+     * @param power the percentage the motor should operate at
+     */
     public void setDebugRotate(double power)
     {
         steerMotor.set(ControlMode.PercentOutput, power);

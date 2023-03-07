@@ -11,6 +11,7 @@ import frc.robot.subsystems.OI;
 public class TeleopClaw extends CommandBase {
   private Claw claw;
   private OI oi;
+  private double clawPower;
 
   /** Creates a new TeleopClaw. */
   public TeleopClaw(Claw claw, OI oi) {
@@ -22,7 +23,9 @@ public class TeleopClaw extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    clawPower = 0;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -31,8 +34,27 @@ public class TeleopClaw extends CommandBase {
       claw.setVacuumSpeed(0);
     }
     if(oi.getOperatorRightBumper()){
-      claw.setVacuumSpeed(628.4); //intial: 314.2 rps
+      claw.setVacuumSpeed(620.0); //intial: 314.2 rps
+      //TODO: Week 1 set from 628.4 to current value
     }
+    //cube preset
+    if(oi.getOperatorDPadRight()){
+      claw.setActuator1Angle(0.53);
+      claw.setActuator2Angle(0.47);
+    }
+    //open
+    else if(Math.abs(oi.getOperatorLeftX()) > 0.25 || Math.abs(oi.getOperatorLeftY()) > 0.25){
+      claw.setActuator1Angle(1.0);
+      claw.setActuator2Angle(0.0);
+    }
+    //cone preset
+    else if(oi.getOperatorDPadDown()){
+      claw.setActuator1Angle(0.42);
+      claw.setActuator2Angle(0.58);
+    }
+    //else{
+      //claw.setActuatorDebugPercent(0.3);
+    //}
   }
 
   // Called once the command ends or is interrupted.

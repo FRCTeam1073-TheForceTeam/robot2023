@@ -23,6 +23,13 @@ public class DriveToPoint extends CommandBase {
   private double maxLinearVelocity;   // Meters/second
   private double maxRotationVelocity; // Radians/second
 
+  /**DriveToPoint constuctor.
+   * 
+   * @param ds  variable for the drive subsystem
+   * @param targetPose2d  the target position on the field
+   * @param maxSpeed  maximum speed of the robot
+   * @param maxRotate maximum rotation of the robot
+   */
   public DriveToPoint(DriveSubsystem ds, Pose2d targetPose2d, double maxSpeed, double maxRotate) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = ds;
@@ -39,6 +46,7 @@ public class DriveToPoint extends CommandBase {
     System.out.println("DriveToPoint");
  }
 
+  //Sets the speed and rotation proportional to the difference in current robot position and target position.
   @Override
   public void execute() {
     robotPose = drivetrain.getOdometry();
@@ -66,6 +74,7 @@ public class DriveToPoint extends CommandBase {
       angularVelocity = -maxRotationVelocity;
     }
     
+    //sets chassisSpeeds to the clamped velocity
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         xVelocity, yVelocity, angularVelocity,
         Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
@@ -80,6 +89,7 @@ public class DriveToPoint extends CommandBase {
   }
 
   // Returns true when the command should end.
+  // Returns true when robot position is within the tolerance
   @Override
   public boolean isFinished() {
     var error = targetPose.minus(robotPose);

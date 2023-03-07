@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import java.util.ArrayList;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -30,8 +31,16 @@ public class Engage extends CommandBase
   private double linearVelocity;
   private double startTime;
   
+  /*
+   * 
+   * This command is not currently used
+   * Instead of this command, use a combination of EngageDriveUp at the beginning,
+   * ParkingBrake at the end, and some other Engage files, such as EngageForward and EngageBalance.
+   * 
+   */
 
-  public Engage(DriveSubsystem ds, double maxSpeed, boolean inverted) {
+  public Engage(DriveSubsystem ds, double maxSpeed, boolean inverted)
+  {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = ds;
     maxLinearVelocity = maxSpeed;
@@ -41,7 +50,8 @@ public class Engage extends CommandBase
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void initialize() 
+  {
     drivePhase = 0; //starts  moving
     brake = new PersistentParkingBrake(drivetrain);
     if (inverted)
@@ -56,9 +66,11 @@ public class Engage extends CommandBase
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
+  public void execute() 
+  {
     SmartDashboard.putNumber("Drive Phase", drivePhase);
-    if (drivePhase == 0) {
+    if (drivePhase == 0) 
+    {
       robotPose = drivetrain.getOdometry();
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
           linearVelocity,
@@ -67,7 +79,8 @@ public class Engage extends CommandBase
           Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
         drivetrain.setChassisSpeeds(chassisSpeeds);
       
-      if (Math.abs(drivetrain.getPitch()) > 13) {
+      if (Math.abs(drivetrain.getPitch()) > 13) 
+      {
         drivePhase = 1; //starts climbing
       }
     } //end of phase 0
@@ -113,7 +126,8 @@ public class Engage extends CommandBase
   // Returns true when the command should end.
 
   @Override
-  public boolean isFinished() {
+  public boolean isFinished() 
+  {
     return false;
   }
 }

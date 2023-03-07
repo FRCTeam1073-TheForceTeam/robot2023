@@ -21,6 +21,8 @@ public class Underglow extends SubsystemBase {
   /** Creates a new Underglow. */
   private CANifier canifier;
 
+  /**Underglow constructor. Initializes canfiers and sets them to the default configuration
+   */
   public Underglow() {
     canifier = new CANifier(14);
     canifier.configFactoryDefault();
@@ -50,10 +52,12 @@ public class Underglow extends SubsystemBase {
     //canifier.?
   }
 
+  // returns current color in the type Color8Bit
   public Color8Bit getCurrentColor(){
     return new Color8Bit(0,0,0);
   }
 
+  //Sets the LED intensity
   public void setLEDIntensity(double redPercent, double greenPercent, double bluePercent){
     redPercent = MathUtil.clamp(redPercent, 0, 1);
     bluePercent = MathUtil.clamp(bluePercent, 0, 1);
