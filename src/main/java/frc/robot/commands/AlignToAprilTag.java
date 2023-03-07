@@ -59,6 +59,10 @@ public class AlignToAprilTag extends CommandBase {
   }
 
   // Called when the command is initially scheduled.
+  /**
+   * The robot looks for the closest ID, and saves that ID
+   * Also the Bling is cleared for later steps
+   */
   @Override
   public void initialize() {
     int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
@@ -73,6 +77,20 @@ public class AlignToAprilTag extends CommandBase {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Sets the bling to white as a "headlight" to see the apriltag better
+   * @param x - The x component of the translation.
+   * @param y - The y component of the translation.
+   * @param z - The z component of the translation.
+   * @param trasnlation - The translational component of the pose.
+   * @param rotation - The rotational component of the pose.
+   * @param value - Value to clamp
+   * @param low - The lower boundary to which to clamp value.
+   * @param hight - The highest boundary to which to clamp value.
+   * @return The translational component of the pose.
+   * @return buffer length
+   * @return The translational component of the pose.
+   */
   @Override
   public void execute() {
     bling.setColorRGBAll(255, 255, 255);
@@ -113,6 +131,10 @@ public class AlignToAprilTag extends CommandBase {
   }
 
   // Called once the command ends or is interrupted.
+  /**
+   * Stops the robot
+   * Clears all of the LEDs
+   */
   @Override
   public void end(boolean interrupted) {
     chassisSpeeds.vxMetersPerSecond = 0.0;

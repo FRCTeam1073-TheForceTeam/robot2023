@@ -21,12 +21,17 @@ public class BlingTeleopCommand extends CommandBase {
   }
 
   // Called when the command is initially scheduled.
+  //clears all LEDS
   @Override
   public void initialize() {
     bling.clearLEDs();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * If the operators View button is pressed set the bling to purple
+   * If the operators Menu button is pressed set the bling to yellow
+   */
   @Override
   public void execute() {
     if(oi.getOperatorViewButton()) {
@@ -39,12 +44,20 @@ public class BlingTeleopCommand extends CommandBase {
   }
 
   // Called once the command ends or is interrupted.
+  /**
+   * @param r - the r value [0-255]
+   * @param g - the g value [0-255]
+   * @param b - the b value [0-255]
+   */
   @Override
   public void end(boolean interrupted) {
     bling.setSlot(7, 0, 0, 0);
   }
 
   // Returns true when the command should end.
+  /**
+   * @return false
+   */
   @Override
   public boolean isFinished() {
     return false;
