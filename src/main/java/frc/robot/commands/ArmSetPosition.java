@@ -30,6 +30,12 @@ public class ArmSetPosition extends CommandBase {
   private final double shoulderTolerance = 0.1;
   private final double elbowTolerance = 0.1;
 
+  /**Constructs an ArmSetPosition
+   * 
+   * @param arm variable for Arm subsystem
+   * @param shoulderAng desired shoulder angle
+   * @param elbowAng desired elbow angle
+   */
   public ArmSetPosition(Arm arm, double shoulderAng, double elbowAng) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;

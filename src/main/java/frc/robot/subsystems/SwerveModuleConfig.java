@@ -33,6 +33,9 @@ public class SwerveModuleConfig
     public double driveMaxIntegrator = 400.0;
     public double steerMaxIntegrator = 400.0;    
 
+    /**SwerveModuleConfig contstructor sets PIDF values and current limits
+     * 
+     */
     public SwerveModuleConfig()
     {
         tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 86670.8);
@@ -55,6 +58,7 @@ public class SwerveModuleConfig
         steerCurrentThreshold = Preferences.getDouble("Drive.Steer.CurrentThreshold", 12);
     }
 
+    //Initializes preferences for PIDF values for both drive and steer motors, current limits and current threshold
     public static void initPreferences() {
         Preferences.initDouble("Drive.Drive.TickPerMeter", 86670.8);
         Preferences.initDouble("Drive.Drive.Kp", 0.1);
