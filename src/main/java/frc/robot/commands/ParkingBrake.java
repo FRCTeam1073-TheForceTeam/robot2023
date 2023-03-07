@@ -20,23 +20,14 @@ public class ParkingBrake extends CommandBase
     @Override
     public void initialize()
     {
-        drivetrain.parkingBrake(true);
+        drivetrain.parkingBrake(true); // turns on the parking brake
     }
 
     @Override
     public void execute()
     {
-        // if (!isOn)
-        // {
-        //     drivetrain.parkingBrake(true);
-        // }
-        // else
-        // {
-        //     drivetrain.parkingBrake(false);
-        // }
-        // //isParkingBrakeOn = true;
         bling.clearLEDs();
-        bling.setSlot(1, 255, 0, 0);
+        bling.setSlot(1, 255, 0, 0); // sets the LEDs
         bling.setSlot(2, 255, 160, 0);
         bling.setSlot(3, 255, 255, 0);
         bling.setSlot(4, 0, 255, 0);
@@ -48,8 +39,8 @@ public class ParkingBrake extends CommandBase
     @Override
     public void end(boolean interrupted)
     {
-        drivetrain.parkingBrake(false);
-        bling.clearLEDs();
+        drivetrain.parkingBrake(false); // turns off the parking brake
+        bling.clearLEDs(); // turns off the LEDs
     }
 
     @Override
