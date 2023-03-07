@@ -296,7 +296,7 @@ public class DriveSubsystem extends SubsystemBase
   }
 
 
-  // rotates all the wheels to be facing inwards and stops the motors to hold position
+  // Rotates all the wheels to be facing inwards and stops the motors to hold position
   public void parkingBrake(boolean parkingBrakeOn) 
   {
     this.parkingBrakeOn = parkingBrakeOn;
@@ -347,7 +347,7 @@ public class DriveSubsystem extends SubsystemBase
   }
 
 
-  // optimizes the module states to take the shortest path to the desired position
+  // Optimizes the module states to take the shortest path to the desired position
   public static SwerveModuleState optimizeB(SwerveModuleState desiredState, Rotation2d currentAngle)
   {
     double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
@@ -368,7 +368,7 @@ public class DriveSubsystem extends SubsystemBase
    */
   
 
-  // places the desired angle to be in a 0 to 360 scope to minimize distance for wheels to rotate 
+  // Places the desired angle to be in a 0 to 360 scope to minimize distance for wheels to rotate 
   private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) 
   {
     double lowerBound;
