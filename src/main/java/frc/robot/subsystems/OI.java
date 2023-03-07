@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -12,6 +13,8 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
+    Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
+
 
 
 
@@ -141,7 +144,7 @@ public class OI extends SubsystemBase
 
     public boolean getLeftBumper()
     {
-        return driverController.getRawButton(5);
+        return parkingBrakeDebouncer.calculate(driverController.getRawButton(5));
     }
 
     public boolean getRightBumper()

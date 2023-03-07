@@ -12,9 +12,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.OI;
@@ -31,6 +33,7 @@ public class TeleopDrive extends CommandBase
   private boolean fieldCentric;
   private boolean parked = false;
   ChassisSpeeds speeds;
+
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
@@ -61,8 +64,8 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute(){
     //multiples the angle by a number from 1 to the square root of 30:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(30) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(30) - 1));
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(25) - 1));
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(25) - 1));
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -73,15 +76,16 @@ public class TeleopDrive extends CommandBase
     if (Math.abs(rightX) < .05) {rightX = 0;}
 
     //sets the velocity to a number from 0 to 1/30th of the max:
-    leftY *= maximumLinearVelocity / 30;
-    leftX *= maximumLinearVelocity / 30;
-    rightX *= maximumRotationVelocity / 30;
+    leftY *= maximumLinearVelocity / 25;
+    leftX *= maximumLinearVelocity / 25;
+    rightX *= maximumRotationVelocity / 25 ;
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
       fieldCentric = !fieldCentric;
     }
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
+    
     if(m_OI.getLeftBumper()){
       parked = !parked;
     }

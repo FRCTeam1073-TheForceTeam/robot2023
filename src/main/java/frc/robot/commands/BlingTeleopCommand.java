@@ -30,10 +30,10 @@ public class BlingTeleopCommand extends CommandBase {
   @Override
   public void execute() {
     if(oi.getOperatorViewButton()) {
-      bling.setSlot(7, 128, 0, 128); //purple for cube
+      bling.setColorRGBAll(128, 0, 128); //purple for cube
     }
     else if(oi.getOperatorMenuButton()){
-      bling.setSlot(7, 255, 255, 0); //yellow for cone
+      bling.setColorRGBAll(255, 255, 0); //yellow for cone
     }
     
   }

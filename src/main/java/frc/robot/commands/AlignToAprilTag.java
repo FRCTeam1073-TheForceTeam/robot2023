@@ -127,7 +127,8 @@ public class AlignToAprilTag extends CommandBase {
   public boolean isFinished() {
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
     //de-bouncing glitch "signal"
-    if (targetTagID < 0 || glitchCounter > 3){
+    //TODO: set glitch counter to 5 instead of 3
+    if (targetTagID < 0 || glitchCounter > 5){
 
       System.out.println("AlignToAprilTag Finished.");
       
