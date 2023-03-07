@@ -23,7 +23,9 @@ public class BlingSetCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    bling.setRGBAll(177, 204, 157); //sage green
+    for(int i = 0; i < 8 ; i++){
+      bling.setSlot(i, 177, 204, 157); //sage green
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +47,7 @@ public class BlingSetCommand extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    bling.setRGBAll(0, 0, 0);
+    bling.setSlot(7, 0, 0, 0);
   }
 
   // Returns true when the command should end.
