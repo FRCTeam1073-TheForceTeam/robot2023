@@ -12,7 +12,8 @@ public class BlingSetCommand extends CommandBase {
   Bling bling;
   OI oi;
 
-  /** Creates a new BlingSetCommand. */
+  /** Creates a new BlingSetCommand. 
+  */
   public BlingSetCommand(Bling bling_, OI oi_) {
     // Use addRequirements() here to declare subsystem dependencies.
     bling = bling_;
@@ -21,6 +22,12 @@ public class BlingSetCommand extends CommandBase {
   }
 
   // Called when the command is initially scheduled.
+  /**
+   * @param slotNumber
+   * @param r - the r value [0-255]
+   * @param g - the g value [0-255]
+   * @param b - the b value [0-255]
+   */
   @Override
   public void initialize() {
     for(int i = 0; i < 8 ; i++){
@@ -29,6 +36,14 @@ public class BlingSetCommand extends CommandBase {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * @param Button - 
+   * @param r - the r value [0-255]
+   * @param g - the g value [0-255]
+   * @param b - the b value [0-255]
+   * @return The Value of the operator controller's Y button
+   * @return The Value of the operator controller's B button
+   */
   @Override
   public void execute() {
     if(oi.getOperatorYButton())
@@ -45,12 +60,20 @@ public class BlingSetCommand extends CommandBase {
   }
 
   // Called once the command ends or is interrupted.
+  /**
+   * @param r - the r value [0-255]
+   * @param g - the g value [0-255]
+   * @param b - the b value [0-255]
+   */
   @Override
   public void end(boolean interrupted) {
     bling.setSlot(7, 0, 0, 0);
   }
 
   // Returns true when the command should end.
+  /**
+   * @return false
+   */
   @Override
   public boolean isFinished() {
     return false;

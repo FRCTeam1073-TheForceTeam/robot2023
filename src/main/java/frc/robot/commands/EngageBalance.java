@@ -34,7 +34,7 @@ public class EngageBalance extends CommandBase
         startTime = Timer.getFPGATimestamp();
         if (inverted)
         {
-            linearVelocity = -maxLinearVelocity;
+            linearVelocity = -maxLinearVelocity; // sets the direction
         }
         else
         {
@@ -65,20 +65,20 @@ public class EngageBalance extends CommandBase
         //     drivetrain.setChassisSpeeds(chassisSpeeds);
         // } 
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-             drivetrain.setChassisSpeeds(chassisSpeeds);
+        drivetrain.setChassisSpeeds(chassisSpeeds); // makes the robot back up at half speed
     }
 
     @Override
     public void end(boolean interrupted)
     {
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-    }
+    } // stops the robot
 
     @Override
     public boolean isFinished()
     {
         if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitch()) < 9.0)
-        {
+        { // triggers once the robot drives up to the halfway point again
             return true;
         }
         else

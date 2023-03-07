@@ -10,14 +10,16 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class EngageForward extends CommandBase {
+public class EngageForward extends CommandBase 
+{
   DriveSubsystem drivetrain;
   boolean inverted;
   double maxSpeed;
   double linearVelocity;
 
   /** Creates a new EngageForward. */
-  public EngageForward(DriveSubsystem drivetrain, double maxSpeed, boolean inverted) {
+  public EngageForward(DriveSubsystem drivetrain, double maxSpeed, boolean inverted) 
+  {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.maxSpeed = maxSpeed;
@@ -27,30 +29,33 @@ public class EngageForward extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void initialize() 
+  {
     if (inverted)
-        {
-            linearVelocity = -maxSpeed;
-        }
-        else
-        {
-            linearVelocity = maxSpeed;
-        }
+    {
+      linearVelocity = -maxSpeed; // sets the direction engage goes
+    }
+    else
+    {
+      linearVelocity = maxSpeed;
+    }
   }
 
-  public static void initPreferences() {
-    Preferences.initDouble("EngageDriveUp.maxSpeed", 0.7);
-}
+  public static void initPreferences()
+  {
+    Preferences.initDouble("EngageDriveUp.maxSpeed", 0.7); // sets the speed the robot goes
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          linearVelocity,
-          0, 
-          0,
-          Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
-        drivetrain.setChassisSpeeds(chassisSpeeds);
+  public void execute() 
+  {
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( // sets the speed
+      linearVelocity,
+      0, 
+      0,
+      Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
+    drivetrain.setChassisSpeeds(chassisSpeeds);
   }
 
   // Called once the command ends or is interrupted.
@@ -59,15 +64,15 @@ public class EngageForward extends CommandBase {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
-    if (Math.abs(drivetrain.getPitch()) < 6) 
+  public boolean isFinished() 
+  {
+    if (Math.abs(drivetrain.getPitch()) < 6) // triggers when the robot reaches the halfway point
         {
-            
-            return true;
+          return true;
         }
         else
         {
-            return false;
+          return false;
         }
   }
 }

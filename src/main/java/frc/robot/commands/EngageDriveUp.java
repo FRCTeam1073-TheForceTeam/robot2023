@@ -15,7 +15,6 @@ public class EngageDriveUp extends CommandBase
     boolean inverted;
     private double maxLinearVelocity;
     private double linearVelocity;
-    private int phase;
 
     public EngageDriveUp(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
@@ -31,16 +30,16 @@ public class EngageDriveUp extends CommandBase
     {
         if (inverted)
         {
-            linearVelocity = -maxLinearVelocity;
+            linearVelocity = -maxLinearVelocity; // sets the direction
         }
         else
         {
             linearVelocity = maxLinearVelocity;
         }
-        phase = 0;
     }
 
-    public static void initPreferences() {
+    public static void initPreferences() 
+    {
         Preferences.initDouble("EngageDriveUp.maxSpeed", 0.9);
     }
 
@@ -48,7 +47,7 @@ public class EngageDriveUp extends CommandBase
     public void execute()
     {
         robotPose = drivetrain.getOdometry();
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( // sets the speed
           linearVelocity,
           0, 
           0,
@@ -65,7 +64,7 @@ public class EngageDriveUp extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Math.abs(drivetrain.getPitch()) > 13) 
+        if (Math.abs(drivetrain.getPitch()) > 13) // triggers when the robot starts driving onto the charging station
         {
             
             return true;
