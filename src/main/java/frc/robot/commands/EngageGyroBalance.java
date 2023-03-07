@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class EngageGyroBalance extends CommandBase {
+public class EngageGyroBalance extends CommandBase 
+{
     DriveSubsystem drivetrain;
     ChassisSpeeds chassisSpeeds;
     Pose2d robotPose;
@@ -20,7 +21,15 @@ public class EngageGyroBalance extends CommandBase {
     private double pitchRate;
     private double loopTime;
 
-    public EngageGyroBalance(DriveSubsystem ds, double maxSpeed, boolean inverted){
+    /*
+     * 
+     * DOES NOT WORK
+     * Tries to use the rate to detect when the charging station starts going down to stop at the perfect moment
+     * 
+     */
+
+    public EngageGyroBalance(DriveSubsystem ds, double maxSpeed, boolean inverted)
+    {
         // Use addRequirements() here to declare subsystem dependencies.
         this.drivetrain = ds;
         maxLinearVelocity = maxSpeed;
@@ -31,20 +40,22 @@ public class EngageGyroBalance extends CommandBase {
     @Override 
     public void initialize(){
         startTime = Integer.MAX_VALUE;
-        if (inverted){ 
+        if (inverted)
+        { // sets direction
             linearVelocity = -maxLinearVelocity; 
         }
-        else{ 
+        else
+        { 
             linearVelocity = maxLinearVelocity; 
         }
 
-        System.out.println("GryoBalance Initialized");
+        System.out.println("GyroBalance Initialized");
     } 
  
     @Override  
     public void execute(){ 
         loopTime = Timer.getFPGATimestamp() - loopTime;
-        pitchRate = (drivetrain.getPitch() - currentPitch) / loopTime;
+        pitchRate = (drivetrain.getPitch() - currentPitch) / loopTime; // calculates the pitch rate
         SmartDashboard.putNumber("GyroBalance/Pitch Rate", pitchRate);
         SmartDashboard.putNumber("GyroBalance/Start Time", startTime);
         SmartDashboard.putNumber("GyroBalance/Loop Time", loopTime); 
@@ -58,8 +69,10 @@ public class EngageGyroBalance extends CommandBase {
             Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading 
             drivetrain.setChassisSpeeds(chassisSpeeds); 
  
-            if (Math.abs(drivetrain.getPitch()) < 5){ 
-                if (startTime == Integer.MAX_VALUE){ 
+            if (Math.abs(drivetrain.getPitch()) < 5)
+            { 
+                if (startTime == Integer.MAX_VALUE)
+                { 
                     startTime = Timer.getFPGATimestamp();
                 }
                 robotPose = drivetrain.getOdometry();
@@ -71,17 +84,21 @@ public class EngageGyroBalance extends CommandBase {
     }
 
     @Override
-    public void end(boolean interrupted){
+    public void end(boolean interrupted)
+    {
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, Rotation2d.fromDegrees(drivetrain.getHeading()));
         drivetrain.setChassisSpeeds(chassisSpeeds);
     }
 
     @Override
-    public boolean isFinished(){
-        if (Timer.getFPGATimestamp() > (startTime + 0.5) && Math.abs(pitchRate) < 7){
+    public boolean isFinished()
+    {
+        if (Timer.getFPGATimestamp() > (startTime + 0.5) && Math.abs(pitchRate) < 7)
+        {
             return false; //change back to true after check if will go backwards
         }
-        else{
+        else
+        {
             return false;
         }
     }
