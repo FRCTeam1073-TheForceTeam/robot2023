@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 
 //import javax.lang.model.util.ElementScanner14;
 
@@ -73,7 +74,7 @@ public class TeleopDrive extends CommandBase
     //sets deadzones on the controller to extend to .05:
     if(Math.abs(leftY) < .05) {leftY = 0;}
     if (Math.abs(leftX) < .05) {leftX = 0;}
-    if (Math.abs(rightX) < .05) {rightX = 0;}
+    if (Math.abs(rightX) < .15) {rightX = 0;}
 
     //sets the velocity to a number from 0 to 1/30th of the max:
     leftY *= maximumLinearVelocity / 25;
@@ -109,19 +110,23 @@ public class TeleopDrive extends CommandBase
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
       rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
 
+      double vx = MathUtil.clamp(-leftY * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-leftX * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp(-rightX * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
+
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        -leftY * mult1 * mult2,
-        -leftX * mult1 * mult2,
-        -rightX * mult1 * mult2,
+        vx,
+        vy,
+        w,
         Rotation2d.fromDegrees(m_driveSubsystem.getHeading())); // get fused heading
         m_driveSubsystem.setChassisSpeeds(speeds);
     }
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = -leftY * mult1 * mult2; 
-      speeds.vyMetersPerSecond = -leftX * mult1 * mult2; 
-      speeds.omegaRadiansPerSecond = -rightX * mult1 * mult2;
+      speeds.vxMetersPerSecond = MathUtil.clamp(-leftY * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.vyMetersPerSecond = MathUtil.clamp(-leftX * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.omegaRadiansPerSecond = MathUtil.clamp(-rightX * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     
