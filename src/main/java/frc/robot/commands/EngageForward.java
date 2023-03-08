@@ -67,12 +67,12 @@ public class EngageForward extends CommandBase
   public boolean isFinished() 
   {
     if (Math.abs(drivetrain.getPitch()) < 6) // triggers when the robot reaches the halfway point
-        {
-          return true;
-        }
-        else
-        {
-          return false;
-        }
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }

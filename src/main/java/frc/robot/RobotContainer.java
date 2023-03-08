@@ -42,6 +42,7 @@ import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.commands.VacuumActivateCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
+import frc.robot.commands.EngageRateBalance;
 import frc.robot.commands.ParkingBrake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
@@ -80,6 +81,7 @@ public class RobotContainer {
   private static final String kNoAuto = "No Autonomous";
   private static final String kBasicEngage = "Basic Engage";
   private static final String kSplitEngage = "Split Engage";
+  private static final String kEngageExperimental = "Engage Experimental";
   private static final String kEngagePlus = "Engage Plus";
   private static final String kLeaveCommunity = "Leave Community";
   private static final String kTestMode = "Test Mode";
@@ -112,6 +114,7 @@ public class RobotContainer {
    
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
     m_chooser.setDefaultOption("Split Engage", kSplitEngage);
+    m_chooser.setDefaultOption("Engage Experimental", kEngageExperimental);
     m_chooser.addOption("Leave (All)", kLeaveCommunity);
     m_chooser.addOption("Cube and Engage (2)", kScoreCubeAndEngage);
     m_chooser.addOption("Cube and Leave (B1, R3)", kCubeLeaveCommand);
@@ -227,6 +230,8 @@ public class RobotContainer {
       //  return engageExperimental();
       case kSplitEngage:
         return splitEngage();
+      case kEngageExperimental:
+        return engageExperimental();
       case kLeaveCommunity:
         return leaveCommunity();
       case kTestMode:
@@ -409,6 +414,14 @@ public class RobotContainer {
     return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
       new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
 
+  }
+
+  public Command engageExperimental()
+  {
+    return new SequentialCommandGroup(
+      new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false), 
+      new EngageRateBalance(m_driveSubsystem, Preferences.getDouble("EngageForawrd.maxSpeed", 0.7), false),
+      new ParkingBrake(m_driveSubsystem, m_bling));
   }
 
   public Command armSetTest(){

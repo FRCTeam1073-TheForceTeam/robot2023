@@ -1,89 +1,78 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class EngageRateBalance extends CommandBase
+public class EngageRateBalance extends CommandBase 
 {
-    DriveSubsystem drivetrain;
-    ChassisSpeeds chassisSpeeds;
-    Pose2d robotPose;
-    boolean inverted;
-    private double maxLinearVelocity;
-    private double linearVelocity;
-    private double startTime = 0.0;
-    private int phase;
+  DriveSubsystem drivetrain;
+  boolean inverted;
+  double maxSpeed;
+  double linearVelocity;
 
-    public EngageRateBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
+  /** Creates a new EngageForward. */
+  public EngageRateBalance(DriveSubsystem drivetrain, double maxSpeed, boolean inverted) 
+  {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.drivetrain = drivetrain;
+    this.maxSpeed = maxSpeed;
+    this.inverted = inverted;
+    addRequirements(drivetrain);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() 
+  {
+    if (inverted)
     {
-        // Use addRequirements() here to declare subsystem dependencies.
-        this.drivetrain = ds;
-        maxLinearVelocity = maxSpeed;
-        this.inverted = inverted;
-        addRequirements(ds);
+      linearVelocity = -maxSpeed; // sets the direction engage goes
     }
-
-    @Override
-    public void initialize()
+    else
     {
-        phase = 0; 
-        if (inverted)
-        {
-            linearVelocity = -maxLinearVelocity; // sets the direction it will go 
-        }
-        else
-        {
-            linearVelocity = maxLinearVelocity;
-        }
+      linearVelocity = maxSpeed;
     }
+  }
 
-    @Override 
-    public void execute()
+  public static void initPreferences()
+  {
+    Preferences.initDouble("EngageDriveUp.maxSpeed", 0.7); // sets the speed the robot goes
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() 
+  {
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( // sets the speed
+      linearVelocity,
+      0, 
+      0,
+      Rotation2d.fromDegrees(drivetrain.getHeading())); // get fused heading
+    drivetrain.setChassisSpeeds(chassisSpeeds);
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() 
+  {
+    if (Math.abs(drivetrain.getPitchRate()) > 25) // triggers when the robot reaches the halfway point
     {
-        /*if (Math.abs(drivetrain.getPitch()) < 5 && phase == 0) // activates once the robot nears the halfway mark
-        {
-            phase = 1;
-        }
-
-        if (phase == 1)
-        {
-            if (startTime == 0.0) // sets the timer which makes sure the robot goes backwards at least a set amount of time
-            {
-                startTime = Timer.getFPGATimestamp();
-            }
-            robotPose = drivetrain.getOdometry();
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity * -0.5,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-            drivetrain.setChassisSpeeds(chassisSpeeds); // makes the robot back up at half speed
-        } */
-        robotPose = drivetrain.getOdometry();
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(linearVelocity,0,0, Rotation2d.fromDegrees(drivetrain.getHeading()));
-        drivetrain.setChassisSpeeds(chassisSpeeds);
+      return true;
     }
-
-    @Override
-    public void end(boolean interrupted)
+    else
     {
-
+      return false;
     }
-
-    @Override
-    public boolean isFinished()
-    {
-        /*if (Timer.getFPGATimestamp() > startTime + 0.25 && Math.abs(drivetrain.getPitchRate()) > 15)
-        { // triggers once the robot starts nearing the middle
-            return true;
-        }*/
-        if (Math.abs(drivetrain.getPitchRate()) > 10)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+  }
 }
