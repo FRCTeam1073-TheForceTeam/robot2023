@@ -34,6 +34,8 @@ public class TeleopDrive extends CommandBase
   private boolean fieldCentric;
   private boolean parked = false;
   ChassisSpeeds speeds;
+  double last_error = 0; //for snap-to-positions derivative
+  double last_time = 0; //for snap-to-positions derivative
 
 
   // Teleop drive velocity scaling:
@@ -142,17 +144,6 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-    //PAST snap-to vars
-    // double leftY = m_OI.getDriverLeftY();
-    // double leftX = m_OI.getDriverLeftX();
-    // double rightX = m_OI.getDriverRightX();
-    // if (Math.abs(leftY) < .1) {leftY = 0;}
-    // if (Math.abs(leftX) < .1) {leftX = 0;}
-    // if (Math.abs(rightX) < .1) {rightX = 0;}
-
-    // if(m_OI.getXButton()){
-    //   parked = !parked;
-
   public double snapToHeading(double currentAngle, double targetAngle, double defaultVelocity){
     if(targetAngle == 361){
       return defaultVelocity;
@@ -167,7 +158,16 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(error) < SLOW_THRESHOLD){
       return error/SLOW_THRESHOLD;
     }
-    return error * .7;
+
+    //calculate derivative
+    double new_error = error;
+    double current_time = System.currentTimeMillis();
+    double derivative = (new_error - last_error)/(current_time - last_time);
+    last_time = current_time;
+    last_error = error;
+    error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
+
+    return error * .7 + derivative * .1;
   }
 
   // Called once the command ends or is interrupted.
