@@ -21,8 +21,10 @@ public class EngageDriveUp extends CommandBase
     {
         // Use addRequirements() here to declare subsystem dependencies.
         this.drivetrain = ds;
+        maxSpeed = Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9);
         maxLinearVelocity = maxSpeed;
         this.inverted = inverted;
+        endPitch = Preferences.getDouble("EngageDriveUp.endPitch", 13.0);
         addRequirements(ds);
     }
 

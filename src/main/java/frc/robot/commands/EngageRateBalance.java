@@ -23,6 +23,8 @@ public class EngageRateBalance extends CommandBase
   {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
+    maxSpeed = Preferences.getDouble("EngageRateBalance.maxSpeed", 0.7);
+    endPitchRate = Preferences.getDouble("EngageRateBalance.endPitchRate", 252.0);
     this.maxSpeed = maxSpeed;
     this.inverted = inverted;
     addRequirements(drivetrain);

@@ -158,6 +158,7 @@ public class RobotContainer {
     EngageBalance.initPreferences();
     EngageDriveUp.initPreferences();
     EngageForward.initPreferences();
+    EngageRateBalance.initPreferences();
 
     // Initialize Preferences For Command Classes:
 
