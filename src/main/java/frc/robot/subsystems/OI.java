@@ -13,9 +13,13 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
-    Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
 
-
+    public Debouncer parkingBrakeDebouncer = new Debouncer(0.15);
+    public Debouncer xButtonDebouncer = new Debouncer(0.15);
+    public Debouncer yButtonDebouncer = new Debouncer(0.15);
+    public Debouncer aButtonDebouncer = new Debouncer(0.15);
+    public Debouncer bButtonDebouncer = new Debouncer(0.15);
+    public Debouncer menuButtonDebouncer = new Debouncer(0.15);
 
     /** Setting up which controllor is which
      * Drive Controller is controllor 0
@@ -207,7 +211,7 @@ public class OI extends SubsystemBase
      */
     public boolean getMenuButton()
     {
-        return driverController.getRawButton(8);
+        return menuButtonDebouncer.calculate(driverController.getRawButton(8));
     }
     
      /**
@@ -217,7 +221,7 @@ public class OI extends SubsystemBase
      */
     public boolean getXButton()
     {
-        return driverController.getRawButtonPressed(3);
+        return xButtonDebouncer.calculate(driverController.getRawButtonPressed(3));
     }
 
      /**
@@ -227,7 +231,7 @@ public class OI extends SubsystemBase
      */
     public boolean getAButton()
     {
-        return driverController.getRawButton(1);
+        return aButtonDebouncer.calculate(driverController.getRawButton(1));
     }
 
      /**
@@ -237,7 +241,7 @@ public class OI extends SubsystemBase
      */
     public boolean getYButton()
     {
-        return driverController.getRawButton(4);
+        return yButtonDebouncer.calculate(driverController.getRawButton(4));
     }
 
      /**
@@ -247,13 +251,14 @@ public class OI extends SubsystemBase
      */
     public boolean getBButton()
     {
-        return driverController.getRawButton(2);
+        return bButtonDebouncer.calculate(driverController.getRawButton(2));
     }
 
      /**
      * @return The Value of the driver controller's DPad button
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
+
     public int getDPad(){
         return driverController.getPOV();
     }
