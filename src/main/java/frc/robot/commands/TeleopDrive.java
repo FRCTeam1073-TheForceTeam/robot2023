@@ -67,8 +67,8 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute(){
     //multiples the angle by a number from 1 to the square root of 30:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * (Math.sqrt(25) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * (Math.sqrt(25) - 1));
+    double add1 = m_OI.getDriverLeftTrigger() * 12/25;
+    double add2 = m_OI.getDriverRightTrigger() * 12/25;
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -77,11 +77,6 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftY) < .05) {leftY = 0;}
     if (Math.abs(leftX) < .05) {leftX = 0;}
     if (Math.abs(rightX) < .15) {rightX = 0;}
-
-    //sets the velocity to a number from 0 to 1/30th of the max:
-    leftY *= maximumLinearVelocity / 25;
-    leftX *= maximumLinearVelocity / 25;
-    rightX *= maximumRotationVelocity / 25 ;
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
@@ -112,9 +107,9 @@ public class TeleopDrive extends CommandBase
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
       rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
 
-      double vx = MathUtil.clamp(-leftY * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
-      double vy = MathUtil.clamp(-leftX * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp(-rightX * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
+      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
@@ -126,9 +121,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = MathUtil.clamp(-leftY * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.vyMetersPerSecond = MathUtil.clamp(-leftX * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.omegaRadiansPerSecond = MathUtil.clamp(-rightX * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
+      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     
@@ -144,9 +139,9 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-  public double snapToHeading(double currentAngle, double targetAngle, double defaultVelocity){
+  public double snapToHeading(double currentAngle, double targetAngle, double joystick){
     if(targetAngle == 361){
-      return defaultVelocity;
+      targetAngle = currentAngle + (joystick * 90);
     }
     double error = currentAngle - targetAngle;
     while(error < -180){error += 360;}
@@ -155,11 +150,9 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(error) < STOP_THRESHOLD){
       return 0;
     }
-    if(Math.abs(error) < SLOW_THRESHOLD){
-      return error/SLOW_THRESHOLD;
-    }
 
     //calculate derivative
+    error = error * Math.PI / 180;
     double new_error = error;
     double current_time = System.currentTimeMillis();
     double derivative = (new_error - last_error)/(current_time - last_time);
@@ -167,7 +160,7 @@ public class TeleopDrive extends CommandBase
     last_error = error;
     error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
 
-    return error * .7 + derivative * .1;
+    return MathUtil.clamp(error * .7 + derivative * .1, -maximumRotationVelocity, maximumRotationVelocity) / maximumRotationVelocity;
   }
 
   // Called once the command ends or is interrupted.
