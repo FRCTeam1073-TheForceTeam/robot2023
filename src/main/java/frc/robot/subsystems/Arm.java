@@ -30,6 +30,7 @@ public class Arm extends SubsystemBase{
   //private SlewRateLimiter shoulderLimiter;
   private boolean isElbowMagnetHealthy;
   private boolean isShoulderMagnetHealthy;
+  private boolean isShoulderInitialized;
   //set variables below to correct lengths
   public final double upperArmLength = 25.0;
   public final double forearmLength = 27.5;
@@ -217,11 +218,13 @@ public class Arm extends SubsystemBase{
     elbowMotor.configMaxIntegralAccumulator(0, 0);
     elbowMotor.setIntegralAccumulator(0);
 
+    isShoulderInitialized = false;
+
     ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 400);
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
+    //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
 
     SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
-    SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
+    //SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
 
     SmartDashboard.putNumber("Shoulder Angle on init", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle on init", getJointAngles().elbow);
@@ -248,6 +251,10 @@ public class Arm extends SubsystemBase{
   @Override
   public void periodic(){
     /* 
+    if(!isShoulderInitialized){
+      shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
+      isShoulderInitialized = true;
+    }
     double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - profileStartTime;
     //setting angles with trapezoid trajectories
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
