@@ -107,9 +107,9 @@ public class TeleopDrive extends CommandBase
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
       rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
 
-      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
+      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
