@@ -16,6 +16,7 @@ public class EngageForward extends CommandBase
   boolean inverted;
   double maxSpeed;
   double linearVelocity;
+  double endPitch;
 
   /** Creates a new EngageForward. */
   public EngageForward(DriveSubsystem drivetrain, double maxSpeed, boolean inverted) 
@@ -43,7 +44,8 @@ public class EngageForward extends CommandBase
 
   public static void initPreferences()
   {
-    Preferences.initDouble("EngageDriveUp.maxSpeed", 0.7); // sets the speed the robot goes
+    Preferences.initDouble("EngageForward.maxSpeed", 0.7); // sets the speed the robot goes
+    Preferences.initDouble("EngageForward.endPitch", 6.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -66,7 +68,7 @@ public class EngageForward extends CommandBase
   @Override
   public boolean isFinished() 
   {
-    if (Math.abs(drivetrain.getPitch()) < 6) // triggers when the robot reaches the halfway point
+    if (Math.abs(drivetrain.getPitch()) < endPitch) // triggers when the robot reaches the halfway point
     {
       return true;
     }

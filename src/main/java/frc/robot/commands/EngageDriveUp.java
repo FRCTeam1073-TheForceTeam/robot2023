@@ -15,6 +15,7 @@ public class EngageDriveUp extends CommandBase
     boolean inverted;
     private double maxLinearVelocity;
     private double linearVelocity;
+    private double endPitch;
 
     public EngageDriveUp(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
@@ -41,6 +42,7 @@ public class EngageDriveUp extends CommandBase
     public static void initPreferences() 
     {
         Preferences.initDouble("EngageDriveUp.maxSpeed", 0.9);
+        Preferences.initDouble("EngageDriveUp.endPitch", 13.0);
     }
 
     @Override 
@@ -64,7 +66,7 @@ public class EngageDriveUp extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Math.abs(drivetrain.getPitch()) > 13) // triggers when the robot starts driving onto the charging station
+        if (Math.abs(drivetrain.getPitch()) > endPitch) // triggers when the robot starts driving onto the charging station
         {
             
             return true;

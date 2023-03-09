@@ -17,7 +17,8 @@ public class EngageBalance extends CommandBase
     private double maxLinearVelocity;
     private double linearVelocity;
     private double startTime = 0.0;
-    private int phase;
+    private double endPitch;
+    private double minRunTime;
 
     public EngageBalance(DriveSubsystem ds, double maxSpeed, boolean inverted) 
     {
@@ -42,8 +43,11 @@ public class EngageBalance extends CommandBase
         }
     }
 
-    public static void initPreferences() {
+    public static void initPreferences() 
+    {
         Preferences.initDouble("EngageBalance.maxSpeed", 0.7);
+        Preferences.initDouble("EngageBalance.endPitch", 9.0);
+        Preferences.initDouble("EngageBalance.minRunTime", 0.5);
     }
 
     @Override 
@@ -77,7 +81,7 @@ public class EngageBalance extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitch()) < 9.0)
+        if (Timer.getFPGATimestamp() > startTime + minRunTime && Math.abs(drivetrain.getPitch()) < endPitch)
         { // triggers once the robot drives up to the halfway point again
             return true;
         }
