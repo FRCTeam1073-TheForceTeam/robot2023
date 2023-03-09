@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -17,6 +18,7 @@ public class EngageRateBalance extends CommandBase
   double maxSpeed;
   double linearVelocity;
   double endPitchRate;
+  private double startTime = 0.0;
 
   /** Creates a new EngageForward. */
   public EngageRateBalance(DriveSubsystem drivetrain, double maxSpeed, boolean inverted) 
@@ -34,6 +36,7 @@ public class EngageRateBalance extends CommandBase
   @Override
   public void initialize() 
   {
+    startTime = Timer.getFPGATimestamp();
     if (inverted)
     {
       linearVelocity = -maxSpeed; // sets the direction engage goes
@@ -70,7 +73,7 @@ public class EngageRateBalance extends CommandBase
   @Override
   public boolean isFinished() 
   {
-    if (Math.abs(drivetrain.getPitchRate()) > endPitchRate) // triggers when the robot reaches the halfway point
+    if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitchRate()) > endPitchRate) // triggers when the robot reaches the halfway point
     {
       return true;
     }
