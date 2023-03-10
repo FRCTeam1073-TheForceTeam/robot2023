@@ -75,8 +75,14 @@ public class TeleopDrive extends CommandBase
     double rightX = m_OI.getDriverRightX();
     //sets deadzones on the controller to extend to .05:
     if(Math.abs(leftY) < .05) {leftY = 0;}
-    if (Math.abs(leftX) < .05) {leftX = 0;}
-    if (Math.abs(rightX) < .15) {rightX = 0;}
+    if(Math.abs(leftX) < .05) {leftX = 0;}
+    if(Math.abs(rightX) < .15) {rightX = 0;}
+
+    double velVector = Math.sqrt(Math.pow(leftY, 2) + Math.pow(leftX, 2));
+    if(velVector > 1){
+      leftX -= Math.abs(velVector / leftX);
+      leftY -= Math.abs(velVector / leftY);
+    }
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
@@ -107,9 +113,47 @@ public class TeleopDrive extends CommandBase
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
       rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
 
-      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
+      double xAdd;
+      double yAdd;
+      double wAdd;
+
+      if(leftY > 0){
+        xAdd = add1 + add2;
+      }
+      else if(leftY < 0){
+        xAdd = -add1 + -add2;
+      }
+      else{
+        xAdd = 0;
+      }
+
+      if(leftX > 0){
+        yAdd = add1 + add2;
+      }
+      else if(leftX < 0){
+        yAdd = -add1 + -add2;
+      }
+      else{
+        yAdd = 0;
+      }
+
+      if(rightX > 0){
+        wAdd = add1 + add2;
+      }
+      else if(rightX < 0){
+        wAdd = -add1 + -add2;
+      }
+      else{
+        wAdd = 0;
+      }
+
+      //double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
+      //double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (rightX > 0 ? -add2 : add2)), -maximumRotationVelocity, maximumRotationVelocity);
+
+      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + xAdd), -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + yAdd), -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
