@@ -39,7 +39,7 @@ public class EngageRateBalance extends CommandBase
   public void initialize() 
   {
     startTime = Timer.getFPGATimestamp();
-    System.out.println(startTime);
+    System.out.println("Start Time:" + startTime);
     if (inverted)
     {
       linearVelocity = -maxSpeed; // sets the direction engage goes
@@ -79,7 +79,8 @@ public class EngageRateBalance extends CommandBase
   {
     if (Timer.getFPGATimestamp() > (startTime + minRunTime) && Math.abs(drivetrain.getPitchRate()) > endPitchRate) // triggers when the robot reaches the halfway point
     {
-      System.out.println(Timer.getFPGATimestamp());
+      System.out.println("End Time:" + Timer.getFPGATimestamp());
+      System.out.println("Intended End Time: " + (startTime + minRunTime));
       return true;
     }
     else 

@@ -400,7 +400,7 @@ public class RobotContainer {
   {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false), 
-      new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForawrd.maxSpeed", 0.7), false),
+      new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling));
   }
@@ -421,7 +421,7 @@ public class RobotContainer {
   {
     return new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false), 
-      new EngageRateBalance(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
+      new EngageRateBalance(m_driveSubsystem, Preferences.getDouble("EngageRateBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling));
   }
 
