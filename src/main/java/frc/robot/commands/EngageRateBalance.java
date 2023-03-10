@@ -18,7 +18,7 @@ public class EngageRateBalance extends CommandBase
   double maxSpeed;
   double linearVelocity;
   double endPitchRate;
-  private double startTime = 0.0;
+  private double startTime;
   private double minRunTime;
 
   /** Creates a new EngageForward. */
@@ -27,7 +27,7 @@ public class EngageRateBalance extends CommandBase
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     maxSpeed = Preferences.getDouble("EngageRateBalance.maxSpeed", 0.7);
-    endPitchRate = Preferences.getDouble("EngageRateBalance.endPitchRate", 252.0);
+    endPitchRate = Preferences.getDouble("EngageRateBalance.endPitchRate", 25.0);
     minRunTime = Preferences.getDouble("EngageRateBalance.minRunTime", 0.5);
     this.maxSpeed = maxSpeed;
     this.inverted = inverted;
@@ -39,6 +39,7 @@ public class EngageRateBalance extends CommandBase
   public void initialize() 
   {
     startTime = Timer.getFPGATimestamp();
+    System.out.println(startTime);
     if (inverted)
     {
       linearVelocity = -maxSpeed; // sets the direction engage goes
@@ -53,7 +54,7 @@ public class EngageRateBalance extends CommandBase
   {
     Preferences.initDouble("EngageRateBalance.maxSpeed", 0.7); // sets the speed the robot goes
     Preferences.initDouble("EngageRateBalance.endPitchRate", 25.0);
-    Preferences.initDouble("EngageRateBalancee.minRunTime", 0.5);
+    Preferences.initDouble("EngageRateBalance.minRunTime", 0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -78,10 +79,11 @@ public class EngageRateBalance extends CommandBase
   {
     if (Timer.getFPGATimestamp() > (startTime + minRunTime) && Math.abs(drivetrain.getPitchRate()) > endPitchRate) // triggers when the robot reaches the halfway point
     {
+      System.out.println(Timer.getFPGATimestamp());
       return true;
     }
-    else
-    {
+    else 
+    { 
       return false;
     }
   }
