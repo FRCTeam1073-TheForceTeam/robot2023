@@ -30,13 +30,13 @@ public class Claw extends SubsystemBase {
 
   /** Creates a new Claw. */
   public Claw() {
-    vacuumMotor = new TalonFX(19);
-    //setUpMotors();
-    actuator1 = new Servo(8);
-    actuator2 = new Servo(9);
-    //setUpActuators();
-    vacuumRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
-    targetVacuumSpeed = 0;
+    // vacuumMotor = new TalonFX(19);
+    // //setUpMotors();
+    // actuator1 = new Servo(8);
+    // actuator2 = new Servo(9);
+    // //setUpActuators();
+    // vacuumRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
+    // targetVacuumSpeed = 0;
   }
 
   @Override
@@ -44,13 +44,13 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     //SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
     //SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
-    double vacuumSpeed =vacuumRateLimiter.calculate(targetVacuumSpeed);
-    vacuumMotor.set(ControlMode.Velocity, vacuumSpeed);
+    // double vacuumSpeed =vacuumRateLimiter.calculate(targetVacuumSpeed);
+    // vacuumMotor.set(ControlMode.Velocity, vacuumSpeed);
 
   }
 
   public void setVacuumSpeed(double speed){
-    targetVacuumSpeed = speed * 325.94/10; //converted to ticks per second
+    //targetVacuumSpeed = speed * 325.94/10; //converted to ticks per second
   }
 
   // Initialize preferences for this class:
@@ -103,27 +103,27 @@ public class Claw extends SubsystemBase {
   }
 */
   public void setActuator1Angle(double speed){
-    actuator1.set(speed);
+    //actuator1.set(speed);
   }
 
   public void setActuator2Angle(double speed){
-    actuator2.set(speed);
+    //actuator2.set(speed);
   }
 
   public void setUpMotors(){
-    vacuumMotor.configFactoryDefault();
-    //vacuumMotor.setNeutralMode(NeutralMode.Brake);
-    // motor.configRemoteFeedbackFilter(encoder, 0);
-    // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
-    // motor.setSensorPhase(true);
-    vacuumMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 17, 0.1));
+    // vacuumMotor.configFactoryDefault();
+    // //vacuumMotor.setNeutralMode(NeutralMode.Brake);
+    // // motor.configRemoteFeedbackFilter(encoder, 0);
+    // // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
+    // // motor.setSensorPhase(true);
+    // vacuumMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 17, 0.1));
 
-    vacuumMotor.config_kP(0, 0.2);
-    vacuumMotor.config_kI(0, 0);
-    vacuumMotor.config_kD(0, 0);
-    vacuumMotor.config_kF(0, 0);
-    vacuumMotor.configMaxIntegralAccumulator(0, 0);
-    vacuumMotor.setIntegralAccumulator(0);
+    // vacuumMotor.config_kP(0, 0.2);
+    // vacuumMotor.config_kI(0, 0);
+    // vacuumMotor.config_kD(0, 0);
+    // vacuumMotor.config_kF(0, 0);
+    // vacuumMotor.configMaxIntegralAccumulator(0, 0);
+    // vacuumMotor.setIntegralAccumulator(0);
   }
 
   public void setUpActuators(){
