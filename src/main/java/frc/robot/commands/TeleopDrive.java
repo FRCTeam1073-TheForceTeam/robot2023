@@ -33,6 +33,7 @@ public class TeleopDrive extends CommandBase
   private boolean fieldCentric;
   private boolean parked = false;
   ChassisSpeeds speeds;
+  boolean lastParkingBreakButton = false;
 
 
   // Teleop drive velocity scaling:
@@ -86,9 +87,10 @@ public class TeleopDrive extends CommandBase
     }
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
     
-    if(m_OI.getLeftBumper()){
+    if(m_OI.getLeftBumper() && lastParkingBreakButton == false){
       parked = !parked;
     }
+    lastParkingBreakButton = m_OI.getLeftBumper();
     if(parked && !m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(true);
       m_bling.clearLEDs();
