@@ -250,6 +250,7 @@ public class Arm extends SubsystemBase{
 
   @Override
   public void periodic(){
+    /* 
     if(!isShoulderInitialized){
       shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
       isShoulderInitialized = true;
@@ -267,6 +268,7 @@ public class Arm extends SubsystemBase{
       currentShoulderState = shoulderProfile.calculate(trajectoryTime);
       shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
     }
+    */
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Elbow State", currentElbowState.position);
