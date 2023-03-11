@@ -203,7 +203,15 @@ public class RobotContainer {
 
     Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
     rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
+
+    Trigger operatorCubeMode = new Trigger(m_OI::getOperatorViewButton);
+    operatorCubeMode.whileTrue(cubeMode());
+
+    Trigger operatorConeMode = new Trigger(m_OI::getOperatorMenuButton);
+    operatorConeMode.whileTrue(coneMode());
+
   }
+
 
   /**Sets test mode
    */
@@ -535,6 +543,25 @@ public class RobotContainer {
    */
   public Command alignToAprilTag(double offset){
     return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
+  }
+
+  //TODO: fill these out plz future Alex :)
+  /** Creates view button(left) button series for cone, and menu button(right) for cube. 
+   * 
+   * @param 
+   * @return cone operator mode to the driverstation to set the correct series of buttons
+   */
+  public Command cubeMode(){
+    return null;
+  }
+  
+  /** Creates view button(left) button series for cone, and menu button(right) for cube. 
+   * 
+   * @param 
+   * @return cone operator mode to the driverstation to set the correct series of buttons
+   */
+  public Command coneMode(){
+    return null;
   }
 
   /** Sets the bling and underglow of the Robot on startup. Underglow to the color of the alliance.
