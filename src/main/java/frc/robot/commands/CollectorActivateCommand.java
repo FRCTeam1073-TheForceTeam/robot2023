@@ -7,12 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw;
 
-public class VacuumActivateCommand extends CommandBase {
+public class CollectorActivateCommand extends CommandBase {
   /** Creates a new VacuumActivateCommand. */
   private Claw claw;
   private boolean on;
 
-  public VacuumActivateCommand(Claw claw, boolean isOn) {
+  public CollectorActivateCommand(Claw claw, boolean isOn) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
     on = isOn;
@@ -22,10 +22,10 @@ public class VacuumActivateCommand extends CommandBase {
   @Override
   public void initialize() {
     if(on){
-      claw.setVacuumSpeed(628.4);
+      claw.setCollectorSpeed(628.4);
     }
     else{
-      claw.setVacuumSpeed(0);
+      claw.setCollectorSpeed(0);
     }
   }
 
