@@ -38,7 +38,7 @@ import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
-import frc.robot.commands.CollectorActivateCommand;
+import frc.robot.commands.CollectCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
@@ -419,9 +419,9 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new CollectorActivateCommand(m_claw, true)),
+        new CollectCommand(m_claw)),
       highNodeCommand(),
-      new CollectorActivateCommand(m_claw, false),
+      new CollectCommand(m_claw),
       //new ActuateClaw(m_claw, true, 1),
       armStowCommand()
     );
