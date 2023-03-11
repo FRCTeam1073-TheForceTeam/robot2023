@@ -247,6 +247,7 @@ public class Arm extends SubsystemBase{
 
   @Override
   public void periodic(){
+    /* 
     double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - profileStartTime;
     //setting angles with trapezoid trajectories
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
@@ -260,6 +261,7 @@ public class Arm extends SubsystemBase{
       currentShoulderState = shoulderProfile.calculate(trajectoryTime);
       shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
     }
+    */
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Elbow State", currentElbowState.position);

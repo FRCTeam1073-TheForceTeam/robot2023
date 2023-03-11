@@ -32,7 +32,7 @@ public class ArmSetPosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arm.setTrapezoidTargetAngle(arm.new JointPositions(shoulderAng, elbowAng));
+    //arm.setTrapezoidTargetAngle(arm.new JointPositions(shoulderAng, elbowAng));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,6 +48,7 @@ public class ArmSetPosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    /* 
     double shoulderError = Math.abs(arm.getJointAngles().getShoulderAngle() - shoulderAng);
     double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
 
@@ -55,5 +56,7 @@ public class ArmSetPosition extends CommandBase {
       return true;
     }
     return false;
+    */
+    return true;
   }
 }
