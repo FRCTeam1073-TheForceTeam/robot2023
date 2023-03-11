@@ -42,7 +42,7 @@ public class Arm extends SubsystemBase{
   public final double wristAbsoluteOffset = 0.0;
   public final double shoulderTicksPerRadian = 26931.24;
   public final double elbowTicksPerRadian = 13465.62;
-  public final double wristTicksPerRadian = 6144; //should check if accurate
+  public final double wristTicksPerRadian = 1303.7; //should check if accurate
   public final double maxShoulderVel = 1.5;
   public final double maxElbowVel = 2.1;
   public final double maxWristVel = 1;
@@ -177,7 +177,7 @@ public class Arm extends SubsystemBase{
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i] = waypoints.get(i).elbow;
         shoulderPositions[i] = waypoints.get(i).shoulder;
-        wristPositions[i] = waypoints.get(i).shoulder;
+        wristPositions[i] = waypoints.get(i).wrist;
         times[i] = waypoints.get(i).time;
       }
 
@@ -218,7 +218,7 @@ public class Arm extends SubsystemBase{
   public Arm() {
     shoulderMotor = new TalonFX(16);
     elbowMotor = new TalonFX(18);
-    wristMotor = new TalonFX(0); //TODO need to change motor and encoder values once plugged in
+    //wristMotor = new TalonFX(0); //TODO need to change motor and encoder values once plugged in
     shoulderEncoder = new CANCoder(15);
     elbowEncoder = new CANCoder(17);
     wristEncoder = new CANCoder(0);
@@ -255,7 +255,7 @@ public class Arm extends SubsystemBase{
 
     ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 400);
     ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
-    ErrorCode errorWrist = wristMotor.setSelectedSensorPosition(getAbsoluteAngles().wrist*wristTicksPerRadian, 0, 400);
+    ErrorCode errorWrist = wristMotor.setSelectedSensorPosition(0, 0, 100);
 
     SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != null);
     SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != null);
@@ -307,11 +307,11 @@ public class Arm extends SubsystemBase{
       currentShoulderState = shoulderProfile.calculate(trajectoryTime);
       shoulderMotor.set(ControlMode.Position, currentShoulderState.position * shoulderTicksPerRadian);
     }
-    */
+    
     if(!wristProfile.isFinished(trajectoryTime)){
       currentWristState = wristProfile.calculate(trajectoryTime);
       wristMotor.set(ControlMode.Position, currentWristState.position * wristTicksPerRadian);
-    }
+    }*/
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
     SmartDashboard.putNumber("Elbow State", currentElbowState.position);
