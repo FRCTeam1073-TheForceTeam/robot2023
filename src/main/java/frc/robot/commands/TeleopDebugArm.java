@@ -32,7 +32,7 @@ public class TeleopDebugArm extends CommandBase {
   @Override
   public void execute() {
     if(false){
-      arm.setTargetAngle(arm.new JointPositions(0,0)); //tuck arm in
+      arm.setTargetAngle(arm.new JointPositions(0,0,0)); //tuck arm in
     }
     //code change for week zero (increased speed) 
     double leftY = -oi.getOperatorLeftY() * 1.2;
@@ -76,7 +76,7 @@ public class TeleopDebugArm extends CommandBase {
       rightX = Math.max(0, rightX);
     }
 */
-    arm.setJointVelocities(arm.new JointVelocities(leftY * maxShoulderVel, rightY * maxElbowVel));
+    arm.setJointVelocities(arm.new JointVelocities(leftY * maxShoulderVel, rightY * maxElbowVel, 0));
 
     //if(oi.getOperatorAButton()){
       //arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.5, 2.7));
@@ -86,7 +86,7 @@ public class TeleopDebugArm extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    arm.setJointVelocities(arm.new JointVelocities(0,0));
+    arm.setJointVelocities(arm.new JointVelocities(0,0,0));
   }
 
   // Returns true when the command should end.
