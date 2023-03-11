@@ -79,9 +79,21 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(rightX) < .15) {rightX = 0;}
 
     double velVector = Math.sqrt(Math.pow(leftY, 2) + Math.pow(leftX, 2));
+    double tempY = leftY;
+    double tempX = leftX;
     if(velVector > 1){
-      leftX -= Math.abs(velVector / leftX);
-      leftY -= Math.abs(velVector / leftY);
+      if(leftY > 0){
+        leftY = Math.sqrt(1 - Math.pow(tempX, 2));
+      }
+      else{
+        leftY = -Math.sqrt(1 - Math.pow(tempX, 2));
+      }
+      if(leftX > 0){
+        leftX = Math.sqrt(1 - Math.pow(tempY, 2));
+      }
+      else{
+        leftX = -Math.sqrt(1 - Math.pow(tempX, 2));
+      }
     }
 
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
