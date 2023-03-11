@@ -157,7 +157,18 @@ public class RobotContainer {
     EngageForward.initPreferences();
 
     // Initialize Preferences For Command Classes:
-
+    Preferences.initDouble("Stow Step 1 shoulder", -1.9);
+    Preferences.initDouble("Stow Step 1 elbow", 3.3);
+    Preferences.initDouble("Stow Step 2 shoulder", -3.84);
+    Preferences.initDouble("Stow Step 2 elbow", 2.95);
+    Preferences.initDouble("Double Substation shoulder", -2.0576);
+    Preferences.initDouble("Double Substation elbow", 3.69);
+    Preferences.initDouble("Middle Node shoulder", -1.48);
+    Preferences.initDouble("Middle Node elbow", 3.75);
+    Preferences.initDouble("High Node shoulder", -0.652);
+    Preferences.initDouble("High Node elbow", 3.3086);
+    Preferences.initDouble("Cube Ground Aim Shoulder", -0.949);
+    Preferences.initDouble("Cube Ground Aim Elbow", 5.1665);
   }
 
   // called when robot initializes. Sets parking brake to false
