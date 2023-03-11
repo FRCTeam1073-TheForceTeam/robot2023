@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -185,27 +186,6 @@ public class RobotContainer {
     Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
     stowTrigger.onTrue(armStowCommand());
 
-    Trigger midTrigger = new Trigger(m_OI::getOperatorXButton);
-    midTrigger.onTrue(middleNodeCommand());
-
-    //Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
-    //midCubeTrigger.onTrue(midCubeNodeCommand());
-
-    Trigger highTrigger = new Trigger(m_OI::getOperatorYButton);
-    highTrigger.onTrue(highNodeCommand());
-
-    //Trigger highCubeTrigger = new Trigger(m_OI::getOperatorDPadUp);
-    //highCubeTrigger.onTrue(highCubeNodeCommand());
-
-    Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorBButton);
-    doubleSubstationTrigger.onTrue(doubleSubstationCommand());
-
-    Trigger cubeAimTrigger = new Trigger(m_OI::getOperatorDPadUp);
-    cubeAimTrigger.onTrue(cubeGroundAim());
-
-    Trigger cubePickTrigger = new Trigger(m_OI::getOperatorDPadLeft);
-    cubePickTrigger.onTrue(cubeGroundPick());
-
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
     alignToAprilTag.whileTrue(alignToAprilTag(0));
     
@@ -216,10 +196,38 @@ public class RobotContainer {
     rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
 
     Trigger operatorCubeMode = new Trigger(m_OI::getOperatorViewButton);
-    operatorCubeMode.whileTrue(cubeMode());
+    operatorCubeMode.onTrue(new InstantCommand(m_OI :: setCubeMode));
 
     Trigger operatorConeMode = new Trigger(m_OI::getOperatorMenuButton);
-    operatorConeMode.whileTrue(coneMode());
+    operatorConeMode.onTrue(new InstantCommand(m_OI :: setConeMode));
+
+    if(m_OI.isCubeMode()){
+      Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
+      midCubeTrigger.onTrue(midCubeNodeCommand());
+
+      Trigger highCubeTrigger = new Trigger(m_OI::getOperatorDPadUp);
+      highCubeTrigger.onTrue(highCubeNodeCommand());
+
+      Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
+      doubleSubstationConeTrigger.onTrue(doubleSubstationCubeCommand());
+
+      Trigger cubeGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
+      cubeGroundPickupTrigger.onTrue(cubeGroundPickupCommand());
+    }
+    else{
+      Trigger midConeTrigger = new Trigger(m_OI::getOperatorXButton);
+      midConeTrigger.onTrue(middleConeNodeCommand());
+  
+      Trigger highConeTrigger = new Trigger(m_OI::getOperatorYButton);
+      highConeTrigger.onTrue(highConeNodeCommand());
+  
+      Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
+      doubleSubstationConeTrigger.onTrue(doubleSubstationConeCommand());
+
+      Trigger coneGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
+      coneGroundPickupTrigger.onTrue(coneGroundPickupCommand());
+  
+    }
 
   }
 
@@ -290,20 +298,32 @@ public class RobotContainer {
         new ArmSetPosition(m_arm, -1.9, 3.3),
         new ArmSetPosition(m_arm, -3.84, 2.95));
   }
+
+  public Command cubeGroundPickupCommand(){ 
+    return null;
+  }
+
+  public Command coneGroundPickupCommand(){
+    return null;
+  }
   
   /** Positions arm to pick up from double substation
    * 
    * @return Command that sets arm position
    */
-  public Command doubleSubstationCommand(){
+  public Command doubleSubstationConeCommand(){
     return new ArmSetPosition(m_arm, -2.0576, 3.69);
+  }
+
+  public Command doubleSubstationCubeCommand(){
+    return null;
   }
 
   /**Positions arm to score in the middle node for both cone and cube
    * 
    * @return Command that sets arm position
    */
-  public Command middleNodeCommand(){
+  public Command middleConeNodeCommand(){
     return new ArmSetPosition(m_arm, -1.48, 3.75);
   }
 
@@ -311,33 +331,27 @@ public class RobotContainer {
    * 
    * @return Command that sets arm position
    */
-  public Command highNodeCommand(){
+  public Command highConeNodeCommand(){
     return new ArmSetPosition(m_arm, -0.652, 3.3086);
   }
 
-  //public Command highCubeNodeCommand(){
-  //  return new ArmSetPosition(m_arm, -1.018, 3.764);
-  //}
+  public Command highCubeNodeCommand(){
+    return new ArmSetPosition(m_arm, -1.018, 3.764);
+  }
 
-  //public Command midCubeNodeCommand(){
-  //  return new ArmSetPosition(m_arm, -1.573, 3.9);
-  //}
+  public Command midCubeNodeCommand(){
+    return new ArmSetPosition(m_arm, -1.573, 3.9);
+  }
 
   /**First step in the sequence to pick a cube off of the ground. Positions arm above cube to aim before grabbing
    * 
    * @return Command that sets arm position
    */
-  public Command cubeGroundAim(){
-    return new ArmSetPosition(m_arm, -0.949, 5.1665);
-  }
 
   /** Second step in the sequence to pick up a cube off of the ground. Positions arm so that end effector is up against the cube
    * 
    * @return Command that sets arm position
    */
-  public Command cubeGroundPick(){
-    return new ArmSetPosition(m_arm, -0.7096, 5.315);
-  }
   
   /**An autonomous command to drive up and engage on the charging station using the Engage command
    * 
@@ -359,7 +373,7 @@ public class RobotContainer {
         new ActuateClaw(m_claw, 0.53, 0.47)),
         //new VacuumActivateCommand(m_claw, true)),
      // new VacuumActivateCommand(m_claw, false),
-      highNodeCommand(),
+      highCubeNodeCommand(),
       new ActuateClaw(m_claw, 1.0, 0.0),
       new WaitCommand(1.5),
       new ParallelCommandGroup(
@@ -387,7 +401,7 @@ public class RobotContainer {
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new ActuateClaw(m_claw, 0.53, 0.47)),
-      highNodeCommand(),
+      highCubeNodeCommand(),
       new ActuateClaw(m_claw, 1.0, 0.0),
       new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
@@ -419,7 +433,7 @@ public class RobotContainer {
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new ActuateClaw(m_claw, 0.53, 0.47)),
-      highNodeCommand(),
+      highConeNodeCommand(),
       new ActuateClaw(m_claw, 1.0, 0.0),
       new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
@@ -440,7 +454,7 @@ public class RobotContainer {
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new VacuumActivateCommand(m_claw, true)),
-      highNodeCommand(),
+      highConeNodeCommand(),
       new VacuumActivateCommand(m_claw, false),
       //new ActuateClaw(m_claw, true, 1),
       armStowCommand()
@@ -554,25 +568,6 @@ public class RobotContainer {
    */
   public Command alignToAprilTag(double offset){
     return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
-  }
-
-  //TODO: fill these out plz future Alex :)
-  /** Creates view button(left) button series for cone, and menu button(right) for cube. 
-   * 
-   * @param 
-   * @return cone operator mode to the driverstation to set the correct series of buttons
-   */
-  public Command cubeMode(){
-    return null;
-  }
-  
-  /** Creates view button(left) button series for cone, and menu button(right) for cube. 
-   * 
-   * @param 
-   * @return cone operator mode to the driverstation to set the correct series of buttons
-   */
-  public Command coneMode(){
-    return null;
   }
 
   /** Sets the bling and underglow of the Robot on startup. Underglow to the color of the alliance.

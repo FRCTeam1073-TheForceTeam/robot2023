@@ -14,6 +14,7 @@ public class OI extends SubsystemBase
     public Joystick driverController;
     public Joystick operatorController;
     Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
+    private boolean isCubeMode;
 
 
 
@@ -33,6 +34,7 @@ public class OI extends SubsystemBase
         RIGHT_Y_ZERO = 0;
          zeroDriverController();
          zeroOperatorController();
+        isCubeMode = true;
     }
 
     public static void initPreferences() 
@@ -71,6 +73,18 @@ public class OI extends SubsystemBase
         LEFT_Y_ZERO = getDriverLeftY();
         RIGHT_X_ZERO = getDriverRightX();
         RIGHT_Y_ZERO = getDriverRightY();
+    }
+
+    public boolean isCubeMode(){
+        return isCubeMode;
+    }
+
+    public void setCubeMode(){
+        isCubeMode = true;
+    }
+    
+    public void setConeMode(){
+        isCubeMode = false;
     }
 
     private final double LEFT_X_MIN = -1;
