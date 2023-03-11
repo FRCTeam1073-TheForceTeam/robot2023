@@ -65,7 +65,7 @@ public class TeleopDrive extends CommandBase
       Preferences.getDouble("Snap to Position P", 0.1), 
       Preferences.getDouble("Snap to Position I", 0.0), 
       Preferences.getDouble("Snap to Position D", 0.0), 
-      new TrapezoidProfile.Constraints(maximumRotationVelocity, Preferences.getDouble("Snap to Position Max Acceleration", 0.5)));
+      new TrapezoidProfile.Constraints(1, Preferences.getDouble("Snap to Position Max Acceleration", 0.5)));
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
   }
