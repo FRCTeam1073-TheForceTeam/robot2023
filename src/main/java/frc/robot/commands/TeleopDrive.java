@@ -5,6 +5,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
@@ -13,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +28,8 @@ import frc.robot.subsystems.OI;
 public class TeleopDrive extends CommandBase 
 {
   double angleTolerance = 0.05;
+  double startAngle;
+  double desiredAngle;
   ChassisSpeeds chassisSpeeds;
   Pose2d targetRotation;
   Pose2d robotRotation;
@@ -37,6 +42,7 @@ public class TeleopDrive extends CommandBase
   double last_error = 0; //for snap-to-positions derivative
   double last_time = 0; //for snap-to-positions derivative
 
+  ProfiledPIDController snapPidProfile;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
@@ -53,8 +59,22 @@ public class TeleopDrive extends CommandBase
     m_OI = oi;
     m_bling = bling;
     fieldCentric = true;
+    startAngle = ds.getHeading();
+    desiredAngle = startAngle;
+    snapPidProfile = new ProfiledPIDController(
+      Preferences.getDouble("Snap to Position P", 0.1), 
+      Preferences.getDouble("Snap to Position I", 0.0), 
+      Preferences.getDouble("Snap to Position D", 0.0), 
+      new TrapezoidProfile.Constraints(maximumRotationVelocity, Preferences.getDouble("Snap to Position Max Acceleration", 0.5)));
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
+  }
+
+  public void initPreferences(){
+    Preferences.initDouble("Snap to Position P", 0.1);
+    Preferences.initDouble("Snap to Position I", 0);
+    Preferences.initDouble("Snap to Position D", 0);
+    Preferences.initDouble("Snap to Position Max Acceleration", 0.5);
   }
 
   // Called when the command is initially scheduled.
@@ -96,6 +116,40 @@ public class TeleopDrive extends CommandBase
       }
     }
 
+    double xAdd;
+    double yAdd;
+    double wAdd;
+
+    if(leftY > 0){
+      xAdd = add1 + add2;
+    }
+    else if(leftY < 0){
+      xAdd = -add1 + -add2;
+    }
+    else{
+      xAdd = 0;
+    }
+
+    if(leftX > 0){
+      yAdd = add1 + add2;
+    }
+    else if(leftX < 0){
+      yAdd = -add1 + -add2;
+    }
+    else{
+      yAdd = 0;
+    }
+
+    if(rightX > 0){
+      wAdd = -add1 + -add2;
+    }
+    else if(rightX < 0){
+      wAdd = add1 + add2;
+    }
+    else{
+      wAdd = 0;
+    }
+
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
       fieldCentric = !fieldCentric;
@@ -123,41 +177,8 @@ public class TeleopDrive extends CommandBase
     else if (fieldCentric){
       //Snap to cardinal directions
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
-      rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), rightX);
-
-      double xAdd;
-      double yAdd;
-      double wAdd;
-
-      if(leftY > 0){
-        xAdd = add1 + add2;
-      }
-      else if(leftY < 0){
-        xAdd = -add1 + -add2;
-      }
-      else{
-        xAdd = 0;
-      }
-
-      if(leftX > 0){
-        yAdd = add1 + add2;
-      }
-      else if(leftX < 0){
-        yAdd = -add1 + -add2;
-      }
-      else{
-        yAdd = 0;
-      }
-
-      if(rightX > 0){
-        wAdd = add1 + add2;
-      }
-      else if(rightX < 0){
-        wAdd = -add1 + -add2;
-      }
-      else{
-        wAdd = 0;
-      }
+      desiredAngle += rightX;
+      rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), desiredAngle);
 
       //double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
       //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
@@ -165,7 +186,7 @@ public class TeleopDrive extends CommandBase
 
       double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + xAdd), -maximumLinearVelocity, maximumLinearVelocity);
       double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + yAdd), -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
+      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
@@ -177,9 +198,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + (leftY > 0 ? add1 : -add1) + (leftY > 0 ? add2 : -add2)), -maximumRotationVelocity, maximumRotationVelocity);
+      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + xAdd), -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + yAdd), -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     
@@ -195,19 +216,23 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-  public double snapToHeading(double currentAngle, double targetAngle, double joystick){
+  public double snapToHeading(double currentAngle, double targetAngle, double joystickDesired){
     if(targetAngle == 361){
-      targetAngle = currentAngle + (joystick * 90);
+      targetAngle = joystickDesired;
     }
     double error = currentAngle - targetAngle;
     while(error < -180){error += 360;}
     while(error > 180){error -= 360;}
     SmartDashboard.putNumber("Angle Error", error);
-    if(Math.abs(error) < STOP_THRESHOLD){
-      return 0;
-    }
+    //if(Math.abs(error) < STOP_THRESHOLD){
+    //  return 0;
+    //}
 
+    snapPidProfile.setTolerance(STOP_THRESHOLD);
+    snapPidProfile.enableContinuousInput(-180, 180);
+    return snapPidProfile.calculate(currentAngle, targetAngle);
     //calculate derivative
+    /*
     error = error * Math.PI / 180;
     double new_error = error;
     double current_time = System.currentTimeMillis();
@@ -217,6 +242,7 @@ public class TeleopDrive extends CommandBase
     error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
 
     return MathUtil.clamp(error * .7 + derivative * .1, -maximumRotationVelocity, maximumRotationVelocity) / maximumRotationVelocity;
+    */
   }
 
   // Called once the command ends or is interrupted.
