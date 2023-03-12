@@ -25,16 +25,31 @@ public class TeleopClaw extends CommandBase {
   @Override
   public void initialize() {
     clawPower = 0;
+    claw.setCollectorSpeed(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //right bumper is in for cube, left is out
+    //reversed for cube
     if(oi.getOperatorLeftBumper()){
-      claw.setCollectorSpeed(-5);
+      if(oi.isCubeMode() == true) {
+        claw.setCollectorSpeed(5);
+      }
+      if(oi.isCubeMode() == false){
+        claw.setCollectorSpeed(-5);
+      }
+      System.out.println("Operator Left Bumper");
     }
     else if(oi.getOperatorRightBumper()){
-      claw.setCollectorSpeed(5); 
+      if(oi.isCubeMode() == true) {
+        claw.setCollectorSpeed(-5);
+      }
+      if(oi.isCubeMode() == false){
+        claw.setCollectorSpeed(5);
+      }
+      System.out.println("Operator Right Bumper");
     }
     else {
       claw.setCollectorSpeed(0);

@@ -36,6 +36,7 @@ public class Claw extends SubsystemBase {
   private final double tof1ScaleFactor = 1;
   private final double tof2ScaleFactor = 1;
   private final double constant = 1;
+  private final double collectorScaleFactor = 21000;
   //private final boolean debug = true;
 
   /** Creates a new Claw. */
@@ -58,8 +59,8 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     //SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
     //SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
-    double collectorSpeed =collectorRateLimiter.calculate(targetCollectorSpeed);
-    collectorMotor.set(ControlMode.Velocity, collectorSpeed);
+    double collectorSpeed = collectorRateLimiter.calculate(targetCollectorSpeed);
+    collectorMotor.set(ControlMode.Velocity, collectorSpeed/10);
     tof1Freq = tof1DutyCycleInput.getFrequency();
     tof2Freq = tof2DutyCycleInput.getFrequency();
     tof1DutyCycle = tof1DutyCycleInput.getOutput();
@@ -68,6 +69,7 @@ public class Claw extends SubsystemBase {
     tof2Range = tof2ScaleFactor * (tof2DutyCycle / tof2Freq - 0.001);
     SmartDashboard.putNumber("TOF 1/Range", tof1Range);
     SmartDashboard.putNumber("TOF 2/Range", tof1Range);
+    SmartDashboard.putNumber("Collector Speed", collectorSpeed);
 
     if (debug) {
       SmartDashboard.putNumber("TOF 1/Frequency", tof1Freq);
@@ -80,7 +82,7 @@ public class Claw extends SubsystemBase {
   }
 
   public void setCollectorSpeed(double speed){
-    targetCollectorSpeed = speed * 325.94/10; //converted to ticks per second
+    targetCollectorSpeed = speed * collectorScaleFactor; //converted to ticks per meter
     collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
   }
 
@@ -104,7 +106,7 @@ public class Claw extends SubsystemBase {
     // motor.configRemoteFeedbackFilter(encoder, 0);
     // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
     // motor.setSensorPhase(true);
-    collectorMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 6, 8, 0.1));
+    collectorMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 12, 0.1));
 
     collectorMotor.config_kP(0, 0.2);
     collectorMotor.config_kI(0, 0);
