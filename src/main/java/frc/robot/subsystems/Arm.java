@@ -31,19 +31,20 @@ public class Arm extends SubsystemBase{
   private boolean isElbowMagnetHealthy;
   private boolean isShoulderMagnetHealthy;
   private boolean isShoulderInitialized;
+  private boolean isTrajectoryDone;
 
   //set variables below to correct lengths
   public final double upperArmLength = 25.0;
   public final double forearmLength = 27.5;
   public final double shoulderOffset = 0.0;
-  public final double shoulderAbsoluteOffset = 2.42;
+  public final double shoulderAbsoluteOffset = 4.3828;
   public final double elbowOffset = 0.0;
-  public final double elbowAbsoluteOffset = 1.73;
+  public final double elbowAbsoluteOffset = 3.25;
   public final double wristOffset = 0.0;
-  public final double wristAbsoluteOffset = 0.0;
-  public final double shoulderTicksPerRadian = 26931.24;
+  public final double wristAbsoluteOffset = -1.21;
+  public final double shoulderTicksPerRadian = -26931.24;
   public final double elbowTicksPerRadian = 13465.62;
-  public final double wristTicksPerRadian = 1303.7; // Should check if accurate
+  public final double wristTicksPerRadian = -1303.7; // Should check if accurate
   public final double maxShoulderVel = 1.5;
   public final double maxElbowVel = 2.1;
   public final double maxWristVel = 1;
@@ -54,14 +55,17 @@ public class Arm extends SubsystemBase{
   public JointPositions maxAngles;
   public JointPositions currentJointPositions = new JointPositions();
   public JointVelocities currentJointVelocities = new JointVelocities();
+  public JointPositions referencePositions = new JointPositions();
+  public JointVelocities referenceVelocities = new JointVelocities();
+  public ArmTrajectory armTrajectory;
 
   public JointPositions targetPositions;
   public TrapezoidProfile shoulderProfile;
   public TrapezoidProfile elbowProfile;
   public TrapezoidProfile wristProfile;
-  public TrapezoidProfile.State currentShoulderState;
-  public TrapezoidProfile.State currentElbowState;
-  public TrapezoidProfile.State currentWristState;
+  public TrapezoidProfile.State currentShoulderReference;
+  public TrapezoidProfile.State currentElbowReference;
+  public TrapezoidProfile.State currentWristReference;
   public double profileStartTime;
   Bling bling;
 
@@ -177,11 +181,12 @@ public class Arm extends SubsystemBase{
     double[] wristPositions;
     double[] times;
     double finalTime;
+    double startTime;
 
 
-    public ArmTrajectory(ArrayList<JointWaypoints> waypoints, double maxVelocity, double maxAcceleration){
+    public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration){
       this.waypoints = waypoints;
-      trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
+      //trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
       var interpolator = new SplineInterpolator();
       elbowPositions = new double[waypoints.size()];
       shoulderPositions = new double[waypoints.size()];
@@ -189,6 +194,7 @@ public class Arm extends SubsystemBase{
       times = new double[waypoints.size()];
 
       finalTime = 0.0;
+      startTime = ((double)System.currentTimeMillis() / 1000.0);
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i] = waypoints.get(i).elbow;
         shoulderPositions[i] = waypoints.get(i).shoulder;
@@ -197,12 +203,12 @@ public class Arm extends SubsystemBase{
       }
 
       if (waypoints.size() > 0)
-        finalTime = times[waypoints.size()-1];  // The last time.
+        finalTime = startTime + times[waypoints.size()-1];  // The last time.
 
 
-      elbowSplines = interpolator.interpolate(elbowPositions, times);
-      shoulderSplines = interpolator.interpolate(shoulderPositions, times);
-      wristSplines = interpolator.interpolate(wristPositions, times);
+      elbowSplines = interpolator.interpolate(times, elbowPositions);
+      shoulderSplines = interpolator.interpolate(times, shoulderPositions);
+      wristSplines = interpolator.interpolate(times, wristPositions);
     }
  /* 
     public double getTimeForMotion(double[] singularJoint){
@@ -217,13 +223,22 @@ public class Arm extends SubsystemBase{
 
     }
 */
+    public double getFinalTime(){
+      return finalTime;
+    }
+
+    public double getStartTime(){
+      return startTime;
+    }
+
     public JointVelocities getVelocitiesAtTime(double time) {
+      double t = time - startTime;
       if (time <= finalTime) {
       //get derivative of elbow spline
-      double elbowVelocity = elbowSplines.derivative().value(time);
+      double elbowVelocity = elbowSplines.derivative().value(t);
       //get derivative of shoulder spline
-      double shoulderVelocity = shoulderSplines.derivative().value(time);
-      double wristVelocity = wristSplines.derivative().value(time);
+      double shoulderVelocity = shoulderSplines.derivative().value(t);
+      double wristVelocity = wristSplines.derivative().value(t);
       return new JointVelocities(shoulderVelocity, elbowVelocity, wristVelocity);
       } else {
         return new JointVelocities(0.0, 0.0, 0.0);
@@ -231,9 +246,10 @@ public class Arm extends SubsystemBase{
     }
 
     public JointPositions getPositionsAtTime(double time){
+      double t = time - startTime;
       if (time <= finalTime) {
         // Placeholder for joint angles
-        return new JointPositions(shoulderSplines.value(time), elbowSplines.value(time), wristSplines.value(time));
+        return new JointPositions(shoulderSplines.value(t), elbowSplines.value(t), wristSplines.value(t));
       } else {
         // Return the terminal point forever after the time is over:
         return new JointPositions(shoulderPositions[waypoints.size()-1], elbowPositions[waypoints.size()-1], wristPositions[waypoints.size()-1]);
@@ -255,27 +271,27 @@ public class Arm extends SubsystemBase{
     setUpMotors();
 
     // Trapezoid trajectory for angles
-    currentShoulderState = new TrapezoidProfile.State(getAbsoluteAngles().shoulder, 0.0);
-    currentElbowState = new TrapezoidProfile.State(getAbsoluteAngles().elbow, 0.0);
-    currentElbowState = new TrapezoidProfile.State(getAbsoluteAngles().wrist, 0.0);
+    currentShoulderReference = new TrapezoidProfile.State(getAbsoluteAngles().shoulder, 0.0);
+    currentElbowReference = new TrapezoidProfile.State(getAbsoluteAngles().elbow, 0.0);
+    currentWristReference = new TrapezoidProfile.State(getAbsoluteAngles().wrist, 0.0);
      
     // At the start we "go to where we already are":
     shoulderProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), currentShoulderState, currentShoulderState);
+      new TrapezoidProfile.Constraints(maxShoulderVel, maxShoulderAcc), currentShoulderReference, currentShoulderReference);
     elbowProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowState, currentElbowState);
+      new TrapezoidProfile.Constraints(maxElbowVel, maxElbowAcc), currentElbowReference, currentElbowReference);
     wristProfile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(maxWristVel, maxElbowAcc),currentWristState, currentWristState);
+      new TrapezoidProfile.Constraints(maxWristVel, maxElbowAcc),currentWristReference, currentWristReference);
     profileStartTime = System.currentTimeMillis() / 1000.0;
     
-    SmartDashboard.putNumber("Shoulder State on init", currentShoulderState.position);
-    SmartDashboard.putNumber("Elbow State on int", currentElbowState.position);
-    SmartDashboard.putNumber("Wrist state on init", currentWristState.position);
+    //SmartDashboard.putNumber("Shoulder State on init", currentShoulderState.position);
+    //SmartDashboard.putNumber("Elbow State on int", currentElbowState.position);
+    //SmartDashboard.putNumber("Wrist state on init", currentWristState.position);
     //minAngles = getAbsoluteAngles();
 
     // Set our physical angle Limits:
-    maxAngles = new JointPositions(3.37, 0.08, 0);
-    minAngles = new JointPositions(-3.37, 2.98, 0);
+    maxAngles = new JointPositions(3.37, 0.08, 1.5);
+    minAngles = new JointPositions(-3.37, 2.98, -1.21);
   }
 
   @Override
@@ -284,12 +300,13 @@ public class Arm extends SubsystemBase{
     if(!isShoulderInitialized){
       if (initializeShoulder()) {
         System.out.println("Shoulder Initialized!");
+        isShoulderInitialized = true;
       } else {
         System.out.println("Shoulder initialization failed!");
       }
     }
      
-    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - profileStartTime;
+    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
 
     /*
     //setting angles with trapezoid trajectories
@@ -309,12 +326,20 @@ public class Arm extends SubsystemBase{
       currentWristState = wristProfile.calculate(trajectoryTime);
       wristMotor.set(ControlMode.Position, currentWristState.position * wristTicksPerRadian);
     }*/
+  
+    if(armTrajectory != null){
+      referencePositions = armTrajectory.getPositionsAtTime(trajectoryTime);
+      referenceVelocities = armTrajectory.getVelocitiesAtTime(trajectoryTime);
+      SmartDashboard.putNumber("Shoulder Reference", referencePositions.shoulder);
+      SmartDashboard.putNumber("Elbow Reference", referencePositions.elbow);
+      SmartDashboard.putNumber("Wrist Reference", referencePositions.wrist);
 
+      shoulderMotor.set(ControlMode.Position, referencePositions.shoulder * shoulderTicksPerRadian);
+      elbowMotor.set(ControlMode.Position, referencePositions.elbow * elbowTicksPerRadian);
+      wristMotor.set(ControlMode.Position, referencePositions.wrist * wristTicksPerRadian);
+    }
 
     //SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
-    SmartDashboard.putNumber("Shoulder State", currentShoulderState.position);
-    SmartDashboard.putNumber("Elbow State", currentElbowState.position);
-    SmartDashboard.putNumber("Wrist State", currentWristState.position);
 
     // This method will be called once per scheduler run
     if(elbowEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
@@ -331,16 +356,18 @@ public class Arm extends SubsystemBase{
       isShoulderMagnetHealthy = true;
     }
 
+    //if(((double)System.currentTimeMillis() / 1000.0) -  >= ArmTrajectory.getFinalTime())
+
     currentJointPositions = getAbsoluteAngles();
     SmartDashboard.putNumber("Shoulder Angle", getJointAngles().shoulder);
     SmartDashboard.putNumber("Elbow Angle", getJointAngles().elbow);
     SmartDashboard.putNumber("Wrist Angle", getJointAngles().wrist);
-    SmartDashboard.putNumber("Shoulder Motor Angle", shoulderMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Elbow Motor Angle", elbowMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Wrist Motor Angle", wristMotor.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("Shoulder Motor Angle", shoulderMotor.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("Elbow Motor Angle", elbowMotor.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("Wrist Motor ANgle", wristMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Shoulder Absolute Angle", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle", currentJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Absolute Angle", currentJointPositions.wrist);
+    SmartDashboard.putNumber("Wrist Absolute Anglge", currentJointPositions.wrist);
     // SmartDashboard.putNumber("Shoulder Velocitiy", currentJointVelocities.shoulder);
     // SmartDashboard.putNumber("Elbow Velocitiy", currentJointVelocities.elbow);
     // SmartDashboard.putNumber("Wrist Velocity", currentJointVelocities.wrist);
@@ -363,7 +390,7 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setNeutralMode(NeutralMode.Brake);
     shoulderMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 25, 0.1));
     shoulderMotor.setSensorPhase(true);
-    shoulderMotor.setInverted(true);
+    //shoulderMotor.setInverted(true);
 
     shoulderMotor.config_kP(0, 0.2, 100);
     shoulderMotor.config_kI(0, 0, 100);
@@ -405,7 +432,7 @@ public class Arm extends SubsystemBase{
     wristMotor.configMaxIntegralAccumulator(0, 0);
     wristMotor.setIntegralAccumulator(0);
 
-    ErrorCode errorWrist = wristMotor.setSelectedSensorPosition(0, 0, 400);
+    ErrorCode errorWrist = wristMotor.setSelectedSensorPosition(wristAbsoluteOffset * wristTicksPerRadian, 0, 400);
     if (errorWrist != ErrorCode.OK) {
       System.out.println("Wrist: set selected sensor position failed.");
     }
@@ -452,7 +479,7 @@ public class Arm extends SubsystemBase{
   }
 
   public JointPositions getAbsoluteAngles(){
-    double shoulderAngle = -(shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset);
+    double shoulderAngle = (shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset);
     double elbowAngle = elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
     // No separate absolute sensor for wrist:
     double wristAngle = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian - wristAbsoluteOffset;
@@ -475,6 +502,11 @@ public class Arm extends SubsystemBase{
     // shoulderLimiter.calculate(target.shoulder);
     //  shoulderMotor.set(ControlMode.Position, target.shoulder);
     //  elbowMotor.set(ControlMode.Position, target.elbow);
+    targetPositions = target;
+    //shoulderMotor.set(ControlMode.Position, target.shoulder);
+    //elbowMotor.set(ControlMode.Position, target.elbow);
+    //wristMotor.set(ControlMode.Position, target.wrist);
+    clamp(targetPositions, minAngles, maxAngles);
   }
 
   public void setTrapezoidTargetAngles(JointPositions target){
@@ -501,6 +533,23 @@ public class Arm extends SubsystemBase{
       new TrapezoidProfile.State(getJointAngles().wrist, 0)
       );
 
+  }
+
+  public void setArmTrajectories(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocities, double maxAcceleration){
+    waypoints.add(0, new JointWaypoints(getJointAngles(), 0));
+    armTrajectory = new ArmTrajectory(waypoints, maxVelocities, maxAcceleration);
+    //endTime = waypoints.get(waypoints.size() - 1).time;
+    //endPose = arm.new JointPositions(waypoints.get(waypoints.size() - 1).shoulder, waypoints.get(waypoints.size() - 1).elbow, waypoints.get(waypoints.size() - 1).wrist);
+  }
+
+  public boolean isTrajectoryDone(){
+    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - armTrajectory.getStartTime();
+    if(armTrajectory != null){
+      if(armTrajectory.getFinalTime() < trajectoryTime){
+        return false;
+      }
+    }
+    return true;
   }
 
   // This method sets a target speed for joints
