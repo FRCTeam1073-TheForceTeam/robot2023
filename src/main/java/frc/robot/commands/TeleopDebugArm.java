@@ -32,7 +32,7 @@ public class TeleopDebugArm extends CommandBase {
   @Override
   public void execute() {
     if(false){
-      arm.setTargetAngle(arm.new JointPositions(0,0,0)); //tuck arm in
+      arm.setTargetAngles(arm.new JointPositions(0,0,0)); //tuck arm in
     }
     //code change for week zero (increased speed) 
     double leftY = -oi.getOperatorLeftY() * 1.2;

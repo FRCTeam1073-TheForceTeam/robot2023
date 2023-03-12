@@ -31,8 +31,8 @@ and 2-3 motors /w CANCoder feedback for the arm. Possible additional nodes to co
 | Arm Joint #0 Motor    |  16    | Shoulder
 | Arm Joint #1 Encoder  |  17    | Elbow
 | Arm Joint #1 Motor    |  18    | Elbow
-| Vacuum Motor          |  19    |
-| TalonFX actuator #1   |  20    |
+| Collector Motor       |  19    | Collector
+| Arm Joint #2 Motor    |  20    | Wrist
 
 
 
