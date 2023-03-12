@@ -81,6 +81,7 @@ public class Claw extends SubsystemBase {
 
   public void setCollectorSpeed(double speed){
     targetCollectorSpeed = speed * 325.94/10; //converted to ticks per second
+    collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
   }
 
   // Initialize preferences for this class:

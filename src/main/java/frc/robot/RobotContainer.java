@@ -29,6 +29,7 @@ import frc.robot.commands.AlignToAprilTag;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmSetPosition;
+import frc.robot.commands.ArmSplinePosition;
 import frc.robot.commands.BlingTeleopCommand;
 import frc.robot.commands.DriveTestCommand;
 import frc.robot.commands.DriveThroughTrajectory;
@@ -121,6 +122,7 @@ public class RobotContainer {
     m_chooser.addOption("3_B_2023_1073", kScoreCube);
     m_chooser.addOption("2_C_2023_1073", kBasicEngage);
     m_chooser.addOption("2_D_2023_1073", kEngagePlus);
+    m_chooser.addOption("Arm test", kArmTest);
    
     //m_chooser.addOption("Test Mode", kTestMode);
     //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
@@ -299,11 +301,10 @@ public class RobotContainer {
   }
 
   public Command cubeGroundPickupCommand(){ 
-    return null;
-  }
+    return new ArmSetPosition(m_arm, -2.0576, 3.69);  }
 
   public Command coneGroundPickupCommand(){
-    return null;
+    return new ArmSetPosition(m_arm, -2.0576, 3.69);
   }
   
   /** Positions arm to pick up from double substation
@@ -315,8 +316,7 @@ public class RobotContainer {
   }
 
   public Command doubleSubstationCubeCommand(){
-    return null;
-  }
+    return new ArmSetPosition(m_arm, -2.0576, 3.69);  }
 
   /**Positions arm to score in the middle node for both cone and cube
    * 
@@ -517,7 +517,10 @@ public class RobotContainer {
    * @return an ArmSetPosition Command
    */
   public Command armSetTest(){
-    return new ArmSetPosition(m_arm, -1.5, 4.1);
+    ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    waypoints.add(m_arm.new JointWaypoints(-1.0, 2.6, 0.0, 6.0));
+    waypoints.add(m_arm.new JointWaypoints(-1.55, 2.4, 0.0, 9.0));
+    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
   }
 
   /**A way to test OI and DriveSubsystem while debug mode in DriveSubsystem is on
