@@ -32,6 +32,12 @@ public class GamePieceFinder extends SubsystemBase {
   private ArrayList<GamePiece> gamePieceArray;
   private Transform3d cameraTransform;
   private GamePiece gamePiece;
+  private GamePiecePoseEstimator poseEstimator;
+
+  public class GamePiecePoseEstimator {
+    //public Transform3d estimate(){
+    //}
+  }
 
   public GamePieceFinder(DriveSubsystem ds, String tableName, Transform3d cameraTransform3d) {
     driveSubsystem = ds;
@@ -99,5 +105,10 @@ public class GamePieceFinder extends SubsystemBase {
     }else{
       return null;
     }
+  }
+
+
+  public String getClosestGamePiece() {
+    return closestGamePiece;
   }
 }
