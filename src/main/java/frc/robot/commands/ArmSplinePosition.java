@@ -58,5 +58,6 @@ public class ArmSplinePosition extends CommandBase {
 	  //double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
 
 	  //return ((time == endTime) && (shoulderError <= shoulderTolerance && elbowError <= elbowTolerance));
+    return false;
   }
 }
