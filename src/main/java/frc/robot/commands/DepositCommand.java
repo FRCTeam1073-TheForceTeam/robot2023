@@ -6,53 +6,50 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw;
+import edu.wpi.first.wpilibj.Timer;
 
-public class ActuateClaw extends CommandBase {
-  /** Creates a new ActuateClaw. */
-  private Claw claw; 
-  //private double time;
-  //private double startTime;
-  private double actuator1Val;
-  private double actuator2Val;
 
-  public ActuateClaw(Claw claw, double actuator1Val, double actuator2Val) {
+public class DepositCommand extends CommandBase {
+  /** Creates a new VacuumActivateCommand. */
+  private Claw claw;
+  private double startTime = 0.0;
+  
+  public DepositCommand(Claw claw) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
-    this.actuator1Val = actuator1Val;
-    this.actuator2Val = actuator2Val;
-    //time = timeSeconds;
+    addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //startTime = System.currentTimeMillis() / 1000.0;
-    /* 
-    if(open){
-      claw.setActuatorDebugPercent(0.5);
-    }
-    if(!open){
-      claw.setActuatorDebugPercent(0.3);
-    }
-    */
-    claw.setActuator1Angle(actuator1Val);
-    claw.setActuator2Angle(actuator2Val);
+   claw.setCollectorSpeed(-10);
+
   }
+  
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (startTime == 0.0) // sets the timer which makes sure the collector runs for a set amount of time
+      {
+        startTime = Timer.getFPGATimestamp();
+      }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //claw.setActuatorDebugPercent(0);
+    claw.setCollectorSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //return ((System.currentTimeMillis() / 1000.0) - startTime) >= time;
+    if(claw.getRange1() == 0 && claw.getRange2() == 0)
+    {
+      return false;
+    }
     return true;
   }
 }

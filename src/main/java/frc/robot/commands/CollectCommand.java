@@ -7,27 +7,23 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw;
 
-public class VacuumActivateCommand extends CommandBase {
+public class CollectCommand extends CommandBase {
   /** Creates a new VacuumActivateCommand. */
   private Claw claw;
-  private boolean on;
-
-  public VacuumActivateCommand(Claw claw, boolean isOn) {
+  
+  public CollectCommand(Claw claw) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
-    on = isOn;
+    addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(on){
-      claw.setVacuumSpeed(628.4);
-    }
-    else{
-      claw.setVacuumSpeed(0);
-    }
+   claw.setCollectorSpeed(10);
+
   }
+  
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -35,11 +31,17 @@ public class VacuumActivateCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    claw.setCollectorSpeed(0);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    if(claw.getRange1() == 0 && claw.getRange2() == 0)
+    {
+      return true;
+    }
+    return false;
   }
 }
