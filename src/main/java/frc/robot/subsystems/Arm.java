@@ -108,10 +108,10 @@ public class Arm extends SubsystemBase{
 
 
   public class JointWaypoints{
-    double shoulder;
-    double elbow;
-    double wrist;
-    double time;
+    public double shoulder;
+    public double elbow;
+    public double wrist;
+    public double time;
 
     public JointWaypoints(double shoulder, double elbow, double wrist, double time){
       this.shoulder = shoulder;
