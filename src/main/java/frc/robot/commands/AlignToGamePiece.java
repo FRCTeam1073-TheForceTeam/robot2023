@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Bling;
@@ -21,7 +22,7 @@ public class AlignToGamePiece extends CommandBase {
 
 
   // State variables for execution:
-  int tagetGamePiece;
+  String targetGamePiece;
   double targetGamePieceDistance;
   private ChassisSpeeds chassisSpeeds;
   int glitchCounter;
@@ -45,12 +46,25 @@ public class AlignToGamePiece extends CommandBase {
     bling.clearLEDs();
     if(closestGamePiece != "None"){
       System.out.println(String.format("AlignToGamePiece Initialized to %s", closestGamePiece));
-    }  
+      targetGamePiece = closestGamePiece;
+    } else {
+      targetGamePiece = "None";
+      System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    bling.setColorRGBAll(255, 255, 255);
+    String closestGamePiece = finder.getClosestGamePiece();
+   // TODO:Pose3d targetPose = finder.getClosestPose();
+   double currentHeading = drivetrain.getWrappedHeading();
+
+   //TODO: if(targetPose != null){
+     //targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY(), targetPose.getZ()), targetPose.getRotation());
+  // }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
