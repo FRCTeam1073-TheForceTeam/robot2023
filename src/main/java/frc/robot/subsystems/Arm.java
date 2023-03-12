@@ -337,10 +337,10 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Wrist Angle", getJointAngles().wrist);
     SmartDashboard.putNumber("Shoulder Motor Angle", shoulderMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Elbow Motor Angle", elbowMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("Wrist Motor ANgle", wristMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Wrist Motor Angle", wristMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Shoulder Absolute Angle", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle", currentJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Absolute Anglge", currentJointPositions.wrist);
+    SmartDashboard.putNumber("Wrist Absolute Angle", currentJointPositions.wrist);
     // SmartDashboard.putNumber("Shoulder Velocitiy", currentJointVelocities.shoulder);
     // SmartDashboard.putNumber("Elbow Velocitiy", currentJointVelocities.elbow);
     // SmartDashboard.putNumber("Wrist Velocity", currentJointVelocities.wrist);
