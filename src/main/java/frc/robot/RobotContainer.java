@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.ActuateClaw;
 import frc.robot.commands.AlignToAprilTag;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -40,7 +39,7 @@ import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
-import frc.robot.commands.VacuumActivateCommand;
+import frc.robot.commands.CollectCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
@@ -370,19 +369,19 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new ActuateClaw(m_claw, 0.53, 0.47)),
+        // TODO: New Claw command
         //new VacuumActivateCommand(m_claw, true)),
      // new VacuumActivateCommand(m_claw, false),
       highCubeNodeCommand(),
-      new ActuateClaw(m_claw, 1.0, 0.0),
-      new WaitCommand(1.5),
+        // TODO: New Claw command
+        new WaitCommand(1.5),
       new ParallelCommandGroup(
         armStowCommand(),
         new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false),
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
-      new ParkingBrake(m_driveSubsystem, m_bling)))
+      new ParkingBrake(m_driveSubsystem, m_bling))))
     );
   }
 
@@ -400,10 +399,10 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new ActuateClaw(m_claw, 0.53, 0.47)),
-      highCubeNodeCommand(),
-      new ActuateClaw(m_claw, 1.0, 0.0),
-      new WaitCommand(0.5),
+        // TODO: New Claw command
+        highCubeNodeCommand(),
+        // TODO: New Claw command
+        new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.5,
@@ -412,7 +411,7 @@ public class RobotContainer {
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
-      new ParkingBrake(m_driveSubsystem, m_bling)
+      new ParkingBrake(m_driveSubsystem, m_bling))
     );
 
   }
@@ -432,14 +431,14 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new ActuateClaw(m_claw, 0.53, 0.47)),
-      highConeNodeCommand(),
-      new ActuateClaw(m_claw, 1.0, 0.0),
+      // TODO: New Claw command
+        highCubeNodeCommand(),
+      // TODO: New Claw Command
       new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
-        armStowCommand())
+        armStowCommand()))
     );
   }
 
@@ -453,9 +452,9 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new VacuumActivateCommand(m_claw, true)),
-      highConeNodeCommand(),
-      new VacuumActivateCommand(m_claw, false),
+        new CollectCommand(m_claw)),
+      highCubeNodeCommand(),
+      new CollectCommand(m_claw),
       //new ActuateClaw(m_claw, true, 1),
       armStowCommand()
     );

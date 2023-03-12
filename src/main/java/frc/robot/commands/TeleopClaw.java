@@ -31,35 +31,21 @@ public class TeleopClaw extends CommandBase {
   @Override
   public void execute() {
     if(oi.getOperatorLeftBumper()){
-      claw.setVacuumSpeed(0);
+      claw.setCollectorSpeed(-5);
     }
-    if(oi.getOperatorRightBumper()){
-      claw.setVacuumSpeed(620.0); //intial: 314.2 rps
-      //TODO: Week 1 set from 628.4 to current value
+    else if(oi.getOperatorRightBumper()){
+      claw.setCollectorSpeed(5); 
     }
-    //cube preset
-    if(oi.getOperatorDPadRight()){
-      claw.setActuator1Angle(0.53);
-      claw.setActuator2Angle(0.47);
+    else {
+      claw.setCollectorSpeed(0);
     }
-    //open
-    else if(Math.abs(oi.getOperatorLeftX()) > 0.25 || Math.abs(oi.getOperatorLeftY()) > 0.25){
-      claw.setActuator1Angle(1.0);
-      claw.setActuator2Angle(0.0);
-    }
-    //cone preset
-    else if(oi.getOperatorDPadDown()){
-      claw.setActuator1Angle(0.42);
-      claw.setActuator2Angle(0.58);
-    }
-    //else{
-      //claw.setActuatorDebugPercent(0.3);
-    //}
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    claw.setCollectorSpeed(0);
+  }
 
   // Returns true when the command should end.
   @Override
