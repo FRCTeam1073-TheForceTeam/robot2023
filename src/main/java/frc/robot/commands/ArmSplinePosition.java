@@ -54,9 +54,9 @@ public class ArmSplinePosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    double shoulderError = Math.abs(arm.getJointAngles().getShoulderAngle() - shoulderAng);
-	  double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
+    //double shoulderError = Math.abs(arm.getJointAngles().getShoulderAngle() - shoulderAng);
+	  //double elbowError = Math.abs(arm.getJointAngles().getElbowAngle() - elbowAng);
 
-	  return ((time == endTime) && (shoulderError <= shoulderTolerance && elbowError <= elbowTolerance));
+	  //return ((time == endTime) && (shoulderError <= shoulderTolerance && elbowError <= elbowTolerance));
   }
 }
