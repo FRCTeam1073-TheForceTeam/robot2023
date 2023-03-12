@@ -188,23 +188,30 @@ public class Arm extends SubsystemBase{
       this.waypoints = waypoints;
       //trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
       var interpolator = new SplineInterpolator();
-      elbowPositions = new double[waypoints.size()];
-      shoulderPositions = new double[waypoints.size()];
-      wristPositions = new double[waypoints.size()];
-      times = new double[waypoints.size()];
+      elbowPositions = new double[waypoints.size() + 1];
+      shoulderPositions = new double[waypoints.size() + 1];
+      wristPositions = new double[waypoints.size() + 1];
+      times = new double[waypoints.size() + 1];
 
       finalTime = 0.0;
       startTime = ((double)System.currentTimeMillis() / 1000.0);
+      JointPositions pos = getJointAngles();
+      elbowPositions[0] = pos.elbow;
+      shoulderPositions[0] = pos.shoulder;
+      wristPositions[0] = pos.wrist;
+      times[0] = 0;
       for(int i = 0; i < waypoints.size(); i++){
-        elbowPositions[i] = waypoints.get(i).elbow;
-        shoulderPositions[i] = waypoints.get(i).shoulder;
-        wristPositions[i] = waypoints.get(i).wrist;
-        times[i] = waypoints.get(i).time;
+        elbowPositions[i + 1] = waypoints.get(i).elbow;
+        shoulderPositions[i + 1] = waypoints.get(i).shoulder;
+        wristPositions[i + 1] = waypoints.get(i).wrist;
+        times[i + 1] = waypoints.get(i).time;
       }
 
       if (waypoints.size() > 0)
-        finalTime = startTime + times[waypoints.size()-1];  // The last time.
-
+        finalTime = startTime + times[times.length - 1];  // The last time.
+      else{
+        finalTime = startTime;
+      }
 
       elbowSplines = interpolator.interpolate(times, elbowPositions);
       shoulderSplines = interpolator.interpolate(times, shoulderPositions);
@@ -252,7 +259,7 @@ public class Arm extends SubsystemBase{
         return new JointPositions(shoulderSplines.value(t), elbowSplines.value(t), wristSplines.value(t));
       } else {
         // Return the terminal point forever after the time is over:
-        return new JointPositions(shoulderPositions[waypoints.size()-1], elbowPositions[waypoints.size()-1], wristPositions[waypoints.size()-1]);
+        return new JointPositions(shoulderPositions[shoulderPositions.length - 1], elbowPositions[elbowPositions.length - 1], wristPositions[wristPositions.length - 1]);
       }
     }
   }
@@ -392,8 +399,8 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setSensorPhase(true);
     //shoulderMotor.setInverted(true);
 
-    shoulderMotor.config_kP(0, 0.2, 100);
-    shoulderMotor.config_kI(0, 0, 100);
+    shoulderMotor.config_kP(0, 0.35, 100);
+    shoulderMotor.config_kI(0, 0.002, 100);
     shoulderMotor.config_kD(0, 0, 100);
     shoulderMotor.config_kF(0, 0, 100);
     shoulderMotor.configMaxIntegralAccumulator(0, 0, 100);
@@ -408,8 +415,8 @@ public class Arm extends SubsystemBase{
     // Elbow Motor Setup:
     elbowMotor.setNeutralMode(NeutralMode.Brake);
     elbowMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 25, 0.1));
-    elbowMotor.config_kP(0, 0.2);
-    elbowMotor.config_kI(0, 0);
+    elbowMotor.config_kP(0, 0.35);
+    elbowMotor.config_kI(0, 0.002);
     elbowMotor.config_kD(0, 0);
     elbowMotor.config_kF(0, 0);
     elbowMotor.configMaxIntegralAccumulator(0, 0);
@@ -425,9 +432,9 @@ public class Arm extends SubsystemBase{
     wristMotor.setNeutralMode(NeutralMode.Brake);
     wristMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 20, 0.1));
 
-    wristMotor.config_kP(0, 0.2);
-    wristMotor.config_kI(0, 0);
-    wristMotor.config_kD(0, 0);
+    wristMotor.config_kP(0, 0.35);
+    wristMotor.config_kI(0, 0.0);
+    wristMotor.config_kD(0, 0.01);
     wristMotor.config_kF(0, 0);
     wristMotor.configMaxIntegralAccumulator(0, 0);
     wristMotor.setIntegralAccumulator(0);
@@ -536,7 +543,7 @@ public class Arm extends SubsystemBase{
   }
 
   public void setArmTrajectories(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocities, double maxAcceleration){
-    waypoints.add(0, new JointWaypoints(getJointAngles(), 0));
+    //waypoints.add(0, new JointWaypoints(getJointAngles(), 0));
     armTrajectory = new ArmTrajectory(waypoints, maxVelocities, maxAcceleration);
     //endTime = waypoints.get(waypoints.size() - 1).time;
     //endPose = arm.new JointPositions(waypoints.get(waypoints.size() - 1).shoulder, waypoints.get(waypoints.size() - 1).elbow, waypoints.get(waypoints.size() - 1).wrist);

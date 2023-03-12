@@ -295,9 +295,11 @@ public class RobotContainer {
    * @return Command that sets arm position
    */
   public Command armStowCommand(){
-      return new SequentialCommandGroup(
-        new ArmSetPosition(m_arm, -1.9, 3.3),
-        new ArmSetPosition(m_arm, -3.84, 2.95));
+      ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+        waypoints.add(m_arm.new JointWaypoints(-3.0, 2.6, -0.7, 2.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.8, 2.9, -1.21, 4.0));
+    return new SequentialCommandGroup(
+        new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
   }
 
   public Command cubeGroundPickupCommand(){ 
@@ -312,7 +314,10 @@ public class RobotContainer {
    * @return Command that sets arm position
    */
   public Command doubleSubstationConeCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);
+    ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    waypoints.add(m_arm.new JointWaypoints(-2.0, 2.6, 0.0, 4.0));
+    waypoints.add(m_arm.new JointWaypoints(-1.55, 2.4, 0.0, 8.0));
+    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
   }
 
   public Command doubleSubstationCubeCommand(){
