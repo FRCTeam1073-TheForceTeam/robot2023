@@ -362,9 +362,9 @@ public class Arm extends SubsystemBase{
       armTrajectory.getVelocitiesAtTime(trajectoryTime, referenceVelocities);
     }
     else{
-      //referencePositions.shoulder += referenceVelocities.shoulder * 0.02;
-      //referencePositions.elbow += referenceVelocities.elbow * 0.02;
-      //referencePositions.wrist += referenceVelocities.wrist * 0.02;
+      referencePositions.shoulder += referenceVelocities.shoulder * 0.02;
+      referencePositions.elbow += referenceVelocities.elbow * 0.02;
+      referencePositions.wrist += referenceVelocities.wrist * 0.02;
     }
 
     

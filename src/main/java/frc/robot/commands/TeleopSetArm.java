@@ -36,11 +36,21 @@ public class TeleopSetArm extends CommandBase {
     double leftY = oi.getOperatorLeftY();
     double rightY = oi.getOperatorRightY();
     double rightX = oi.getOperatorRightX();
+      if(leftY > 0.5){leftY = 0.5;}
+      if(leftY < -0.5){leftY = -0.5;}
+      else{leftY = 0;}
+      if(rightY > 0.5){rightY = 0.5;}
+      if(rightY < -0.5){rightY = -0.5;}
+      else{rightY = 0;}
+      if(rightX > 0.5){rightX = 0.5;}
+      if(rightX < -0.5){rightX = -0.5;}
+      else{rightX = 0;}
+
     if(Math.abs(leftY) > 0.1|| Math.abs(rightY) > 0.1 || Math.abs(rightX) > 0.1){
-      //arm.setJointVelocities(arm.new JointVelocities(leftY, rightY, rightX));
+      arm.setJointVelocities(arm.new JointVelocities(leftY, rightY, rightX));
     }
     else{
-      //arm.setJointVelocities(arm.new JointVelocities(0.0, 0.0, 0.0));
+      arm.setJointVelocities(arm.new JointVelocities(0.0, 0.0, 0.0));
     }
   }
 
