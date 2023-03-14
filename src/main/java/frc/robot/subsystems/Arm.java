@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase{
   public final double upperArmMass = 1.0; // 2.2lbs
   public final double foreArmMass = 0.5; // 1.1lbs
   public final double wristMass = 3.85; // ~8.5lbs
-  public final double gravityCompensationGain = 0.2;            // Increase this to increase the overall amount of gravity compensation.
+  public final double gravityCompensationGain = 1.25;            // Increase this to increase the overall amount of gravity compensation.
   public final double gravityCompensationShoulderGain = 0.0125; // 1/80 gear ratio
   public final double gravityCompensationElbowGain = 0.025;     // 1/40 gear ratio
   public final double gravityCompensationWristGain = 0.05;      // 1/20 gear ratio
@@ -321,6 +321,7 @@ public class Arm extends SubsystemBase{
 
   public void disableMotors() {
     motorsEnabled = false;
+    armTrajectory = null;
   }
 
   public void enableMotors() {
@@ -359,10 +360,11 @@ public class Arm extends SubsystemBase{
       // Update reference positions and velocities:
       armTrajectory.getPositionsAtTime(trajectoryTime, referencePositions);
       armTrajectory.getVelocitiesAtTime(trajectoryTime, referenceVelocities);
-      // Output updated references:
-      SmartDashboard.putNumber("Shoulder Reference", referencePositions.shoulder);
-      SmartDashboard.putNumber("Elbow Reference", referencePositions.elbow);
-      SmartDashboard.putNumber("Wrist Reference", referencePositions.wrist);
+    }
+    else{
+      //referencePositions.shoulder += referenceVelocities.shoulder * 0.02;
+      //referencePositions.elbow += referenceVelocities.elbow * 0.02;
+      //referencePositions.wrist += referenceVelocities.wrist * 0.02;
     }
 
     
@@ -397,6 +399,9 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Shoulder Angle", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Angle", currentJointPositions.elbow);
     SmartDashboard.putNumber("Wrist Angle", currentJointPositions.wrist);
+    SmartDashboard.putNumber("Shoulder Gravity", gravityCompensation[0]);
+    SmartDashboard.putNumber("Elbow Gravity", gravityCompensation[1]);
+    SmartDashboard.putNumber("Wrist Gravity", gravityCompensation[2]);
 
     SmartDashboard.putNumber("Shoulder Absolute Angle", absoluteJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle", absoluteJointPositions.elbow);
@@ -404,7 +409,14 @@ public class Arm extends SubsystemBase{
 
     SmartDashboard.putBoolean("Is Elbow Magnet Healthy", isElbowMagnetHealthy);
     SmartDashboard.putBoolean("Is Shoulder Magnet Healthy", isShoulderMagnetHealthy);
+
+    SmartDashboard.putNumber("Shoulder Reference", referencePositions.shoulder);
+    SmartDashboard.putNumber("Elbow Reference", referencePositions.elbow);
+    SmartDashboard.putNumber("Wrist Reference", referencePositions.wrist);
    
+    SmartDashboard.putNumber("Reference Shoulder velocity", referenceVelocities.shoulder);
+    SmartDashboard.putNumber("Reference Elbow velocity", referenceVelocities.elbow);
+    SmartDashboard.putNumber("Reference wrist velocity", referenceVelocities.wrist);
   }
 
   // Initialize preferences for this class:
@@ -417,36 +429,42 @@ public class Arm extends SubsystemBase{
     ErrorCode elbowError = elbowMotor.configFactoryDefault();
     ErrorCode wristError = wristMotor.configFactoryDefault();
 
+    updateAbsolutePositions();
+
     // Shoulder Motor Setup:
     shoulderMotor.setNeutralMode(NeutralMode.Brake);
-    shoulderMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 25, 0.1));
+    shoulderMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 25, 28, 0.1));
     shoulderMotor.setSensorPhase(true);
     //shoulderMotor.setInverted(true);
 
-    shoulderMotor.config_kP(0, 0.35, 100);
-    shoulderMotor.config_kI(0, 0.002, 100);
-    shoulderMotor.config_kD(0, 0, 100);
+    shoulderMotor.config_kP(0, 0.5, 100);
+    shoulderMotor.config_kI(0, 0.1, 100);
+    //shoulderMotor.config_kP(0, 0, 100);
+    //shoulderMotor.config_kI(0, 0, 100);
+    shoulderMotor.config_kD(0, 0.04, 100);
     shoulderMotor.config_kF(0, 0, 100);
     shoulderMotor.configMaxIntegralAccumulator(0, 500, 100);
     shoulderMotor.setIntegralAccumulator(0, 0, 100);
     isShoulderInitialized = false;
 
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.84 * shoulderTicksPerRadian, 0, 400);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
     if (errorShoulder != ErrorCode.OK) {
       System.out.println("Shoulder: set selected sensor position failed.");
     }
 
     // Elbow Motor Setup:
     elbowMotor.setNeutralMode(NeutralMode.Brake);
-    elbowMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 25, 0.1));
-    elbowMotor.config_kP(0, 0.35, 100);
-    elbowMotor.config_kI(0, 0.002, 100);
-    elbowMotor.config_kD(0, 0, 100);
+    elbowMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 25, 28, 0.1));
+    elbowMotor.config_kP(0, 0.5, 100);
+    elbowMotor.config_kI(0, 0.1, 100);
+    //elbowMotor.config_kP(0, 0, 100);
+    //elbowMotor.config_kI(0, 0, 100);
+    elbowMotor.config_kD(0, 0.04, 100);
     elbowMotor.config_kF(0, 0, 100);
     elbowMotor.configMaxIntegralAccumulator(0, 500, 100);
     elbowMotor.setIntegralAccumulator(0);
 
-    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(getAbsoluteAngles().elbow * elbowTicksPerRadian, 0, 400);
+    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, 400);
     if (errorElbow != ErrorCode.OK) {
       System.out.println("Elbow: set selected sensor position failed,");
     }
@@ -458,6 +476,8 @@ public class Arm extends SubsystemBase{
 
     wristMotor.config_kP(0, 0.35, 100);
     wristMotor.config_kI(0, 0.0, 100);
+    //wristMotor.config_kP(0, 0, 100);
+    //wristMotor.config_kI(0, 0, 100);
     wristMotor.config_kD(0, 0.01, 100);
     wristMotor.config_kF(0, 0, 100);
     wristMotor.configMaxIntegralAccumulator(0, 500, 100);
@@ -483,6 +503,7 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Shoulder Absolute Angle on init", absoluteJointPositions.shoulder);
     SmartDashboard.putNumber("Elbow Absolute Angle on init", absoluteJointPositions.elbow);
     SmartDashboard.putNumber("Wrist Absolute Angle on Init", absoluteJointPositions.wrist);
+
   }
   
   public String getDiagnostics() {
@@ -539,12 +560,12 @@ public class Arm extends SubsystemBase{
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
     if(currentJointPositions.shoulder < -3.77){ //3.79
-      if(speed.shoulder > 0){
+      if(speed.shoulder < 0){
         speed.shoulder = 0;
       }
     }
     if(currentJointPositions.shoulder > 0.98){ //1.0
-      if(speed.shoulder < 0){
+      if(speed.shoulder > 0){
         speed.shoulder = 0;
       }
     }
@@ -559,12 +580,29 @@ public class Arm extends SubsystemBase{
         speed.elbow = 0;
       }
     }
+    if(currentJointPositions.wrist < -1.2){ //-2.82
+      if(speed.wrist < 0){
+        speed.wrist = 0;
+      }
+    }
+    if(currentJointPositions.wrist > 1.49){
+      if(speed.wrist > 0){
+        speed.wrist = 0;
+      }
+    }
+
 
     //TODO add limits on wrist rotation
-
+    
     referenceVelocities.shoulder = speed.shoulder;
     referenceVelocities.elbow = speed.elbow;
     referenceVelocities.wrist = speed.wrist;
+    if(!motorsEnabled || armTrajectory != null){
+      updateCurrentPositions();
+      System.out.println("Positions updated");
+      referencePositions = currentJointPositions;
+    }
+    armTrajectory = null;
     motorsEnabled = true;
   }
 
@@ -611,8 +649,8 @@ public class Arm extends SubsystemBase{
     double wristX = Math.cos(absoluteJointPositions.wrist + absoluteJointPositions.elbow + absoluteJointPositions.shoulder) * wristLength;
 
     // Compute torques baed on X offset from previous axis * mass and then scale by a per-joint gain and an overal gain for gravity compensation.
-    gravityCompensation[2] = gravityCompensationGain * gravityCompensationWristGain * (wristX * wristMass); // Wrist compensation.
-    gravityCompensation[1] = gravityCompensationGain * gravityCompensationElbowGain * ((wristX + forearmX) * wristMass + forearmX * foreArmMass); // Elbow compensation.
+    gravityCompensation[2] = -gravityCompensationGain * gravityCompensationWristGain * (wristX * wristMass); // Wrist compensation.
+    gravityCompensation[1] = -gravityCompensationGain * gravityCompensationElbowGain * ((wristX + forearmX) * wristMass + forearmX * foreArmMass); // Elbow compensation.
     gravityCompensation[0] = gravityCompensationGain * gravityCompensationShoulderGain * ((wristX + forearmX + upperLinkX) * wristMass + (forearmX + upperLinkX)* foreArmMass + upperLinkX * upperArmMass); // Shoulder compensation
   }
 }

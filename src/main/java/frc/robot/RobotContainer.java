@@ -177,13 +177,16 @@ public class RobotContainer {
     //m_arm.initializeShoulder();
   }
 
+  public void disableInit(){
+    m_arm.disableMotors();
+  }
   //Configures the button mappings for controllers
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
 
     //Trigger for the arm to stow
     Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
-    stowTrigger.onTrue(armStowCommand());
+    stowTrigger.onTrue(armStowCommand(m_OI));
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
     alignToAprilTag.whileTrue(alignToAprilTag(0));
@@ -200,7 +203,6 @@ public class RobotContainer {
     Trigger operatorConeMode = new Trigger(m_OI::getOperatorMenuButton);
     operatorConeMode.onTrue(new InstantCommand(m_OI :: setConeMode));
 
-    if(m_OI.isCubeMode()){
       Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
       midCubeTrigger.onTrue(midCubeNodeCommand());
 
@@ -208,27 +210,23 @@ public class RobotContainer {
       highCubeTrigger.onTrue(highCubeNodeCommand());
 
       Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
-      doubleSubstationConeTrigger.onTrue(doubleSubstationCubeCommand());
+      doubleSubstationConeTrigger.onTrue(doubleSubstationCommand(m_OI));
 
       Trigger cubeGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       cubeGroundPickupTrigger.onTrue(cubeGroundPickupCommand());
-    }
-    else{
+    
       Trigger midConeTrigger = new Trigger(m_OI::getOperatorXButton);
       midConeTrigger.onTrue(middleConeNodeCommand());
   
       Trigger highConeTrigger = new Trigger(m_OI::getOperatorYButton);
       highConeTrigger.onTrue(highConeNodeCommand());
-  
-      Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
-      doubleSubstationConeTrigger.onTrue(doubleSubstationConeCommand());
 
       Trigger coneGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       coneGroundPickupTrigger.onTrue(coneGroundPickupCommand());
   
     }
 
-  }
+  
 
 
   /**Sets test mode
@@ -292,12 +290,22 @@ public class RobotContainer {
    * 
    * @return Command that sets arm position
    */
-  public Command armStowCommand(){
+  public Command armStowCommand(OI oi){
+    if(oi.isCubeMode()){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-3.0, 2.6, -0.7, 2.0));
-        waypoints.add(m_arm.new JointWaypoints(-3.8, 2.9, -1.21, 4.0));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
+    }
+    else{
+    ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+    return new SequentialCommandGroup(
+        new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
+    }
+
   }
 
   public Command cubeGroundPickupCommand(){ 
@@ -311,15 +319,20 @@ public class RobotContainer {
    * 
    * @return Command that sets arm position
    */
-  public Command doubleSubstationConeCommand(){
+  public Command doubleSubstationCommand(OI oi){
+    if(!oi.isCubeMode()){
     ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-    waypoints.add(m_arm.new JointWaypoints(-2.0, 2.6, 0.0, 4.0));
-    waypoints.add(m_arm.new JointWaypoints(-1.55, 2.4, 0.0, 8.0));
+    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, 1.4, 2.0));
+    waypoints.add(m_arm.new JointWaypoints(-2.22, 3.24, 1.50, 4.0));
     return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
+    }
+    else{
+      ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -0.42, 2.0));
+    waypoints.add(m_arm.new JointWaypoints(-2.60, 3.62, -0.37, 4.0));
+    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
+    }
   }
-
-  public Command doubleSubstationCubeCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);  }
 
   /**Positions arm to score in the middle node for both cone and cube
    * 
@@ -379,7 +392,7 @@ public class RobotContainer {
         // TODO: New Claw command
         new WaitCommand(1.5),
       new ParallelCommandGroup(
-        armStowCommand(),
+        armStowCommand(m_OI),
         new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false),
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
@@ -410,7 +423,7 @@ public class RobotContainer {
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.5,
          1.0, 0.5, 0.9), 
-        armStowCommand()), 
+        armStowCommand(m_OI)), 
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
@@ -441,7 +454,7 @@ public class RobotContainer {
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
-        armStowCommand()))
+        armStowCommand(m_OI)))
     );
   }
 
@@ -459,7 +472,7 @@ public class RobotContainer {
       highCubeNodeCommand(),
       new CollectCommand(m_claw),
       //new ActuateClaw(m_claw, true, 1),
-      armStowCommand()
+      armStowCommand(m_OI)
     );
   }
 
