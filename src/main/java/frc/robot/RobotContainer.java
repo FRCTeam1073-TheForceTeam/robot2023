@@ -36,7 +36,6 @@ import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
 import frc.robot.commands.EngageBalance;
 import frc.robot.commands.TeleopClaw;
-import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
@@ -68,7 +67,6 @@ public class RobotContainer {
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
-  //private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
   private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
