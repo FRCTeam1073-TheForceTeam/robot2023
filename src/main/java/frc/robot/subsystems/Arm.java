@@ -26,57 +26,61 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
+
+  // This is the control mode for the arm:
+  enum Mode {
+    DISABLED,
+    TRAJECTORY,
+    VELOCITY
+  }
+
   private TalonFX shoulderMotor, elbowMotor, wristMotor;
   private CANCoder shoulderEncoder, elbowEncoder;
 
-  private boolean isElbowMagnetHealthy;
-  private boolean isShoulderMagnetHealthy;
+  private boolean isElbowMagnetOk;
+  private boolean isShoulderMagnetOk;
   private boolean isShoulderInitialized;
 
   // Set variables below to correct lengths:
-  public final double upperArmLength = 0.635; // ~25.0"
-  public final double forearmLength = 0.6858; // ~27.5";
-  public final double wristLength = 0.15; // ~6"
+  private final double upperArmLength = 0.635; // ~25.0"
+  private final double forearmLength = 0.6858; // ~27.5";
+  private final double wristLength = 0.15; // ~6"
   // Approximage masses of arm segments for gravity compensation:
-  public final double upperArmMass = 1.0; // 2.2lbs
-  public final double foreArmMass = 0.5; // 1.1lbs
-  public final double wristMass = 3.85; // ~8.5lbs
-  public final double gravityCompensationGain = 1.25;            // Increase this to increase the overall amount of gravity compensation.
-  public final double gravityCompensationShoulderGain = 0.0125; // 1/80 gear ratio
-  public final double gravityCompensationElbowGain = 0.025;     // 1/40 gear ratio
-  public final double gravityCompensationWristGain = 0.05;      // 1/20 gear ratio
+  private final double upperArmMass = 1.0; // 2.2lbs
+  private final double foreArmMass = 0.5; // 1.1lbs
+  private final double wristMass = 3.85; // ~8.5lbs
+  private final double gravityCompensationGain = 1.25;            // Increase this to increase the overall amount of gravity compensation.
+  private final double gravityCompensationShoulderGain = 0.0125; // 1/80 gear ratio
+  private final double gravityCompensationElbowGain = 0.025;     // 1/40 gear ratio
+  private final double gravityCompensationWristGain = 0.05;      // 1/20 gear ratio
 
 
-  public final double shoulderOffset = 0.0;
-  public final double shoulderAbsoluteOffset = 4.3828;
-  public final double elbowOffset = 0.0;
-  public final double elbowAbsoluteOffset = 3.25;
-  public final double wristOffset = 0.0;
-  public final double wristAbsoluteOffset = -1.21;
-  public final double shoulderTicksPerRadian = -26931.24;
-  public final double elbowTicksPerRadian = 13465.62;
-  public final double wristTicksPerRadian = -6518.5; // New 20:1 ratio.
-  public final double maxShoulderVel = 1.5;
-  public final double maxElbowVel = 2.1;
-  public final double maxWristVel = 1;
-  public final double maxShoulderAcc = 1.5;
-  public final double maxElbowAcc = 2.5;
-  public final double maxWristAcc = 1;
-  public JointPositions minAngles;
-  public JointPositions maxAngles;
-  public JointPositions currentJointPositions = new JointPositions();
-  public JointVelocities currentJointVelocities = new JointVelocities();
-  public JointPositions absoluteJointPositions = new JointPositions();
-  public JointPositions referencePositions = new JointPositions();
-  public JointVelocities referenceVelocities = new JointVelocities();
-  public ArmTrajectory armTrajectory;
-
-  public double profileStartTime;
-  public boolean motorsEnabled = false;
-
-  public double[] gravityCompensation;   // Feed forward gravity compensation forces for shoulder, elbow, wrist in order.
-
-  Bling bling;
+  private final double shoulderOffset = 0.0;
+  private final double shoulderAbsoluteOffset = 4.3828;
+  private final double elbowOffset = 0.0;
+  private final double elbowAbsoluteOffset = 3.25;
+  private final double wristOffset = 0.0;
+  private final double wristAbsoluteOffset = -1.21;
+  private final double shoulderTicksPerRadian = -26931.24;
+  private final double elbowTicksPerRadian = 13465.62;
+  private final double wristTicksPerRadian = -6518.5; // New 20:1 ratio.
+  private final JointVelocities maxVelocities = new JointVelocities(1.5, 2.1, 1);
+  private final double maxShoulderAcc = 1.5;
+  private final double maxElbowAcc = 2.5;
+  private final double maxWristAcc = 1;
+  private JointPositions minAngles;
+  private JointPositions maxAngles;  
+  private double[] gravityCompensation = new double[3];
+  private JointPositions currentJointPositions = new JointPositions();
+  private JointVelocities currentJointVelocities = new JointVelocities();
+  private JointPositions absoluteJointPositions = new JointPositions();
+  private JointPositions referencePositions = new JointPositions();
+  private JointVelocities referenceVelocities = new JointVelocities();
+  private ArmTrajectory armTrajectory;
+  private double profileStartTime;
+  private Mode mode = Mode.DISABLED;
+  
+  private Bling bling;
 
 
   public class JointPositions{
@@ -98,6 +102,18 @@ public class Arm extends SubsystemBase{
       wrist = 0.0;
     }
 
+    public JointPositions(JointPositions source) {
+      shoulder = source.shoulder;
+      elbow = source.elbow;
+      wrist = source.wrist;
+    }
+
+    public void copyFrom(JointPositions source) {
+      shoulder = source.shoulder;
+      elbow = source.elbow;
+      wrist = source.wrist;
+    }
+
     public double getShoulderAngle(){
       return shoulder;
     }
@@ -108,8 +124,6 @@ public class Arm extends SubsystemBase{
     public double getWristAngle(){
       return wrist;
     }
-
-    
   }
 
   // Clamp joint positions between minimum and maximum positions for safety on commands:
@@ -117,6 +131,30 @@ public class Arm extends SubsystemBase{
     positions.shoulder = MathUtil.clamp(positions.shoulder, min.shoulder, max.shoulder);
     positions.elbow = MathUtil.clamp(positions.elbow, min.elbow, max.elbow);
     positions.wrist = MathUtil.clamp(positions.wrist, min.wrist, max.wrist);
+  }
+
+  public class JointVelocities{
+    public double shoulder;
+    public double elbow;
+    public double wrist;
+
+    public JointVelocities(double shoulderVel, double elbowVel, double wristVel){
+      shoulder = shoulderVel;
+      elbow = elbowVel;
+      wrist = wristVel;
+    }
+
+    public JointVelocities(){
+      shoulder = 0.0;
+      elbow = 0.0;
+      wrist = 0.0;
+    }
+
+    public void copyFrom(JointVelocities source) {
+      shoulder = source.shoulder;
+      elbow = source.elbow;
+      wrist = source.wrist;
+    }
   }
 
 
@@ -141,24 +179,7 @@ public class Arm extends SubsystemBase{
     }
   }
 
-  public class JointVelocities{
-    public double shoulder;
-    public double elbow;
-    public double wrist;
-
-    public JointVelocities(double shoulderVel, double elbowVel, double wristVel){
-      shoulder = shoulderVel;
-      elbow = elbowVel;
-      wrist = wristVel;
-    }
-
-    public JointVelocities(){
-      shoulder = 0.0;
-      elbow = 0.0;
-      wrist = 0.0;
-    }
-  }
-
+  
   public class CartesianPosition{
     double x;
     double z;
@@ -178,10 +199,8 @@ public class Arm extends SubsystemBase{
   }
 
 
-  public class ArmTrajectory{
+  public class ArmTrajectory {
 
-    private ArrayList<JointWaypoints> waypoints;
-    private TrajectoryConfig trajectoryConfig;
     private PolynomialSplineFunction elbowSplines;
     private PolynomialSplineFunction shoulderSplines;
     private PolynomialSplineFunction wristSplines;
@@ -193,9 +212,7 @@ public class Arm extends SubsystemBase{
     double startTime;
 
 
-    public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration){
-      this.waypoints = waypoints;
-      //trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAcceleration);
+    public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration) {
       var interpolator = new SplineInterpolator();
       elbowPositions = new double[waypoints.size() + 1];
       shoulderPositions = new double[waypoints.size() + 1];
@@ -226,19 +243,7 @@ public class Arm extends SubsystemBase{
       shoulderSplines = interpolator.interpolate(times, shoulderPositions);
       wristSplines = interpolator.interpolate(times, wristPositions);
     }
- /* 
-    public double getTimeForMotion(double[] singularJoint){
-      double difference = Math.abs(singularJoint[0] - singularJoint[shoulderPositions.length]);
-      double time = trajectoryConfig.getMaxVelocity()/trajectoryConfig.getMaxAcceleration();
-      time += difference/trajectoryConfig.getMaxVelocity();
-      time += trajectoryConfig.getMaxVelocity()/trajectoryConfig.getMaxAcceleration();
-      return time;
-    }
-/* 
-    public double timeBetweenPoints(JointPositions firstPoint, JointPositions secondPoint){
-
-    }
-*/
+ 
     public double getFinalTime(){
       return finalTime;
     }
@@ -294,13 +299,13 @@ public class Arm extends SubsystemBase{
     maxAngles = new JointPositions(3.37, 0.08, 1.5);
     minAngles = new JointPositions(-3.37, 2.98, -1.21);
 
-    // Allocate space for gravity compensation:
-    gravityCompensation = new double[3]; // Shoulder, elbow, wrist gravity compensation.
+    // Zero initial gravitry compensation:
     gravityCompensation[0] = 0.0; // Shoulder.
     gravityCompensation[1] = 0.0; // Elbow.
     gravityCompensation[2] = 0.0; // Wrist.
 
-    motorsEnabled = false;
+    // Start out in disabled mode:
+    mode = Mode.DISABLED;
   }
 
   // Runs in periodic:
@@ -319,104 +324,113 @@ public class Arm extends SubsystemBase{
     absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian - wristAbsoluteOffset;
   }
 
+  private void updatePositionLimits() {
+    // Update our min max actuator position limits based on overall postitions:
+    // TODO: Allows full range elbow movement.
+  }
+
+  private void updateMagnetHealth() {
+    // This method will be called once per scheduler run
+    if(elbowEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
+      isElbowMagnetOk = false;
+    }
+    else{
+      isElbowMagnetOk = true;
+    }
+
+    if(shoulderEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
+      isShoulderMagnetOk = false;
+    }
+    else{
+      isShoulderMagnetOk = true;
+    }
+  }
+
   public void disableMotors() {
-    motorsEnabled = false;
-    armTrajectory = null;
+    mode = Mode.DISABLED;
   }
 
-  public void enableMotors() {
-    motorsEnabled = true;
+  public Mode getMode() {
+    return mode;
   }
-
-
-  public boolean areMotorsEnabled() {
-    return motorsEnabled;
-  }
-
 
   @Override
   public void periodic(){
   
-    if(!isShoulderInitialized){
-      if (initializeShoulder()) {
-        System.out.println("Shoulder Initialized!");
-        isShoulderInitialized = true;
-      } else {
-        System.out.println("Shoulder initialization failed!");
-      }
-    }
-
+    // if(!isShoulderInitialized){
+    //   if (initializeShoulder()) {
+    //     System.out.println("Shoulder Initialized!");
+    //     isShoulderInitialized = true;
+    //   } else {
+    //     System.out.println("Shoulder initialization failed!");
+    //   }
+    // }
 
     // Update all of the positions from sensors: Must call this every time through this looop.
     updateCurrentPositions();
     updateAbsolutePositions();
     updateGravityCompensation(); // Must be called every time after updates of positions.
+    updatePositionLimits(); // Must be called every time after updates of positions.
     
-    
-    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
   
     // If we have a trajectory, then get references from the trajectory:
-    if (armTrajectory != null) {
-      // Update reference positions and velocities:
-      armTrajectory.getPositionsAtTime(trajectoryTime, referencePositions);
-      armTrajectory.getVelocitiesAtTime(trajectoryTime, referenceVelocities);
-    }
-    else{
+    if (mode == Mode.TRAJECTORY) {
+      if (armTrajectory != null) {
+        // Update reference positions and velocities:
+        double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
+        armTrajectory.getPositionsAtTime(trajectoryTime, referencePositions);
+        armTrajectory.getVelocitiesAtTime(trajectoryTime, referenceVelocities);
+      } else {
+        System.out.println("ARM: Internal mode error.");
+        mode = Mode.DISABLED;
+      }
+    } else if (mode == Mode.VELOCITY) {
       referencePositions.shoulder += referenceVelocities.shoulder * 0.02;
       referencePositions.elbow += referenceVelocities.elbow * 0.02;
       referencePositions.wrist += referenceVelocities.wrist * 0.02;
-    }
+      clamp(referencePositions, minAngles, maxAngles); // Clamp reference positions to our limits at all times.
+    } 
 
     
 
-    if (motorsEnabled == true)  {
-      // Send motor command if motors are enabled, otherwise send zero power.
+    if (mode != Mode.DISABLED)  {
+      // Send motor command if motors are not disabled.
       shoulderMotor.set(ControlMode.Position, referencePositions.shoulder * shoulderTicksPerRadian, DemandType.ArbitraryFeedForward, gravityCompensation[0]);
       elbowMotor.set(ControlMode.Position, referencePositions.elbow * elbowTicksPerRadian, DemandType.ArbitraryFeedForward, gravityCompensation[1]);
       wristMotor.set(ControlMode.Position, referencePositions.wrist * wristTicksPerRadian, DemandType.ArbitraryFeedForward, gravityCompensation[2]);
     } else {
+      // Send zero power when DISABLED
       shoulderMotor.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, gravityCompensation[0]);
       elbowMotor.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, gravityCompensation[1]);
       wristMotor.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, gravityCompensation[2]); 
     }
 
-    // This method will be called once per scheduler run
-    if(elbowEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
-      isElbowMagnetHealthy = false;
-    }
-    else{
-      isElbowMagnetHealthy = true;
-    }
-
-    if(shoulderEncoder.getMagnetFieldStrength().equals(MagnetFieldStrength.BadRange_RedLED)){
-      isShoulderMagnetHealthy = false;
-    }
-    else{
-      isShoulderMagnetHealthy = true;
-    }
 
     // Output angles:
-    SmartDashboard.putNumber("Shoulder Angle", currentJointPositions.shoulder);
-    SmartDashboard.putNumber("Elbow Angle", currentJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Angle", currentJointPositions.wrist);
-    SmartDashboard.putNumber("Shoulder Gravity", gravityCompensation[0]);
-    SmartDashboard.putNumber("Elbow Gravity", gravityCompensation[1]);
-    SmartDashboard.putNumber("Wrist Gravity", gravityCompensation[2]);
+    SmartDashboard.putNumber("Arm.Shoulder", currentJointPositions.shoulder);
+    SmartDashboard.putNumber("Arm.Elbow", currentJointPositions.elbow);
+    SmartDashboard.putNumber("Arm.Wrist", currentJointPositions.wrist);
+    SmartDashboard.putNumber("Arm.ShoulderGravity", gravityCompensation[0]);
+    SmartDashboard.putNumber("Arm.ElbowGravity", gravityCompensation[1]);
+    SmartDashboard.putNumber("Arm.WristGravity", gravityCompensation[2]);
 
-    SmartDashboard.putNumber("Shoulder Absolute Angle", absoluteJointPositions.shoulder);
-    SmartDashboard.putNumber("Elbow Absolute Angle", absoluteJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Absolute Anglge", absoluteJointPositions.wrist);
+    SmartDashboard.putNumber("Arm.ShoulderAbs", absoluteJointPositions.shoulder);
+    SmartDashboard.putNumber("Arm.ElbowAbs", absoluteJointPositions.elbow);
+    SmartDashboard.putNumber("Arm.WristAbs", absoluteJointPositions.wrist);
 
-    SmartDashboard.putBoolean("Is Elbow Magnet Healthy", isElbowMagnetHealthy);
-    SmartDashboard.putBoolean("Is Shoulder Magnet Healthy", isShoulderMagnetHealthy);
+    // Update health signals for absolute encoder magnets.
+    updateMagnetHealth();
 
-    SmartDashboard.putNumber("Shoulder Reference", referencePositions.shoulder);
-    SmartDashboard.putNumber("Elbow Reference", referencePositions.elbow);
-    SmartDashboard.putNumber("Wrist Reference", referencePositions.wrist);
+    SmartDashboard.putBoolean("Arm.ElbowMagnetOk", isElbowMagnetOk);
+    SmartDashboard.putBoolean("Arm.ShoulderMagnetOk", isShoulderMagnetOk);
+
+    SmartDashboard.putNumber("Arm.ShoulderRef", referencePositions.shoulder);
+    SmartDashboard.putNumber("Arm.ElbowRef", referencePositions.elbow);
+    SmartDashboard.putNumber("Arm.WristRef", referencePositions.wrist);
    
-    SmartDashboard.putNumber("Reference Shoulder velocity", referenceVelocities.shoulder);
-    SmartDashboard.putNumber("Reference Elbow velocity", referenceVelocities.elbow);
-    SmartDashboard.putNumber("Reference wrist velocity", referenceVelocities.wrist);
+    SmartDashboard.putNumber("Arm.ShoulderVelRef", referenceVelocities.shoulder);
+    SmartDashboard.putNumber("Arm.ElbowVelRef", referenceVelocities.elbow);
+    SmartDashboard.putNumber("Arm.WristVelRef", referenceVelocities.wrist);
   }
 
   // Initialize preferences for this class:
@@ -425,9 +439,13 @@ public class Arm extends SubsystemBase{
   }
 
   public void setUpMotors(){
-    ErrorCode shoulderError = shoulderMotor.configFactoryDefault();
-    ErrorCode elbowError = elbowMotor.configFactoryDefault();
-    ErrorCode wristError = wristMotor.configFactoryDefault();
+    ErrorCode shoulderError = shoulderMotor.configFactoryDefault(100);
+    ErrorCode elbowError = elbowMotor.configFactoryDefault(100);
+    ErrorCode wristError = wristMotor.configFactoryDefault(100);
+
+    if (shoulderError != ErrorCode.OK || elbowError != ErrorCode.OK || wristError != ErrorCode.OK) {
+      System.out.println("Arm motor initialization error!");
+    }
 
     updateAbsolutePositions();
 
@@ -472,7 +490,7 @@ public class Arm extends SubsystemBase{
 
     // Wrist Motor Setup:
     wristMotor.setNeutralMode(NeutralMode.Brake);
-    wristMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 20, 0.1));
+    wristMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 15, 18, 0.1));
 
     wristMotor.config_kP(0, 0.35, 100);
     wristMotor.config_kI(0, 0.0, 100);
@@ -492,18 +510,23 @@ public class Arm extends SubsystemBase{
     updateCurrentPositions();
     updateAbsolutePositions();
 
-    SmartDashboard.putBoolean("Is errorElbow returned", errorElbow != ErrorCode.OK);
-    SmartDashboard.putBoolean("Is errorShoulder returned", errorShoulder != ErrorCode.OK);
-    SmartDashboard.putBoolean("Is errorWrsit returned", errorWrist != ErrorCode.OK);
+    SmartDashboard.putBoolean("ArmInit/errorElbow", errorElbow != ErrorCode.OK);
+    SmartDashboard.putBoolean("ArmInit/errorShoudler", errorShoulder != ErrorCode.OK);
+    SmartDashboard.putBoolean("ArmInit/errorWrist", errorWrist != ErrorCode.OK);
 
-    SmartDashboard.putNumber("Shoulder Angle on init", currentJointPositions.shoulder);
-    SmartDashboard.putNumber("Elbow Angle on init", currentJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Angle on Init", currentJointPositions.wrist);
+    SmartDashboard.putNumber("ArmInit/Shoulder Angle", currentJointPositions.shoulder);
+    SmartDashboard.putNumber("ArmInit/Elbow Angle", currentJointPositions.elbow);
+    SmartDashboard.putNumber("Init/Wrist Angle", currentJointPositions.wrist);
 
-    SmartDashboard.putNumber("Shoulder Absolute Angle on init", absoluteJointPositions.shoulder);
-    SmartDashboard.putNumber("Elbow Absolute Angle on init", absoluteJointPositions.elbow);
-    SmartDashboard.putNumber("Wrist Absolute Angle on Init", absoluteJointPositions.wrist);
+    SmartDashboard.putNumber("ArmInit/Shoulder Absolute", absoluteJointPositions.shoulder);
+    SmartDashboard.putNumber("ArmInit/Elbow Absolute", absoluteJointPositions.elbow);
+    SmartDashboard.putNumber("ArmInit/Wrist Absolute", absoluteJointPositions.wrist);
 
+    // Update health signals for absolute encoder magnets.
+    updateMagnetHealth();
+
+    SmartDashboard.putBoolean("ArmInit/ElbowMagnetOk", isElbowMagnetOk);
+    SmartDashboard.putBoolean("ArmInit/ShoulderMagnetOk", isShoulderMagnetOk);
   }
   
   public String getDiagnostics() {
@@ -516,7 +539,7 @@ public class Arm extends SubsystemBase{
   // This methods returns the angle of each joint
   public JointPositions getJointAngles() {
     //return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
-    return new JointPositions(currentJointPositions.shoulder, currentJointPositions.elbow, currentJointPositions.wrist);
+    return new JointPositions(currentJointPositions);
   }
 
   public boolean initializeShoulder() {
@@ -529,28 +552,28 @@ public class Arm extends SubsystemBase{
   }
 
   public JointPositions getAbsoluteAngles(){
-    return new JointPositions(absoluteJointPositions.shoulder, absoluteJointPositions.elbow, absoluteJointPositions.wrist);
+    return new JointPositions(absoluteJointPositions);
   }
 
   // This method returns the maximum angles of joints
-  public JointPositions getMaxAngles(){
-    return maxAngles;
+  public JointPositions getMaxAngles() {
+    return new JointPositions(maxAngles);
   }
 
   // This method returns the minimum angles of joints
-  public JointPositions getMinAngles(){ 
-    return minAngles;
+  public JointPositions getMinAngles() { 
+    return new JointPositions(minAngles);
   }
 
   public void setArmTrajectories(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocities, double maxAcceleration){
     armTrajectory = new ArmTrajectory(waypoints, maxVelocities, maxAcceleration);
-    motorsEnabled = true; // We're moving when given a trajectory.
+    mode = Mode.TRAJECTORY; // We're moving  given a trajectory.
   }
 
-  public boolean isTrajectoryDone(){
-    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0) - armTrajectory.getStartTime();
-    if(armTrajectory != null){
-      if(armTrajectory.getFinalTime() < trajectoryTime){
+  public boolean isTrajectoryDone() {
+    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
+    if (mode == Mode.TRAJECTORY && armTrajectory != null){
+      if (armTrajectory.getFinalTime() < trajectoryTime) {
         return false;
       }
     }
@@ -559,51 +582,50 @@ public class Arm extends SubsystemBase{
 
   // This method sets a target speed for joints
   public void setJointVelocities(JointVelocities speed){
-    if(currentJointPositions.shoulder < -3.77){ //3.79
-      if(speed.shoulder < 0){
-        speed.shoulder = 0;
-      }
-    }
-    if(currentJointPositions.shoulder > 0.98){ //1.0
-      if(speed.shoulder > 0){
-        speed.shoulder = 0;
-      }
-    }
+    // if(currentJointPositions.shoulder < -3.77){ //3.79
+    //   if(speed.shoulder < 0){
+    //     speed.shoulder = 0;
+    //   }
+    // }
+    // if(currentJointPositions.shoulder > 0.98){ //1.0
+    //   if(speed.shoulder > 0){
+    //     speed.shoulder = 0;
+    //   }
+    // }
 
-    if(currentJointPositions.elbow < -2.82){ //-2.82
-      if(speed.elbow < 0){
-        speed.elbow = 0;
-      }
-    }
-    if(currentJointPositions.elbow > 2.99){
-      if(speed.elbow > 0){
-        speed.elbow = 0;
-      }
-    }
-    if(currentJointPositions.wrist < -1.2){ //-2.82
-      if(speed.wrist < 0){
-        speed.wrist = 0;
-      }
-    }
-    if(currentJointPositions.wrist > 1.49){
-      if(speed.wrist > 0){
-        speed.wrist = 0;
-      }
-    }
-
-
-    //TODO add limits on wrist rotation
+    // if(currentJointPositions.elbow < -2.82){ //-2.82
+    //   if(speed.elbow < 0){
+    //     speed.elbow = 0;
+    //   }
+    // }
+    // if(currentJointPositions.elbow > 2.99){
+    //   if(speed.elbow > 0){
+    //     speed.elbow = 0;
+    //   }
+    // }
+    // if(currentJointPositions.wrist < -1.2){ //-2.82
+    //   if(speed.wrist < 0){
+    //     speed.wrist = 0;
+    //   }
+    // }
+    // if(currentJointPositions.wrist > 1.49){
+    //   if(speed.wrist > 0){
+    //     speed.wrist = 0;
+    //   }
+    // }
     
-    referenceVelocities.shoulder = speed.shoulder;
-    referenceVelocities.elbow = speed.elbow;
-    referenceVelocities.wrist = speed.wrist;
-    if(!motorsEnabled || armTrajectory != null){
+    // Limits handled by position clamping now:
+    referenceVelocities.copyFrom(speed);
+
+    if (mode != Mode.VELOCITY) {
       updateCurrentPositions();
-      System.out.println("Positions updated");
-      referencePositions = currentJointPositions;
+      System.out.println("Reference positions updated for velocity mode!");
+      // WARNING: Copy the values not the objects.
+      referencePositions.copyFrom(currentJointPositions);
     }
-    armTrajectory = null;
-    motorsEnabled = true;
+
+    // Set to velocity mode:
+    mode = Mode.VELOCITY;
   }
 
   // This method returns the position of claw given different joint angles
