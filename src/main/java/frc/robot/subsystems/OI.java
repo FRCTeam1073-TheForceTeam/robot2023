@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Joystick;
@@ -14,8 +16,8 @@ public class OI extends SubsystemBase
     public Joystick driverController;
     public Joystick operatorController;
     Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
-    private boolean isCubeMode;
-
+    private BooleanSupplier isCube;
+    private boolean isCubeMode = isCube.getAsBoolean();
 
 
     /** Setting up which controllor is which
@@ -75,7 +77,11 @@ public class OI extends SubsystemBase
         RIGHT_Y_ZERO = getDriverRightY();
     }
 
-    public boolean isCubeMode(){
+    public BooleanSupplier isCube(){
+        return isCube;
+    }
+
+    public boolean isCubeMode() {
         return isCubeMode;
     }
 
