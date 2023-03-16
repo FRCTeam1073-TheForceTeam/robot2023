@@ -16,8 +16,8 @@ public class SwerveModuleConfig
     public double tickPerMeter = 1000;
     public double tickPerRadian = 1000;
     public double steerAngleOffset = 0;
-    public double steerCurrentLimit = 10;
-    public double driveCurrentLimit = 20;
+    public double steerCurrentLimit = 20;
+    public double driveCurrentLimit = 35;
     public double steerCurrentThreshold = 12;
     public double driveCurrentThreshold = 22;
     public double steerCurrentThresholdTime = 0.1;
