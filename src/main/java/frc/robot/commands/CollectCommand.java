@@ -20,14 +20,16 @@ public class CollectCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   claw.setCollectorSpeed(10);
+   claw.setCollectorSpeed(5);
 
   }
   
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    
+  }
 
   // Called once the command ends or is interrupted.
   @Override

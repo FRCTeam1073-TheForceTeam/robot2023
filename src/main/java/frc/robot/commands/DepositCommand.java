@@ -23,7 +23,7 @@ public class DepositCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   claw.setCollectorSpeed(-10);
+   claw.setCollectorSpeed(-5);
 
   }
   
