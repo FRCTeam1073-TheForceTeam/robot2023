@@ -293,15 +293,15 @@ public class RobotContainer {
   public Command armStowCommand(OI oi){
     if(oi.isCubeMode()){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-        waypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.0));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
     }
     else{
     ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-        waypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.0));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
     }
@@ -320,18 +320,18 @@ public class RobotContainer {
    * @return Command that sets arm position
    */
   public Command doubleSubstationCommand(OI oi){
-    if(!oi.isCubeMode()){
+    //if(!oi.isCubeMode()){
     ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, 1.4, 2.0));
-    waypoints.add(m_arm.new JointWaypoints(-2.22, 3.24, 1.50, 4.0));
+    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    waypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 3.0));
     return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
-    }
-    else{
-      ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -0.42, 2.0));
-    waypoints.add(m_arm.new JointWaypoints(-2.60, 3.62, -0.37, 4.0));
-    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
-    }
+    // }
+    // else{
+    //   ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    // waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -0.42, 2.0));
+    // waypoints.add(m_arm.new JointWaypoints(-2.60, 3.62, -0.37, 4.0));
+    // return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
+    // }
   }
 
   /**Positions arm to score in the middle node for both cone and cube
@@ -351,11 +351,17 @@ public class RobotContainer {
   }
 
   public Command highCubeNodeCommand(){
-    return new ArmSetPosition(m_arm, -1.018, 3.764);
+    ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    waypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 3.0));
+    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
   }
 
   public Command midCubeNodeCommand(){
-    return new ArmSetPosition(m_arm, -1.573, 3.9);
+    ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+    waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    waypoints.add(m_arm.new JointWaypoints(-1.72, 3.8, -0.26, 3.0));
+    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
   }
 
   /**First step in the sequence to pick a cube off of the ground. Positions arm above cube to aim before grabbing

@@ -22,6 +22,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -220,7 +221,7 @@ public class Arm extends SubsystemBase{
       times = new double[waypoints.size() + 1];
 
       finalTime = 0.0;
-      startTime = ((double)System.currentTimeMillis() / 1000.0);
+      startTime = Timer.getFPGATimestamp();
       JointPositions pos = getJointAngles();
       elbowPositions[0] = pos.elbow;
       shoulderPositions[0] = pos.shoulder;
@@ -233,11 +234,14 @@ public class Arm extends SubsystemBase{
         times[i + 1] = waypoints.get(i).time;
       }
 
-      if (waypoints.size() > 0)
+      if (times.length > 1)
         finalTime = startTime + times[times.length - 1];  // The last time.
       else{
         finalTime = startTime;
       }
+
+      System.out.println("Trajectory start time: " + startTime);
+      System.out.println("Trajectory end time: " + finalTime);
 
       elbowSplines = interpolator.interpolate(times, elbowPositions);
       shoulderSplines = interpolator.interpolate(times, shoulderPositions);
@@ -377,7 +381,7 @@ public class Arm extends SubsystemBase{
     if (mode == Mode.TRAJECTORY) {
       if (armTrajectory != null) {
         // Update reference positions and velocities:
-        double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
+        double trajectoryTime = Timer.getFPGATimestamp();
         armTrajectory.getPositionsAtTime(trajectoryTime, referencePositions);
         armTrajectory.getVelocitiesAtTime(trajectoryTime, referenceVelocities);
       } else {
@@ -385,10 +389,11 @@ public class Arm extends SubsystemBase{
         mode = Mode.DISABLED;
       }
     } else if (mode == Mode.VELOCITY) {
+      // System.out.println("Velocity mode");
       referencePositions.shoulder += referenceVelocities.shoulder * 0.02;
       referencePositions.elbow += referenceVelocities.elbow * 0.02;
       referencePositions.wrist += referenceVelocities.wrist * 0.02;
-      clamp(referencePositions, minAngles, maxAngles); // Clamp reference positions to our limits at all times.
+      //clamp(referencePositions, minAngles, maxAngles); // Clamp reference positions to our limits at all times.
     } 
 
     
@@ -571,11 +576,18 @@ public class Arm extends SubsystemBase{
   }
 
   public boolean isTrajectoryDone() {
-    double trajectoryTime = ((double)System.currentTimeMillis() / 1000.0);
+    double trajectoryTime = Timer.getFPGATimestamp();
     if (mode == Mode.TRAJECTORY && armTrajectory != null){
-      if (armTrajectory.getFinalTime() < trajectoryTime) {
+      if (armTrajectory.getFinalTime() > trajectoryTime) {
         return false;
       }
+      else{
+        System.out.println("trajectory end time passed: " + trajectoryTime);
+        return true;
+      }
+    }
+    else{
+      System.out.println("no trajectory");
     }
     return true;
   }
