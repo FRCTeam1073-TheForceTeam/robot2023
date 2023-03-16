@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -36,7 +37,6 @@ import frc.robot.commands.DriveThroughTrajectory;
 import frc.robot.commands.Engage;
 import frc.robot.commands.EngageBalance;
 import frc.robot.commands.TeleopClaw;
-import frc.robot.commands.TeleopDebugArm;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
@@ -68,12 +68,12 @@ public class RobotContainer {
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
-  //private final TeleopDebugArm m_armCommand = new TeleopDebugArm(m_arm, m_OI);
   private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
   private final TeleopClaw m_clawCommand = new TeleopClaw(m_claw, m_OI);
+
   //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
   //Auto Chooser
@@ -179,13 +179,16 @@ public class RobotContainer {
     //m_arm.initializeShoulder();
   }
 
+  public void disableInit(){
+    m_arm.disableMotors();
+  }
   //Configures the button mappings for controllers
   private void configureBindings() {
     System.out.println("RobotContainer: configure Bindings");
 
     //Trigger for the arm to stow
     Trigger stowTrigger = new Trigger(m_OI::getOperatorAButton);
-    stowTrigger.onTrue(armStowCommand());
+    stowTrigger.onTrue(armStowCommand(m_OI));
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
     alignToAprilTag.whileTrue(alignToAprilTag(0));
@@ -202,35 +205,20 @@ public class RobotContainer {
     Trigger operatorConeMode = new Trigger(m_OI::getOperatorMenuButton);
     operatorConeMode.onTrue(new InstantCommand(m_OI :: setConeMode));
 
-    if(m_OI.isCubeMode()){
-      Trigger midCubeTrigger = new Trigger(m_OI::getOperatorDPadLeft);
-      midCubeTrigger.onTrue(midCubeNodeCommand());
+      Trigger midTrigger = new Trigger(m_OI::getOperatorXButton);
+      midTrigger.onTrue(midScoreCommand(m_OI));
 
-      Trigger highCubeTrigger = new Trigger(m_OI::getOperatorDPadUp);
-      highCubeTrigger.onTrue(highCubeNodeCommand());
+      Trigger highTrigger = new Trigger(m_OI::getOperatorYButton);
+      highTrigger.onTrue(highScoreCommand(m_OI));
 
-      Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
-      doubleSubstationConeTrigger.onTrue(doubleSubstationCubeCommand());
+      Trigger doubleSubstationTrigger = new Trigger(m_OI::getOperatorBButton);
+      doubleSubstationTrigger.onTrue(doubleSubstationScore(m_OI));
 
-      Trigger cubeGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
-      cubeGroundPickupTrigger.onTrue(cubeGroundPickupCommand());
-    }
-    else{
-      Trigger midConeTrigger = new Trigger(m_OI::getOperatorXButton);
-      midConeTrigger.onTrue(middleConeNodeCommand());
-  
-      Trigger highConeTrigger = new Trigger(m_OI::getOperatorYButton);
-      highConeTrigger.onTrue(highConeNodeCommand());
-  
-      Trigger doubleSubstationConeTrigger = new Trigger(m_OI::getOperatorBButton);
-      doubleSubstationConeTrigger.onTrue(doubleSubstationConeCommand());
-
-      Trigger coneGroundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
-      coneGroundPickupTrigger.onTrue(coneGroundPickupCommand());
-  
+      Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
+      groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
     }
 
-  }
+  
 
 
   /**Sets test mode
@@ -294,53 +282,92 @@ public class RobotContainer {
    * 
    * @return Command that sets arm position
    */
-  public Command armStowCommand(){
-      return new SequentialCommandGroup(
-        new ArmSetPosition(m_arm, -1.9, 3.3),
-        new ArmSetPosition(m_arm, -3.84, 2.95));
+  public Command armStowCommand(OI oi){
+      ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.0));
+    return new SequentialCommandGroup(
+        new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
+
   }
 
-  public Command cubeGroundPickupCommand(){ 
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);  }
+  public Command groundPickupCommand(OI oi){ 
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.19, 5.38, -1.21, 4.0));
 
-  public Command coneGroundPickupCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
+
+    return new ConditionalCommand(
+      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      oi :: isCubeMode);
   }
   
   /** Positions arm to pick up from double substation
    * 
    * @return Command that sets arm position
    */
-  public Command doubleSubstationConeCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);
-  }
 
-  public Command doubleSubstationCubeCommand(){
-    return new ArmSetPosition(m_arm, -2.0576, 3.69);  }
+  
+
+  public Command doubleSubstationScore(OI oi){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 3.2, -0.6, 2.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.45, 3.47, -0.33, 4.0));
+
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
+
+    return new ConditionalCommand(
+      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      oi :: isCubeMode);
+  }
 
   /**Positions arm to score in the middle node for both cone and cube
    * 
    * @return Command that sets arm position
    */
-  public Command middleConeNodeCommand(){
-    return new ArmSetPosition(m_arm, -1.48, 3.75);
+  public Command midScoreCommand(OI oi){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.72, 3.8, -0.26, 3.0));
+
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.33, 1.14, 3.0));
+
+    return new ConditionalCommand(
+      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      oi :: isCubeMode);
   }
 
   /**Positions the arm to score in the high node for both cone and cube.
    * 
    * @return Command that sets arm position
    */
-  public Command highConeNodeCommand(){
-    return new ArmSetPosition(m_arm, -0.652, 3.3086);
+  public Command highScoreCommand(OI oi){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.47, 3.47, -0.18, 3.0));
+
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.46, 3.02, 1.15, 3.0));
+
+    return new ConditionalCommand(
+      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      oi :: isCubeMode);
   }
 
-  public Command highCubeNodeCommand(){
-    return new ArmSetPosition(m_arm, -1.018, 3.764);
-  }
-
-  public Command midCubeNodeCommand(){
-    return new ArmSetPosition(m_arm, -1.573, 3.9);
-  }
 
   /**First step in the sequence to pick a cube off of the ground. Positions arm above cube to aim before grabbing
    * 
@@ -365,6 +392,10 @@ public class RobotContainer {
    * @return Command to do the autonomous outlined above
    */
   public Command scoreHighCubeAndEngageCommand(){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+    
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(1),
@@ -372,11 +403,11 @@ public class RobotContainer {
         // TODO: New Claw command
         //new VacuumActivateCommand(m_claw, true)),
      // new VacuumActivateCommand(m_claw, false),
-      highCubeNodeCommand(),
+      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
         // TODO: New Claw command
         new WaitCommand(1.5),
       new ParallelCommandGroup(
-        armStowCommand(),
+        armStowCommand(m_OI),
         new SequentialCommandGroup(
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false),
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
@@ -392,22 +423,25 @@ public class RobotContainer {
   public Command cubeEngageLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
-
     communityWaypoints.add(new Pose2d(2.4, 0, new Rotation2d(3.14)));
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         // TODO: New Claw command
-        highCubeNodeCommand(),
+        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
         // TODO: New Claw command
         new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.5,
          1.0, 0.5, 0.9), 
-        armStowCommand()), 
+        armStowCommand(m_OI)), 
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
@@ -424,21 +458,24 @@ public class RobotContainer {
   public Command cubeLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
-
     communityWaypoints.add(new Pose2d(2.4, 0.15, new Rotation2d(0)));
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
       // TODO: New Claw command
-        highCubeNodeCommand(),
+        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
       // TODO: New Claw Command
       new WaitCommand(0.5),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
-        armStowCommand()))
+        armStowCommand(m_OI)))
     );
   }
 
@@ -448,15 +485,18 @@ public class RobotContainer {
    * @return  Command that scores a cube after aligning to the april tag and then stows
    */
   public Command scoreHighCubeCommand(){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new CollectCommand(m_claw)),
-      highCubeNodeCommand(),
-      new CollectCommand(m_claw),
+        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),      new CollectCommand(m_claw),
       //new ActuateClaw(m_claw, true, 1),
-      armStowCommand()
+      armStowCommand(m_OI)
     );
   }
 

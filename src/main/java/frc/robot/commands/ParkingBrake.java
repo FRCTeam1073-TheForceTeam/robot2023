@@ -28,7 +28,7 @@ public class ParkingBrake extends CommandBase
     {
         bling.clearLEDs();
         bling.setSlot(1, 255, 0, 0); // sets the LEDs
-        bling.setSlot(2, 255, 160, 0);
+        bling.setSlot(2, 255, 160, 0);  
         bling.setSlot(3, 255, 255, 0);
         bling.setSlot(4, 0, 255, 0);
         bling.setSlot(5, 0, 0, 255);

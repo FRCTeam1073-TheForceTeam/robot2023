@@ -51,13 +51,11 @@ public class Bling extends SubsystemBase {
     blingEntry = blingNetworkTable.getEntry("Shoulder Angle").getDouble(0.0);
     //blingEntry2 = blingNetworkTable.getEntry("Shoulder Angle on init").getDouble(0.0);
    // blingEntry = arm.getJointAngles().shoulder;
-    // TODO: change for the actual length
-    m_ledBuffer = new AddressableLEDBuffer(24);//0 as placeholder
+    m_ledBuffer = new AddressableLEDBuffer(24);
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
-    slotLength = (int) (m_ledBuffer.getLength() / (8));//1 as placeholder
-
+    slotLength = (int) (m_ledBuffer.getLength() / (8));
   }
 
   /**
