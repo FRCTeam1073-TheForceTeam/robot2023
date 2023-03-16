@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,14 +43,14 @@ public class TeleopDrive extends CommandBase
   double last_error = 0; //for snap-to-positions derivative
   double last_time = 0; //for snap-to-positions derivative
 
-  ProfiledPIDController snapPidProfile;
+  PIDController snapPidProfile;
 
   // Teleop drive velocity scaling:
   private final static double maximumLinearVelocity = 3.5;   // Meters/second
   private final static double maximumRotationVelocity = 4.0; // Radians/second
 
   //Snap to position thresholds
-  private final static double STOP_THRESHOLD = 5;
+  private final static double STOP_THRESHOLD = 20;
   private final static double SLOW_THRESHOLD = 30;
 
   /** Creates a new Teleop. */
@@ -61,11 +62,10 @@ public class TeleopDrive extends CommandBase
     fieldCentric = true;
     startAngle = ds.getHeading();
     desiredAngle = startAngle;
-    snapPidProfile = new ProfiledPIDController(
-      Preferences.getDouble("Snap to Position P", 0.1), 
-      Preferences.getDouble("Snap to Position I", 0.0), 
-      Preferences.getDouble("Snap to Position D", 0.0), 
-      new TrapezoidProfile.Constraints(1, Preferences.getDouble("Snap to Position Max Acceleration", 0.5)));
+    snapPidProfile = new PIDController(
+      0.05, 
+      0.0, 
+      0.0);
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(ds);
   }
@@ -177,8 +177,8 @@ public class TeleopDrive extends CommandBase
     else if (fieldCentric){
       //Snap to cardinal directions
       double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
-      desiredAngle += rightX;
-      rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), desiredAngle);
+      //desiredAngle += rightX;
+      //rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), desiredAngle);
 
       //double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + (leftY > 0 ? -add1 : add1) + (leftY > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
       //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
@@ -228,11 +228,11 @@ public class TeleopDrive extends CommandBase
     //  return 0;
     //}
 
-    snapPidProfile.setTolerance(STOP_THRESHOLD);
-    snapPidProfile.enableContinuousInput(-180, 180);
-    return snapPidProfile.calculate(currentAngle, targetAngle);
+    //snapPidProfile.setTolerance(STOP_THRESHOLD);
+    //snapPidProfile.enableContinuousInput(-180, 180);
+    //return MathUtil.clamp(snapPidProfile.calculate(currentAngle, targetAngle), -1.0, 1.0);
     //calculate derivative
-    /*
+    
     error = error * Math.PI / 180;
     double new_error = error;
     double current_time = System.currentTimeMillis();
@@ -242,7 +242,7 @@ public class TeleopDrive extends CommandBase
     error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
 
     return MathUtil.clamp(error * .7 + derivative * .1, -maximumRotationVelocity, maximumRotationVelocity) / maximumRotationVelocity;
-    */
+    
   }
 
   // Called once the command ends or is interrupted.
