@@ -110,7 +110,7 @@ public class Claw extends SubsystemBase {
 
     collectorMotor.config_kP(0, 0.2);
     collectorMotor.config_kI(0, 0);
-    collectorMotor.config_kD(0, 0);
+    collectorMotor.config_kD(0, 0.02);
     collectorMotor.config_kF(0, 0);
     collectorMotor.configMaxIntegralAccumulator(0, 0);
     collectorMotor.setIntegralAccumulator(0);

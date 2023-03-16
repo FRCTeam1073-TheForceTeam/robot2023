@@ -5,6 +5,7 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -58,6 +59,7 @@ public class OI extends SubsystemBase
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        SmartDashboard.putBoolean("OI/isCubeMode", isCubeMode);
     }
 
     //------- Driver Controller Joysticks Below
