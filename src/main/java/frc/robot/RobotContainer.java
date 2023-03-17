@@ -423,13 +423,13 @@ public class RobotContainer {
     communityWaypoints.add(new Pose2d(2.4, 0, new Rotation2d(3.14)));
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
-        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
+        //new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new CollectCommand(m_claw, true, 0.5)),
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
       new DepositCommand(m_claw, true, 1),
@@ -457,13 +457,13 @@ public class RobotContainer {
     communityWaypoints.add(new Pose2d(2.4, 0.15, new Rotation2d(0)));
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(0.5),
-        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
+        //new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new CollectCommand(m_claw, true, 0.5)),
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
       new DepositCommand(m_claw, true, 1),
@@ -481,13 +481,13 @@ public class RobotContainer {
    */
   public Command scoreHighCubeCommand(){
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-3.9, 2.9, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitCommand(1),
-        new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
+        //new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new CollectCommand(m_claw, true, 0.5)),
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),      
       new DepositCommand(m_claw, true, 1),
