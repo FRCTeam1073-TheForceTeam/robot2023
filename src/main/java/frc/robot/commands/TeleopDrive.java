@@ -98,6 +98,7 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftX) < .05) {leftX = 0;}
     if(Math.abs(rightX) < .15) {rightX = 0;}
 
+    /* 
     double velVector = Math.sqrt(Math.pow(leftY, 2) + Math.pow(leftX, 2));
     double tempY = leftY;
     double tempX = leftX;
@@ -115,6 +116,7 @@ public class TeleopDrive extends CommandBase
         leftX = -Math.sqrt(1 - Math.pow(tempX, 2));
       }
     }
+    */
 
     double xAdd;
     double yAdd;
