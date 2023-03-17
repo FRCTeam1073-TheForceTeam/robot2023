@@ -4,23 +4,36 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw;
 
 public class CollectCommand extends CommandBase {
   /** Creates a new VacuumActivateCommand. */
   private Claw claw;
+  private boolean isCube;
+  private double time;
+  private double startTime;
   
-  public CollectCommand(Claw claw) {
+  public CollectCommand(Claw claw, boolean isCube, double time) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.time = time;
     this.claw = claw;
+    this.isCube = isCube;
     addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   claw.setCollectorSpeed(10);
+    startTime = Timer.getFPGATimestamp();
+    if(isCube){
+      claw.setCollectorSpeed(5);
+    }
+    else{
+      claw.setCollectorSpeed(-5);
+    }
+   
 
   }
   
@@ -38,10 +51,6 @@ public class CollectCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(claw.getRange1() == 0 && claw.getRange2() == 0)
-    {
-      return true;
-    }
-    return false;
+    return ((Timer.getFPGATimestamp() - startTime) >= time);
   }
 }

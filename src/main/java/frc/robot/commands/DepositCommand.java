@@ -12,30 +12,34 @@ import edu.wpi.first.wpilibj.Timer;
 public class DepositCommand extends CommandBase {
   /** Creates a new VacuumActivateCommand. */
   private Claw claw;
+  private boolean isCube;
+  private double time;
   private double startTime = 0.0;
   
-  public DepositCommand(Claw claw) {
+  public DepositCommand(Claw claw, boolean isCube, double time) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
+    this.isCube = isCube;
+    this.time = time;
     addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   claw.setCollectorSpeed(-10);
-
+    startTime = Timer.getFPGATimestamp();
+    if(isCube){
+      claw.setCollectorSpeed(-5);
+    }
+    else{
+      claw.setCollectorSpeed(5);
+    }
   }
   
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    if (startTime == 0.0) // sets the timer which makes sure the collector runs for a set amount of time
-      {
-        startTime = Timer.getFPGATimestamp();
-      }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
@@ -46,10 +50,6 @@ public class DepositCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(claw.getRange1() == 0 && claw.getRange2() == 0)
-    {
-      return false;
-    }
-    return true;
+    return ((Timer.getFPGATimestamp() - startTime) >= time);
   }
 }

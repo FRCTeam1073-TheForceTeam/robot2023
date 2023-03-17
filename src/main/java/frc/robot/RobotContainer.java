@@ -41,6 +41,7 @@ import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.commands.CollectCommand;
+import frc.robot.commands.DepositCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
@@ -341,7 +342,7 @@ public class RobotContainer {
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
         coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.33, 1.14, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
@@ -356,11 +357,11 @@ public class RobotContainer {
   public Command highScoreCommand(OI oi){
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        cubeWaypoints.add(m_arm.new JointWaypoints(-1.47, 3.47, -0.18, 3.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
         coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.46, 3.02, 1.15, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.484, 3.211, 1.09, 3.0));
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
@@ -400,11 +401,11 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        // TODO: New Claw command
+        new CollectCommand(m_claw, true, 0.5)),
         //new VacuumActivateCommand(m_claw, true)),
      // new VacuumActivateCommand(m_claw, false),
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-        // TODO: New Claw command
+        new DepositCommand(m_claw, true, 1),
         new WaitCommand(1.5),
       new ParallelCommandGroup(
         armStowCommand(m_OI),
@@ -412,8 +413,7 @@ public class RobotContainer {
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), false),
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
-      new ParkingBrake(m_driveSubsystem, m_bling))))
-    );
+      new ParkingBrake(m_driveSubsystem, m_bling))));
   }
 
   /** Autonomous command that aligns to april tags, scores a cube, leaves community, and then comes back to engage.
@@ -493,11 +493,11 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new WaitCommand(1),
         new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new CollectCommand(m_claw)),
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),      new CollectCommand(m_claw),
+        //new CollectCommand(m_claw)),
+        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),      //new CollectCommand(m_claw),
       //new ActuateClaw(m_claw, true, 1),
       armStowCommand(m_OI)
-    );
+    ));
   }
 
   /**Moves robot back to score a preloaded game piece onto hybrid node, drives over the charging station to leave community, 
