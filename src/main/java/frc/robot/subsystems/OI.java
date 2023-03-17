@@ -16,7 +16,7 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
-    Debouncer parkingBrakeDebouncer = new Debouncer(0.1);
+    Debouncer parkingBrakeDebouncer = new Debouncer(0.05);
     //private BooleanSupplier isCube;
     private boolean isCubeMode;
 
