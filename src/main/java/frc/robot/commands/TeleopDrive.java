@@ -87,8 +87,8 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute(){
     //multiples the angle by a number from 1 to the square root of 30:
-    double add1 = m_OI.getDriverLeftTrigger() * 12/25;
-    double add2 = m_OI.getDriverRightTrigger() * 12/25;
+    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * ((Math.sqrt(25)) - 1));
+    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * ((Math.sqrt(25)) - 1));
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -98,6 +98,7 @@ public class TeleopDrive extends CommandBase
     if(Math.abs(leftX) < .05) {leftX = 0;}
     if(Math.abs(rightX) < .15) {rightX = 0;}
 
+    /* 
     double velVector = Math.sqrt(Math.pow(leftY, 2) + Math.pow(leftX, 2));
     double tempY = leftY;
     double tempX = leftX;
@@ -115,11 +116,12 @@ public class TeleopDrive extends CommandBase
         leftX = -Math.sqrt(1 - Math.pow(tempX, 2));
       }
     }
+    */
 
-    double xAdd;
-    double yAdd;
-    double wAdd;
-
+    double xAdd = 0;
+    double yAdd = 0;
+    double wAdd = 0;
+/* 
     if(leftY > 0){
       xAdd = add1 + add2;
     }
@@ -149,7 +151,7 @@ public class TeleopDrive extends CommandBase
     else{
       wAdd = 0;
     }
-
+*/
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
     if (m_OI.getFieldCentricToggle()){
       fieldCentric = !fieldCentric;
@@ -184,9 +186,9 @@ public class TeleopDrive extends CommandBase
       //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
       //double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (rightX > 0 ? -add2 : add2)), -maximumRotationVelocity, maximumRotationVelocity);
 
-      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + xAdd), -maximumLinearVelocity, maximumLinearVelocity);
-      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + yAdd), -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
+      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 ) * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25) * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
@@ -198,9 +200,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 + xAdd), -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + yAdd), -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25 + wAdd), -maximumRotationVelocity, maximumRotationVelocity);
+      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25)* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25)* mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     
