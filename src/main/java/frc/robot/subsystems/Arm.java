@@ -475,7 +475,8 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setIntegralAccumulator(0, 0, 100);
     isShoulderInitialized = false;
 
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
+    //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.95 * shoulderTicksPerRadian, 0, 400);
     if (errorShoulder != ErrorCode.OK) {
       System.out.println("Shoulder: set selected sensor position failed.");
     }
@@ -492,7 +493,8 @@ public class Arm extends SubsystemBase{
     elbowMotor.configMaxIntegralAccumulator(0, 500, 100);
     elbowMotor.setIntegralAccumulator(0);
 
-    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, 400);
+    //ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, 400);
+    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(2.95 * elbowTicksPerRadian, 0, 400);    
     if (errorElbow != ErrorCode.OK) {
       System.out.println("Elbow: set selected sensor position failed,");
     }
