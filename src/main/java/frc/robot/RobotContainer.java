@@ -426,7 +426,7 @@ public class RobotContainer {
   public Command cubeEngageLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
-    communityWaypoints.add(new Pose2d(4, 0, new Rotation2d(3.14)));
+    communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
@@ -439,7 +439,7 @@ public class RobotContainer {
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
-        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 1.0, 
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 0.8, 
         1.0, 0.5, 0.5), 
         armStowCommand(m_OI)), 
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
@@ -492,6 +492,31 @@ public class RobotContainer {
       new DepositCommand(m_claw, true, 1.0),
       armStowCommand(m_OI)
     );
+  }
+
+  public Command cubeLeaveCubeEngage(){
+    ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
+    communityWaypoints.add(new Pose2d(4, 0, new Rotation2d(3.14)));
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
+
+    ArrayList<Arm.JointWaypoints> cubeGroundWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeGroundWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        cubeGroundWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
+        cubeGroundWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
+
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new CollectCommand(m_claw, true, 0.8)),
+      new DepositCommand(m_claw, true, 1.0),
+      new ParallelDeadlineGroup( 
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 0.5, 
+        1.0, 0.5, 0.5), 
+        armStowCommand(m_OI)));
   }
 
   /**Moves robot back to score a preloaded game piece onto hybrid node, drives over the charging station to leave community, 
