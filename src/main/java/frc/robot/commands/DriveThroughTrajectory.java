@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import edu.wpi.first.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
@@ -35,6 +36,9 @@ public class DriveThroughTrajectory extends CommandBase {
   ArrayList<Pose2d> posePoints;
   ArrayList<Pose2d> posePointInput;
   Trajectory trajectory;
+  InterpolatingTreeMap<Double,Double> xTrajectory;
+  InterpolatingTreeMap<Double,Double> yTrajectory;
+  InterpolatingTreeMap<Double,Double> thetaTrajectory;
   double currentTime;
   double maxVelocity;
   double maxAngularVelocity;
@@ -59,31 +63,37 @@ public class DriveThroughTrajectory extends CommandBase {
     this.maxVelocity = maxVelocity;
     this.maxAngularVelocity = maxAngularVelocity;
     this.alpha = alpha;
+    xTrajectory = new InterpolatingTreeMap<Double,Double>();
+    yTrajectory = new InterpolatingTreeMap<Double,Double>();
+    thetaTrajectory = new InterpolatingTreeMap<Double,Double>();
     addRequirements(ds);
   }
 
   /** Generates trajectory for robot to go through by creating different trajectory states for each waypoints
    * 
    * @param wayPoints list of waypoints the robot should go through
-   * @param trajecotryCfg trajectory config of max acceleration and max velocity
    * @return generated trajectory for robot to follow
    */
-  public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints){
+  public void generateTrajectory(ArrayList<Pose2d> wayPoints){
     List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
     double trajectoryTime = 0;
+    xTrajectory.clear();
+    yTrajectory.clear();
+    thetaTrajectory.clear();
     for(int i = 0; i < wayPoints.size(); i++){
-      Trajectory.State ts = new Trajectory.State();
-      ts.poseMeters = wayPoints.get(i);
-      ts.timeSeconds = trajectoryTime;
-      ts.velocityMetersPerSecond = maxVelocity;
-      ts.curvatureRadPerMeter = 0;
-      ts.accelerationMetersPerSecondSq = 1;
-      traj.add(ts);
+      // Trajectory.State ts = new Trajectory.State();
+      // ts.poseMeters = wayPoints.get(i);
+      // ts.timeSeconds = trajectoryTime;
+      // ts.velocityMetersPerSecond = maxVelocity;
+      // ts.curvatureRadPerMeter = 0;
+      // ts.accelerationMetersPerSecondSq = 1;
+      // traj.add(ts);
+      xTrajectory.put(trajectoryTime, wayPoints.get(i).getX());
+      yTrajectory.put(trajectoryTime, wayPoints.get(i).getY());
+      thetaTrajectory.put(trajectoryTime, wayPoints.get(i).getRotation().getRadians());
       //update time appropriately
       trajectoryTime += 5;
     }
-
-    return new Trajectory(traj);
   }
 
   // Called when the command is initially scheduled.
@@ -95,7 +105,7 @@ public class DriveThroughTrajectory extends CommandBase {
     posePoints.add(startPose);
     posePoints.addAll(posePointInput);
     endPose = posePoints.get(posePoints.size() - 1);
-    trajectory = generateTrajectory(posePointInput);
+    generateTrajectory(posePointInput);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -103,7 +113,7 @@ public class DriveThroughTrajectory extends CommandBase {
   @Override
   public void execute() {
     robotPose = drivetrain.getOdometry();
-    Trajectory.State state = trajectory.sample(currentTime);
+    Pose2d state = new Pose2d(new Translation2d(xTrajectory.get(currentTime).doubleValue(), yTrajectory.get(currentTime).doubleValue()));
     Transform2d difference = new Transform2d(robotPose, state.poseMeters);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
