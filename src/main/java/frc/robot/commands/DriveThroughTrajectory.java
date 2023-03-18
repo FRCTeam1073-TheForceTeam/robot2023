@@ -113,8 +113,11 @@ public class DriveThroughTrajectory extends CommandBase {
   @Override
   public void execute() {
     robotPose = drivetrain.getOdometry();
-    Pose2d state = new Pose2d(new Translation2d(xTrajectory.get(currentTime).doubleValue(), yTrajectory.get(currentTime).doubleValue()));
-    Transform2d difference = new Transform2d(robotPose, state.poseMeters);
+    Pose2d state = new Pose2d(
+      new Translation2d(xTrajectory.get(currentTime).doubleValue(), 
+      yTrajectory.get(currentTime).doubleValue()),
+      Rotation2d.fromRadians(thetaTrajectory.get(currentTime).doubleValue()));
+    Transform2d difference = new Transform2d(robotPose, state);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
 
@@ -122,9 +125,9 @@ public class DriveThroughTrajectory extends CommandBase {
     //double angularVelocity = 0.4 * difference.getRotation().getRadians();
     //double angularVelocity = 0;
 
-    SmartDashboard.putNumber("Trajectory X", state.poseMeters.getX());
-    SmartDashboard.putNumber("Trajectory Y", state.poseMeters.getY());
-    SmartDashboard.putNumber("Trajectory theta", state.poseMeters.getRotation().getDegrees());
+    SmartDashboard.putNumber("Trajectory X", state.getX());
+    SmartDashboard.putNumber("Trajectory Y", state.getY());
+    SmartDashboard.putNumber("Trajectory theta", state.getRotation().getRadians());
     SmartDashboard.putNumber("Difference X", difference.getX());
     SmartDashboard.putNumber("Difference y", difference.getY());
     SmartDashboard.putNumber("Time", currentTime);
