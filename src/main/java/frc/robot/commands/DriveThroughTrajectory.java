@@ -80,18 +80,17 @@ public class DriveThroughTrajectory extends CommandBase {
     yTrajectory.clear();
     thetaTrajectory.clear();
     for(int i = 0; i < wayPoints.size(); i++){
-      // Trajectory.State ts = new Trajectory.State();
-      // ts.poseMeters = wayPoints.get(i);
-      // ts.timeSeconds = trajectoryTime;
-      // ts.velocityMetersPerSecond = maxVelocity;
-      // ts.curvatureRadPerMeter = 0;
-      // ts.accelerationMetersPerSecondSq = 1;
-      // traj.add(ts);
+
       xTrajectory.put(trajectoryTime, wayPoints.get(i).getX());
       yTrajectory.put(trajectoryTime, wayPoints.get(i).getY());
       thetaTrajectory.put(trajectoryTime, wayPoints.get(i).getRotation().getRadians());
       //update time appropriately
-      trajectoryTime += 5;
+      if(i < wayPoints.size() - 1){
+        Transform2d difference = new Transform2d(wayPoints.get(i), wayPoints.get(i + 1));
+        double tTime = difference.getTranslation().getNorm() / maxVelocity;
+        double rTime = Math.abs(difference.getRotation().getRadians()) / maxAngularVelocity;
+        trajectoryTime += Math.max(tTime, rTime);
+      }
     }
     endTime = trajectoryTime;
   }
@@ -99,14 +98,14 @@ public class DriveThroughTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    currentTime = 0.0;
+    currentTime = 0.01;
     startPose = drivetrain.getOdometry();
     posePoints = new ArrayList<Pose2d>();
     posePoints.add(0,startPose);
     posePoints.addAll(posePointInput);
     endPose = posePoints.get(posePoints.size() - 1);
-    generateTrajectory(posePointInput);
-    System.out.println("Drive Through Trajectory" + posePoints.size());
+    generateTrajectory(posePoints);
+    System.out.println("Drive Through Trajectory  " + posePoints.size());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -121,17 +120,15 @@ public class DriveThroughTrajectory extends CommandBase {
     Transform2d difference = new Transform2d(robotPose, state);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
-
     double angularVelocity = 0.6 * difference.getRotation().getRadians();
-    //double angularVelocity = 0.4 * difference.getRotation().getRadians();
-    //double angularVelocity = 0;
+
 
     SmartDashboard.putNumber("Trajectory X", state.getX());
     SmartDashboard.putNumber("Trajectory Y", state.getY());
     SmartDashboard.putNumber("Trajectory theta", state.getRotation().getRadians());
     SmartDashboard.putNumber("Difference X", difference.getX());
     SmartDashboard.putNumber("Difference y", difference.getY());
-    SmartDashboard.putNumber("Time", currentTime);
+    SmartDashboard.putNumber("Trajectory Time", currentTime);
 
     xVelocity = MathUtil.clamp(xVelocity, -maxVelocity, maxVelocity);
     yVelocity = MathUtil.clamp(yVelocity, -maxVelocity, maxVelocity);
@@ -169,7 +166,7 @@ public class DriveThroughTrajectory extends CommandBase {
     var error = robotPose.minus(endPose);
      
     if (error.getTranslation().getNorm()< distanceTolerance && Math.abs(error.getRotation().getRadians()) < angleTolerance) {
-      System.out.println("DriveThroughPoint Is Finished");
+      System.out.println("DriveThroughTrajectory Is Finished");
       return true;
     }
     /*

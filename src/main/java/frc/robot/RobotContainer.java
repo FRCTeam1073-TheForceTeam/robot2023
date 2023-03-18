@@ -539,8 +539,9 @@ public class RobotContainer {
     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
         waypoints.add(new Pose2d(2.5, 0.0, new Rotation2d(3.14)));
         waypoints.add(new Pose2d(2.5, -1.0, new Rotation2d(3.14)));
+        waypoints.add(new Pose2d(2.5, -1, new Rotation2d(0)));
 
-    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, waypoints, 0.5, 0.8, 0.5, 0.5));
+    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, waypoints, 1, 1, 0.5, 0.5));
 
   }
 
