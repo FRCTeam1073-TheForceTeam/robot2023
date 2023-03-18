@@ -476,7 +476,7 @@ public class Arm extends SubsystemBase{
     isShoulderInitialized = false;
 
     //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.91 * shoulderTicksPerRadian, 0, 400);
+    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.95 * shoulderTicksPerRadian, 0, 400);
     if (errorShoulder != ErrorCode.OK) {
       System.out.println("Shoulder: set selected sensor position failed.");
     }

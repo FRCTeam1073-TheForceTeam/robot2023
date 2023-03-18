@@ -367,7 +367,7 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
         coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.484, 3.211, 1.09, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
