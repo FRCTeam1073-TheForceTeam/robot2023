@@ -33,9 +33,8 @@ public class Claw extends SubsystemBase {
   private double tof2Freq;
   private double tof1Range;
   private double tof2Range;
-  private final double tof1ScaleFactor = 1;
-  private final double tof2ScaleFactor = 1;
-  private final double constant = 1;
+  private final double tof1ScaleFactor = 100000;
+  private final double tof2ScaleFactor = 100000;
   private final double collectorScaleFactor = 21000;
   //private final boolean debug = true;
 
@@ -70,6 +69,8 @@ public class Claw extends SubsystemBase {
     SmartDashboard.putNumber("TOF 1/Range", tof1Range);
     SmartDashboard.putNumber("TOF 2/Range", tof1Range);
     SmartDashboard.putNumber("Collector Speed", collectorSpeed);
+    SmartDashboard.putNumber("TOF 1/Frequency", tof1Freq);
+    SmartDashboard.putNumber("TOF 2/Frequency", tof2Freq);
 
     if (debug) {
       SmartDashboard.putNumber("TOF 1/Frequency", tof1Freq);

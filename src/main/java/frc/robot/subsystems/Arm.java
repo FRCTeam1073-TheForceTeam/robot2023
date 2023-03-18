@@ -437,6 +437,10 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Arm.ShoulderVelRef", referenceVelocities.shoulder);
     SmartDashboard.putNumber("Arm.ElbowVelRef", referenceVelocities.elbow);
     SmartDashboard.putNumber("Arm.WristVelRef", referenceVelocities.wrist);
+
+    SmartDashboard.putNumber("Arm.ShoulderTemp", shoulderMotor.getTemperature());
+    SmartDashboard.putNumber("Arm.ElbowTemp", elbowMotor.getTemperature());
+    SmartDashboard.putNumber("Arm.WristTemp", wristMotor.getTemperature());
   }
 
   // Initialize preferences for this class:
