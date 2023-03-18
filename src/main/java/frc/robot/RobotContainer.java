@@ -285,8 +285,8 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
-        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.0));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.5));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
 
@@ -408,8 +408,8 @@ public class RobotContainer {
       new ParallelDeadlineGroup(
         new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
         //new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
-        new CollectCommand(m_claw, true, 0.6)),
-      new DepositCommand(m_claw, true, 0.6),
+        new CollectCommand(m_claw, true, 0.8)),
+      new DepositCommand(m_claw, true, 1.0),
       new ParallelCommandGroup(
         armStowCommand(m_OI),
         new SequentialCommandGroup(
@@ -436,8 +436,8 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-        new CollectCommand(m_claw, true, 0.6)),
-      new DepositCommand(m_claw, true, 0.6),
+        new CollectCommand(m_claw, true, 0.8)),
+      new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.0, 
@@ -468,8 +468,8 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-        new CollectCommand(m_claw, true, 0.6)),
-      new DepositCommand(m_claw, true, 0.6),
+        new CollectCommand(m_claw, true, 0.8)),
+      new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
         new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
         new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
@@ -490,8 +490,8 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-        new CollectCommand(m_claw, true, 0.6)),
-      new DepositCommand(m_claw, true, 0.6),
+        new CollectCommand(m_claw, true, 0.8)),
+      new DepositCommand(m_claw, true, 1.0),
       armStowCommand(m_OI)
     );
   }
