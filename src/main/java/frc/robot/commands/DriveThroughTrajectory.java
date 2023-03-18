@@ -35,7 +35,6 @@ public class DriveThroughTrajectory extends CommandBase {
   Pose2d robotPose;
   ArrayList<Pose2d> posePoints;
   ArrayList<Pose2d> posePointInput;
-  Trajectory trajectory;
   InterpolatingTreeMap<Double,Double> xTrajectory;
   InterpolatingTreeMap<Double,Double> yTrajectory;
   InterpolatingTreeMap<Double,Double> thetaTrajectory;
@@ -43,6 +42,7 @@ public class DriveThroughTrajectory extends CommandBase {
   double maxVelocity;
   double maxAngularVelocity;
   double alpha;
+  double endTime;
 
   /** Constructs a DriveThroughTrajectory
    * 
@@ -75,7 +75,6 @@ public class DriveThroughTrajectory extends CommandBase {
    * @return generated trajectory for robot to follow
    */
   public void generateTrajectory(ArrayList<Pose2d> wayPoints){
-    List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
     double trajectoryTime = 0;
     xTrajectory.clear();
     yTrajectory.clear();
@@ -94,6 +93,7 @@ public class DriveThroughTrajectory extends CommandBase {
       //update time appropriately
       trajectoryTime += 5;
     }
+    endTime = trajectoryTime;
   }
 
   // Called when the command is initially scheduled.
@@ -102,10 +102,11 @@ public class DriveThroughTrajectory extends CommandBase {
     currentTime = 0.0;
     startPose = drivetrain.getOdometry();
     posePoints = new ArrayList<Pose2d>();
-    posePoints.add(startPose);
+    posePoints.add(0,startPose);
     posePoints.addAll(posePointInput);
     endPose = posePoints.get(posePoints.size() - 1);
     generateTrajectory(posePointInput);
+    System.out.println("Drive Through Trajectory" + posePoints.size());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -140,17 +141,18 @@ public class DriveThroughTrajectory extends CommandBase {
     SmartDashboard.putNumber("Trajectory Speed Y", yVelocity);
     SmartDashboard.putNumber("Trajectory Angular Speed", angularVelocity);
 
+
 //    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
 //      Rotation2d.fromDegrees(drivetrain.getHeading()));
 
     speeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
 
     drivetrain.setChassisSpeeds(speeds);
-    if(currentTime < trajectory.getTotalTimeSeconds()){
+    if(currentTime < endTime){
       currentTime += 0.02;
     }
     else{
-      currentTime = trajectory.getTotalTimeSeconds();
+      currentTime = endTime;
     }
   }
 
