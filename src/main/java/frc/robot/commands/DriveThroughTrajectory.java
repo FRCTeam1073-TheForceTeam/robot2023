@@ -28,43 +28,17 @@ public class DriveThroughTrajectory extends CommandBase {
   double angleTolerance = 0.1;
 
   DriveSubsystem drivetrain;
+  ChassisSpeeds speeds;
   Pose2d startPose;
   Pose2d endPose;
   Pose2d robotPose;
-  ArrayList<Translation2d> wayPoints;
   ArrayList<Pose2d> posePoints;
-  TrajectoryConfig trajectoryCfg;
+  ArrayList<Pose2d> posePointInput;
   Trajectory trajectory;
-  double time;
+  double currentTime;
   double maxVelocity;
   double maxAngularVelocity;
   double alpha;
-
-  /**Constructs a DriveThroughTrajectory
-   * 
-   * @param ds variable for driveSubsystem
-   * @param start start position
-   * @param wayPointList list of waypoints the robot should go through
-   * @param end end position
-   * @param maxVelocity maximum robot velocity
-   * @param maxAngularVelocity maximum angular velocity
-   * @param maxAcceleration maximum robot acceleration
-   * @param alpha speed multiplier
-   */
-  public DriveThroughTrajectory(DriveSubsystem ds, Pose2d start, ArrayList<Translation2d> wayPointList, Pose2d end, 
-  double maxVelocity, double maxAngularVelocity, double maxAcceleration, double alpha) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    drivetrain = ds;
-    startPose = start;
-    wayPoints = wayPointList;
-    endPose = end;
-    this.maxVelocity = maxVelocity;
-    this.maxAngularVelocity = maxAngularVelocity;
-    this.alpha = alpha;
-    trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
-    trajectory = TrajectoryGenerator.generateTrajectory(startPose, wayPoints, endPose, trajectoryCfg);
-    addRequirements(ds);
-  }
 
   /** Constructs a DriveThroughTrajectory
    * 
@@ -76,23 +50,15 @@ public class DriveThroughTrajectory extends CommandBase {
    * @param maxAcceleration maximum robot acceleration
    * @param alpha speed multiplier
    */
-  public DriveThroughTrajectory(DriveSubsystem ds, Pose2d start, ArrayList<Pose2d> posePointList, 
+  public DriveThroughTrajectory(DriveSubsystem ds, ArrayList<Pose2d> posePointList, 
   double maxVelocity, double maxAngularVelocity, double maxAcceleration, double alpha) {
     // Use addRequirements() here to declare subsystem dependencies.
     drivetrain = ds;
-    startPose = start;
-    posePoints = new ArrayList<Pose2d>();
-    posePoints.add(start);
-    posePoints.addAll(posePointList);
-    endPose = posePoints.get(posePoints.size() - 1);
+    startPose = new Pose2d();
+    posePointInput = posePointList;
     this.maxVelocity = maxVelocity;
     this.maxAngularVelocity = maxAngularVelocity;
     this.alpha = alpha;
-    trajectoryCfg = new TrajectoryConfig(maxVelocity, maxAcceleration);
-    //trajectoryCfg.addConstraint(new SwerveDriveKinematicsConstraint(drivetrain.getKinematics(), 2.0));
-    trajectoryCfg.setKinematics(drivetrain.getKinematics());
-    //trajectory = TrajectoryGenerator.generateTrajectory(posePoints, trajectoryCfg);
-    trajectory = generateTrajectory(posePointList, trajectoryCfg);
     addRequirements(ds);
   }
 
@@ -102,19 +68,19 @@ public class DriveThroughTrajectory extends CommandBase {
    * @param trajecotryCfg trajectory config of max acceleration and max velocity
    * @return generated trajectory for robot to follow
    */
-  public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints, TrajectoryConfig trajecotryCfg){
+  public Trajectory generateTrajectory(ArrayList<Pose2d> wayPoints){
     List<Trajectory.State> traj = new ArrayList<Trajectory.State>();
     double trajectoryTime = 0;
     for(int i = 0; i < wayPoints.size(); i++){
       Trajectory.State ts = new Trajectory.State();
       ts.poseMeters = wayPoints.get(i);
       ts.timeSeconds = trajectoryTime;
-      ts.velocityMetersPerSecond = trajecotryCfg.getMaxVelocity();
+      ts.velocityMetersPerSecond = maxVelocity;
       ts.curvatureRadPerMeter = 0;
       ts.accelerationMetersPerSecondSq = 1;
       traj.add(ts);
       //update time appropriately
-      trajectoryTime += 1;
+      trajectoryTime += 5;
     }
 
     return new Trajectory(traj);
@@ -123,7 +89,13 @@ public class DriveThroughTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    time = 0.0;
+    currentTime = 0.0;
+    startPose = drivetrain.getOdometry();
+    posePoints = new ArrayList<Pose2d>();
+    posePoints.add(startPose);
+    posePoints.addAll(posePointInput);
+    endPose = posePoints.get(posePoints.size() - 1);
+    trajectory = generateTrajectory(posePointInput);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -131,7 +103,7 @@ public class DriveThroughTrajectory extends CommandBase {
   @Override
   public void execute() {
     robotPose = drivetrain.getOdometry();
-    Trajectory.State state = trajectory.sample(time);
+    Trajectory.State state = trajectory.sample(currentTime);
     Transform2d difference = new Transform2d(robotPose, state.poseMeters);
     double xVelocity = alpha * difference.getX();
     double yVelocity = alpha * difference.getY();
@@ -145,23 +117,27 @@ public class DriveThroughTrajectory extends CommandBase {
     SmartDashboard.putNumber("Trajectory theta", state.poseMeters.getRotation().getDegrees());
     SmartDashboard.putNumber("Difference X", difference.getX());
     SmartDashboard.putNumber("Difference y", difference.getY());
-    SmartDashboard.putNumber("Time", time);
+    SmartDashboard.putNumber("Time", currentTime);
 
     xVelocity = MathUtil.clamp(xVelocity, -maxVelocity, maxVelocity);
     yVelocity = MathUtil.clamp(yVelocity, -maxVelocity, maxVelocity);
     angularVelocity = MathUtil.clamp(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
 
+    SmartDashboard.putNumber("Trajectory Speed X", xVelocity);
+    SmartDashboard.putNumber("Trajectory Speed Y", yVelocity);
+    SmartDashboard.putNumber("Trajectory Angular Speed", angularVelocity);
+
 //    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, angularVelocity, 
 //      Rotation2d.fromDegrees(drivetrain.getHeading()));
 
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
+    speeds = new ChassisSpeeds(xVelocity, yVelocity, angularVelocity);
 
-    drivetrain.setChassisSpeeds(chassisSpeeds);
-    if(time < trajectory.getTotalTimeSeconds()){
-      time += 0.02;
+    drivetrain.setChassisSpeeds(speeds);
+    if(currentTime < trajectory.getTotalTimeSeconds()){
+      currentTime += 0.02;
     }
     else{
-      time = trajectory.getTotalTimeSeconds();
+      currentTime = trajectory.getTotalTimeSeconds();
     }
   }
 

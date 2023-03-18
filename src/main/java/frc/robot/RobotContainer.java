@@ -439,8 +439,7 @@ public class RobotContainer {
         new CollectCommand(m_claw, true, 0.6)),
       new DepositCommand(m_claw, true, 0.6),
       new ParallelDeadlineGroup( 
-        new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), communityWaypoints, 1.0, 
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 1.0, 
         1.0, 0.5, 0.5), 
         armStowCommand(m_OI)), 
       new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true), 
@@ -471,8 +470,7 @@ public class RobotContainer {
         new CollectCommand(m_claw, true, 0.6)),
       new DepositCommand(m_claw, true, 0.6),
       new ParallelDeadlineGroup( 
-        new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 1.0, 0.8, 0.5, 0.7), 
         armStowCommand(m_OI)));
   }
 
@@ -510,10 +508,8 @@ public class RobotContainer {
     communityWaypoints.add(new Pose2d(2.25, 0, new Rotation2d(3.14)));
 
     return new SequentialCommandGroup(
-      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), scoreWaypoints, 1.0, 0.8, 0.5, 0.5),
-      new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-        new Rotation2d()), communityWaypoints, 1.0, 0.8, 0.5, 0.5),
+      new DriveThroughTrajectory(m_driveSubsystem, scoreWaypoints, 1.0, 0.8, 0.5, 0.5),
+      new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 1.0, 0.8, 0.5, 0.5),
       new Engage(m_driveSubsystem, 0.5, true));
       //WEEK 0: changed max velocity in both drive through trajectories to 1.0 from 0.5, and set engage max speed to 0.5 from 0.3
   }
@@ -541,10 +537,10 @@ public class RobotContainer {
     System.out.println("Leave Community");
 
     ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(new Pose2d(2.5, 0.0, new Rotation2d(3.1)));
+        waypoints.add(new Pose2d(2.5, 0.0, new Rotation2d(3.14)));
+        waypoints.add(new Pose2d(2.5, -1.0, new Rotation2d(3.14)));
 
-    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, new Pose2d(0,0, 
-      new Rotation2d()), waypoints, 0.5, 0.8, 0.5, 0.5));
+    return new SequentialCommandGroup(new DriveThroughTrajectory(m_driveSubsystem, waypoints, 0.5, 0.8, 0.5, 0.5));
 
   }
 
