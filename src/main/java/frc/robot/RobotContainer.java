@@ -116,7 +116,7 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Split Engage", kSplitEngage);
     m_chooser.addOption("Leave (All)", kLeaveCommunity);
     m_chooser.addOption("Cube and Engage (2)", kScoreCubeAndEngage);
-    m_chooser.addOption("Cube and Leave (B1, R3)", kCubeLeaveCommand);
+    m_chooser.addOption("Cube and Leave (All)", kCubeLeaveCommand);
     m_chooser.addOption("Cube, Leave, and Engage (2)", kCubeEngageLeaveCommand);
     m_chooser.addOption("1_B_2023_1073", kScoreCube);
     m_chooser.addOption("2_B_2023_1073", kScoreCube);
@@ -285,8 +285,8 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.5));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
 
@@ -457,8 +457,12 @@ public class RobotContainer {
   public Command cubeLeaveCommand(){
 
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
-    communityWaypoints.add(new Pose2d(2.4, 0.15, new Rotation2d(0)));
-
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      communityWaypoints.add(new Pose2d(2.4, 0.15, new Rotation2d(0)));
+    }
+    else{
+      communityWaypoints.add(new Pose2d(2.4, -0.15, new Rotation2d(0)));
+    }
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
