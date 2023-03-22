@@ -42,6 +42,7 @@ public class TeleopDrive extends CommandBase
   ChassisSpeeds speeds;
   double last_error = 0; //for snap-to-positions derivative
   double last_time = 0; //for snap-to-positions derivative
+  boolean lastParkingBreakButton = false;
 
   PIDController snapPidProfile;
 
@@ -158,9 +159,10 @@ public class TeleopDrive extends CommandBase
     }
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
     
-    if(m_OI.getLeftBumper()){
+    if(m_OI.getLeftBumper() && lastParkingBreakButton == false){
       parked = !parked;
     }
+    lastParkingBreakButton = m_OI.getLeftBumper();
     if(parked && !m_driveSubsystem.getParkingBrake()){
       m_driveSubsystem.parkingBrake(true);
       m_bling.clearLEDs();
