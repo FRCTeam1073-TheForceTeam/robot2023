@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -13,8 +16,9 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
-    Debouncer parkingBrakeDebouncer = new Debouncer(0.5);
-
+    Debouncer parkingBrakeDebouncer = new Debouncer(0.05);
+    //private BooleanSupplier isCube;
+    private boolean isCubeMode;
 
 
     /** Setting up which controllor is which
@@ -33,6 +37,10 @@ public class OI extends SubsystemBase
         RIGHT_Y_ZERO = 0;
          zeroDriverController();
          zeroOperatorController();
+         //isCube = new BooleanSupplier() {
+           // return isCubeMode;
+         //};
+        isCubeMode = true;
     }
 
     public static void initPreferences() 
@@ -51,6 +59,7 @@ public class OI extends SubsystemBase
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        SmartDashboard.putBoolean("OI/isCubeMode", isCubeMode);
     }
 
     //------- Driver Controller Joysticks Below
@@ -71,6 +80,18 @@ public class OI extends SubsystemBase
         LEFT_Y_ZERO = getDriverLeftY();
         RIGHT_X_ZERO = getDriverRightX();
         RIGHT_Y_ZERO = getDriverRightY();
+    }
+
+    public boolean isCubeMode() {
+        return isCubeMode;
+    }
+
+    public void setCubeMode(){
+        isCubeMode = true;
+    }
+    
+    public void setConeMode(){
+        isCubeMode = false;
     }
 
     private final double LEFT_X_MIN = -1;

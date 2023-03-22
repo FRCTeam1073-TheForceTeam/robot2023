@@ -33,7 +33,8 @@ public class AlignToAprilTag extends CommandBase {
   private AprilTagFinder finder;
   private double maxVelocity;
   private double maxAngularVelocity;
-  private double tolerance;
+  private double linearTolerance;
+  private double rotationalTolerance;
 
 
 
@@ -51,7 +52,8 @@ public class AlignToAprilTag extends CommandBase {
     this.maxVelocity = maxVelocity;
     this.finder = finder;
     this.maxAngularVelocity = 0.5;
-    this.tolerance = 0.05;
+    this.linearTolerance = 0.05;
+    this.rotationalTolerance = 0.05;
     this.yOffset = yOffset;
     // Create these just once and reuse them in execute loops.
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -96,7 +98,7 @@ public class AlignToAprilTag extends CommandBase {
     bling.setColorRGBAll(255, 255, 255);
     int closestID = finder.getClosestID();    // Closest tag ID from finder.
     Pose3d targetPose = finder.getClosestPose(); // Closest tag pose. (Can be NULL!)
-    double currentHeading = drivetrain.getWrappedHeading();
+    double currentHeading = drivetrain.getWrappedHeading() * (Math.PI / 180.0);
     //apply offset to target pose
     if (targetPose != null){
     targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
@@ -107,15 +109,18 @@ public class AlignToAprilTag extends CommandBase {
       
       // Robot relative movement:
       chassisSpeeds.vxMetersPerSecond = 0.0;
-      double rotationSpeed = (180 - currentHeading)* Math.PI/180 * 0.5;
-      rotationSpeed = MathUtil.clamp(rotationSpeed, -0.3, 0.3);
+      double rotationSpeed = (Math.PI - currentHeading) * 0.5;
+      rotationSpeed = MathUtil.clamp(rotationSpeed, -0.5, 0.5);
       // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
       chassisSpeeds.omegaRadiansPerSecond = rotationSpeed;
-      chassisSpeeds.vyMetersPerSecond = targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
+      chassisSpeeds.vyMetersPerSecond = -targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
       chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
-      drivetrain.setChassisSpeeds(chassisSpeeds);
+      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond, 
+        Rotation2d.fromDegrees(drivetrain.getHeading()));
+      drivetrain.setChassisSpeeds(speeds);
       
-      if(Math.abs(targetPose.getTranslation().getY()) < tolerance){
+      if(Math.abs(targetPose.getTranslation().getY()) < linearTolerance && Math.abs(Math.PI - currentHeading) < rotationalTolerance){
         targetTagID = -1;  // Stop tracking when we're close enough.
       }
       //resets glitch counter
@@ -150,7 +155,7 @@ public class AlignToAprilTag extends CommandBase {
     int closestID = finder.getClosestID();      // If closest ID is -1 or not the one we are tracking.
     //de-bouncing glitch "signal"
     //TODO: set glitch counter to 5 instead of 3
-    if (targetTagID < 0 || glitchCounter > 5){
+    if (targetTagID < 0 || glitchCounter > 3){
 
       System.out.println("AlignToAprilTag Finished.");
       

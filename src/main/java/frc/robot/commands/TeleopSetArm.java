@@ -30,14 +30,35 @@ public class TeleopSetArm extends CommandBase {
     //if(oi.getOperatorAButton()){
     //  arm.setTrapezoidTargetAngle(arm.new JointPositions(-3.84, 2.9) );
     //}
-    if(oi.getOperatorBButton()){
-      arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.9));
+    //if(oi.getOperatorBButton()){
+    //  arm.setTrapezoidTargetAngle(arm.new JointPositions(-1.5, 3.9));
+    //}
+    double leftY = oi.getOperatorLeftY();
+    double rightY = oi.getOperatorRightY();
+    double rightX = oi.getOperatorRightX();
+      if(leftY > 0.5){leftY = 0.25;}
+      else if(leftY < -0.5){leftY = -0.25;}
+      else{leftY = 0;}
+      if(rightY > 0.5){rightY = 0.25;}
+      else if(rightY < -0.5){rightY = -0.25;}
+      else{rightY = 0;}
+      if(rightX > 0.5){rightX = 0.25;}
+      else if(rightX < -0.5){rightX = -0.25;}
+      else{rightX = 0;}
+
+    if(Math.abs(leftY) > 0.1|| Math.abs(rightY) > 0.1 || Math.abs(rightX) > 0.1){
+      arm.setJointVelocities(arm.new JointVelocities(leftY, rightY, rightX));
+    }
+    else{
+      arm.setJointVelocities(arm.new JointVelocities(0.0, 0.0, 0.0));
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    //arm.setJointVelocities(arm.new JointVelocities(0.0, 0.0, 0.0));
+  }
 
   // Returns true when the command should end.
   @Override

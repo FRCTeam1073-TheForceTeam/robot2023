@@ -279,10 +279,15 @@ public class DriveSubsystem extends SubsystemBase
       modules[1].setCommand(states[1].angle.getRadians(), states[1].speedMetersPerSecond);
       modules[2].setCommand(states[2].angle.getRadians(), states[2].speedMetersPerSecond);
       modules[3].setCommand(states[3].angle.getRadians(), states[3].speedMetersPerSecond);
+
+      SmartDashboard.putNumber("Actual Module speed", modules[0].getDriveVelocity());
+      SmartDashboard.putNumber("Actual Module angle", modules[0].getSteeringAngle());
+      SmartDashboard.putNumber("Commanded Speed", states[0].speedMetersPerSecond);
+      SmartDashboard.putNumber("Commanded angle", states[0].angle.getRadians());
     }
     else if(!parkingBrakeOn)
     { //in debug mode
-      SmartDashboard.putNumber("Module 0 Velocity", modules[0].getDriveRawVelocity());
+      SmartDashboard.putNumber("Module 0 Velocity in ticks", modules[0].getDriveRawVelocity());
     }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());

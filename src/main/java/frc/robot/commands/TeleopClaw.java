@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.OI;
 
@@ -25,41 +26,42 @@ public class TeleopClaw extends CommandBase {
   @Override
   public void initialize() {
     clawPower = 0;
+    claw.setCollectorSpeed(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //right bumper is in for cube, left is out
+    //reversed for cube
     if(oi.getOperatorLeftBumper()){
-      claw.setVacuumSpeed(0);
+      if(oi.isCubeMode() == true) {
+        claw.setCollectorSpeed(5);
+      }
+      if(oi.isCubeMode() == false){
+        claw.setCollectorSpeed(-5);
+      }
+      System.out.println("Operator Left Bumper");
     }
-    if(oi.getOperatorRightBumper()){
-      claw.setVacuumSpeed(620.0); //intial: 314.2 rps
-      //TODO: Week 1 set from 628.4 to current value
+    else if(oi.getOperatorRightBumper()){
+      if(oi.isCubeMode() == true) {
+        claw.setCollectorSpeed(-5);
+      }
+      if(oi.isCubeMode() == false){
+        claw.setCollectorSpeed(5);
+      }
+      System.out.println("Operator Right Bumper");
     }
-    //cube preset
-    if(oi.getOperatorDPadRight()){
-      claw.setActuator1Angle(0.53);
-      claw.setActuator2Angle(0.47);
+    else {
+      claw.setCollectorSpeed(0);
     }
-    //open
-    else if(Math.abs(oi.getOperatorLeftX()) > 0.25 || Math.abs(oi.getOperatorLeftY()) > 0.25){
-      claw.setActuator1Angle(1.0);
-      claw.setActuator2Angle(0.0);
-    }
-    //cone preset
-    else if(oi.getOperatorDPadDown()){
-      claw.setActuator1Angle(0.42);
-      claw.setActuator2Angle(0.58);
-    }
-    //else{
-      //claw.setActuatorDebugPercent(0.3);
-    //}
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    claw.setCollectorSpeed(0);
+  }
 
   // Returns true when the command should end.
   @Override
