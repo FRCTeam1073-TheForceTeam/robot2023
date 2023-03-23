@@ -92,6 +92,7 @@ public class RobotContainer {
   private static final String kCubeLeaveCommand = "Score Cube and Leave Community";
 
   private static final String kArmTest = "Arm Test Command";
+  private static final String kTrajectoryTest = "Drive trajectory Test";
 //  private static final String kScoreHybrid = "Score Hybrid";
 //  private static final String kTrajectoryWaypoint = "Traj Waypoint";
 
@@ -124,6 +125,7 @@ public class RobotContainer {
     m_chooser.addOption("2_C_2023_1073", kBasicEngage);
     m_chooser.addOption("2_D_2023_1073", kEngagePlus);
     m_chooser.addOption("Arm test", kArmTest);
+    m_chooser.addOption("Drive Trajectory Test", kTrajectoryTest);
    
     //m_chooser.addOption("Test Mode", kTestMode);
     //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
@@ -292,6 +294,8 @@ public class RobotContainer {
         return cubeEngageLeaveCommand();
       case kCubeLeaveCommand:
         return cubeLeaveCommand();
+      case kTrajectoryTest:
+        return testTrajectory();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -603,6 +607,15 @@ public class RobotContainer {
     waypoints.add(m_arm.new JointWaypoints(-1.0, 2.6, 0.0, 6.0));
     waypoints.add(m_arm.new JointWaypoints(-1.55, 2.4, 0.0, 9.0));
     return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
+  }
+
+  public Command testTrajectory(){
+    ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+    waypoints.add(new Pose2d(0.5, 0, new Rotation2d(3.14)));
+    waypoints.add(new Pose2d(0.5, 0.5, new Rotation2d(3.14)));
+    waypoints.add(new Pose2d(0, 0.5, new Rotation2d(0)));
+    waypoints.add(new Pose2d(0.1,0.2, new Rotation2d(3.14)));
+    return new DriveThroughTrajectory(m_driveSubsystem, waypoints, 0.3, 0.4, 0.5, 0.5);
   }
 
   /**A way to test OI and DriveSubsystem while debug mode in DriveSubsystem is on
