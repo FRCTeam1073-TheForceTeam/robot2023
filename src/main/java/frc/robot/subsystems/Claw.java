@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.Faults;
+import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -117,8 +119,27 @@ public class Claw extends SubsystemBase {
     collectorMotor.setIntegralAccumulator(0);
   }
 
-public String getDiagnostics() {
-    return null;
+public String getDiagnostics(){
+    String result = "";
+    Faults faults = new Faults();
+    collectorMotor.getFaults(faults);
+
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+    ErrorCode error = collectorMotor.clearStickyFaults(500);
+    if (error != ErrorCode.OK) {
+      result += String.format("can't clear collectorMotor faults");
+    }
+
+    if(tof1DutyCycleInput.getFrequency()< 2){
+      result += String.format("tof1 not working");
+    }
+    if(tof2DutyCycleInput.getFrequency()< 2){
+      result += String.format("tof2 not working");
+    }
+      
+    return result;
 }
 
 }

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
@@ -64,17 +65,18 @@ public class SwerveModule
     public String getDiagnostics() {
         ErrorCode error;
         String result = new String();
-        error = steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.steerCurrentLimit, cfg.steerCurrentThreshold, cfg.steerCurrentThresholdTime), 500);
-        if (error != ErrorCode.OK) {
-            result = String.format(" Module %d, steeringMotor %d, error", cfg.moduleNumber, idcfg.steerMotorID);
+        Faults faults = new Faults();
+        driveMotor.getFaults(faults);
+        if(faults.hasAnyFault()){
+            result += faults.toString();
         }
-        error = driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, cfg.driveCurrentLimit, cfg.driveCurrentThreshold, cfg.driveCurrentThresholdTime), 500);
-        if (error != ErrorCode.OK) {
-            result += String.format(" Module %d, driveMotor %d, error", cfg.moduleNumber, idcfg.driveMotorID);
+        steerMotor.getFaults(faults);
+        if(faults.hasAnyFault()){
+            result += faults.toString();
         }
         error = steerEncoder.clearStickyFaults(500);
         if (error != ErrorCode.OK) {
-            result += String.format(" Module %d, steerEncoder %d, error", cfg.moduleNumber, idcfg.steerEncoderID);
+            result += String.format(" Module %d, steerEncoder %d, error.", cfg.moduleNumber, idcfg.steerEncoderID);
         }
         return result;
       }
