@@ -138,7 +138,7 @@ public String getDiagnostics(){
     if(tof2DutyCycleInput.getFrequency()< 2){
       result += String.format("tof2 not working");
     }
-      
+        
     return result;
 }
 
