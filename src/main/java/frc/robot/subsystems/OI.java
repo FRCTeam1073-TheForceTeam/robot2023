@@ -458,6 +458,10 @@ public class OI extends SubsystemBase
         return (operatorController.getPOV() == 0);
     }
 
+    public String getDiagnostics() {
+        return null;
+    }
+
     // public void setRumble(double val){
     //     operatorController.setRumble(RumbleType.kLeftRumble, val);
     //     operatorController.setRumble(RumbleType.kRightRumble, val);

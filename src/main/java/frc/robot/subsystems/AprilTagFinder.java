@@ -247,5 +247,10 @@ public class AprilTagFinder extends SubsystemBase {
   {
     return detections;
   }
+
+
+public String getDiagnostics() {
+    return null;
+}
   
 }

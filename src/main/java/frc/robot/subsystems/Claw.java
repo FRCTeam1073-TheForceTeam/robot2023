@@ -117,4 +117,8 @@ public class Claw extends SubsystemBase {
     collectorMotor.setIntegralAccumulator(0);
   }
 
+public String getDiagnostics() {
+    return null;
+}
+
 }

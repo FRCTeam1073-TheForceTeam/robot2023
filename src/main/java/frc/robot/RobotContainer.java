@@ -174,6 +174,18 @@ public class RobotContainer {
     Preferences.initDouble("Cube Ground Aim Elbow", 5.1665);
   }
 
+  public void diagnostics(){
+    //TODO insert diagnostics routines
+    
+    String armDiagnostics = m_arm.getDiagnostics();
+    String blingDiagnostics = m_bling.getDiagnostics();
+    String clawDiagonstics = m_claw.getDiagnostics();
+    String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
+    String underglowDiagnostics = m_underglow.getDiagnostics();
+    String oiDiagnostics = m_OI.getDiagnostics();
+    String openMVDianostics = m_frontCamera.getDiagnostics();
+
+  }
   // called when robot initializes. Sets parking brake to false
   public void teleopInit(){
     m_driveSubsystem.parkingBrake(false);
