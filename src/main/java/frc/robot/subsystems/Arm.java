@@ -12,6 +12,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -542,8 +543,23 @@ public class Arm extends SubsystemBase{
   }
   
   public String getDiagnostics() {
-    ErrorCode error;
     String result = new String();
+    Faults faults = new Faults();
+    shoulderMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+
+    elbowMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+
+    wristMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+        
     //Check errors for all hardware
     return result;
   }

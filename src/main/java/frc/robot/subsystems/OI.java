@@ -459,7 +459,7 @@ public class OI extends SubsystemBase
     }
 
     public String getDiagnostics() {
-        return null;
+        return "";
     }
 
     // public void setRumble(double val){

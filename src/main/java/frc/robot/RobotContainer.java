@@ -179,11 +179,19 @@ public class RobotContainer {
     
     String armDiagnostics = m_arm.getDiagnostics();
     String blingDiagnostics = m_bling.getDiagnostics();
-    String clawDiagonstics = m_claw.getDiagnostics();
+    String clawDiagnostics = m_claw.getDiagnostics();
     String driveSubDiagnostics = m_driveSubsystem.getDiagnostics();
     String underglowDiagnostics = m_underglow.getDiagnostics();
     String oiDiagnostics = m_OI.getDiagnostics();
-    String openMVDianostics = m_frontCamera.getDiagnostics();
+    String aprilTagDiagnostics = m_frontCamera.getDiagnostics();
+
+    SmartDashboard.putString("Arm Diagnostics", armDiagnostics);
+    SmartDashboard.putString("Bling Diagnostics", blingDiagnostics);
+    SmartDashboard.putString("Claw Diagnostics", clawDiagnostics);
+    SmartDashboard.putString("Drive Subsystem Diagnostics", driveSubDiagnostics);
+    SmartDashboard.putString("OI Diagnostics", oiDiagnostics);
+    SmartDashboard.putString("AprilTag Diagnostics", aprilTagDiagnostics);
+
 
   }
   // called when robot initializes. Sets parking brake to false
