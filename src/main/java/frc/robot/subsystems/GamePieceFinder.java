@@ -39,6 +39,7 @@ public class GamePieceFinder extends SubsystemBase {
   private GamePiece cube;
   private GamePiece cone;
   private GamePiecePoseEstimator poseEstimator;
+  public String closestGamePiece;
 
   public class GamePiecePoseEstimator {
     //public Transform3d estimate(){
@@ -76,16 +77,20 @@ public class GamePieceFinder extends SubsystemBase {
     for (int i = 0; i < numCube; i = i +1){
       
       double[] cubes = new double[3];
+      double[] cones = new double[3];
 
       cubes[0] = cubeData[i*4 + 1].doubleValue();
       cubes[1] = cubeData[i*4 + 2].doubleValue();
       cubes[2] = cubeData[i*4 + 3].doubleValue();
       cubes[3] = cubeData[i*4 + 4].doubleValue();
 
+
       cube.x = cubes[0];
       cube.y = cubes[1];
       cube.w = cubes[2];
       cube.h = cubes[3];
+
+
     }
 
 
@@ -110,6 +115,16 @@ public class GamePieceFinder extends SubsystemBase {
       cone.w = cones[2];
       cone.h = cones[3];
     }
+
+    if (cone.x > cube.x && cone.y > cube.y){
+      closestGamePiece = "Cone";
+    }else if (cone.x < cube.x && cone.y < cube.y) {
+      closestGamePiece = "Cube";
+    }else{
+      closestGamePiece = "None";
+    }
+
+    SmartDashboard.putString(String.format("%s/ClosestGamePiece"), closestGamePiece);
     //~~~~~~~~~~~~~~~~~~~~ ENTERING CUBE AREA ~~~~~~~~~~~~~~~~~~~~
     SmartDashboard.putNumber(String.format("%s/NumCube", tableName), numCube);
     if (closestCube != "None") {

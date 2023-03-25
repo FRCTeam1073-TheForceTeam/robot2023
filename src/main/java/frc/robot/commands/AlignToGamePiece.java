@@ -46,14 +46,14 @@ public class AlignToGamePiece extends CommandBase {
     String closestCone = finder.getClosestCone();
     String closestCube = finder.getClosestCube();
     bling.clearLEDs();
-    //if(closestGamePiece != "None"){
-      //System.out.println(String.format("AlignToGamePiece Initialized to %s", closestGamePiece));
-      //targetGamePiece = closestGamePiece;
-    //} 
-   // else {
-      //targetGamePiece = "None";
-      //System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
-    //}
+    if(finder.closestGamePiece != "None"){
+      System.out.println(String.format("AlignToGamePiece Initialized to %s", finder.closestGamePiece));
+      targetGamePiece = finder.closestGamePiece;
+    } 
+    else {
+      targetGamePiece = "None";
+      System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
