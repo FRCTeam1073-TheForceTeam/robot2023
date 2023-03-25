@@ -43,23 +43,25 @@ public class AlignToGamePiece extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    String closestGamePiece = finder.getClosestGamePiece();
+    String closestCone = finder.getClosestCone();
+    String closestCube = finder.getClosestCube();
     bling.clearLEDs();
-    if(closestGamePiece != "None"){
-      System.out.println(String.format("AlignToGamePiece Initialized to %s", closestGamePiece));
-      targetGamePiece = closestGamePiece;
-    } 
-    else {
-      targetGamePiece = "None";
-      System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
-    }
+    //if(closestGamePiece != "None"){
+      //System.out.println(String.format("AlignToGamePiece Initialized to %s", closestGamePiece));
+      //targetGamePiece = closestGamePiece;
+    //} 
+   // else {
+      //targetGamePiece = "None";
+      //System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
+    //}
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     bling.setColorRGBAll(255, 255, 255);
-    String closestGamePiece = finder.getClosestGamePiece();
+    String closestCube = finder.getClosestCube();
+    String closestCone = finder.getClosestCone();
    // TODO:Pose3d targetPose = finder.getClosestPose();
    double currentHeading = drivetrain.getWrappedHeading();
 
