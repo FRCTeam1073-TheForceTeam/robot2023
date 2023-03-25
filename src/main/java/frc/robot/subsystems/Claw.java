@@ -37,13 +37,13 @@ public class Claw extends SubsystemBase {
   private double tof2Range;
   private final double tof1ScaleFactor = 100000;
   private final double tof2ScaleFactor = 100000;
-  private final double collectorScaleFactor = 21000;
+  private final double collectorTicksPerMeter = 2048/0.32;
   //private final boolean debug = true;
 
   /** Creates a new Claw. */
   public Claw() {
     collectorMotor = new TalonFX(19);
-    collectorRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
+    collectorRateLimiter = new SlewRateLimiter(400000.0); //ticks per second per second
     targetCollectorSpeed = 0;
     tof1 = new DigitalInput(0);
     tof2 = new DigitalInput(1);
@@ -53,6 +53,7 @@ public class Claw extends SubsystemBase {
     tof2Freq = 0;
     tof1Range = 0;
     tof2Range = 0;
+    setUpMotors();
   }
 
   @Override
@@ -85,8 +86,8 @@ public class Claw extends SubsystemBase {
   }
 
   public void setCollectorSpeed(double speed){
-    targetCollectorSpeed = speed * collectorScaleFactor; //converted to ticks per meter
-    collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
+    targetCollectorSpeed = speed * collectorTicksPerMeter; //converted to ticks per meter
+    // collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
   }
 
   // Initialize preferences for this class:
@@ -111,7 +112,7 @@ public class Claw extends SubsystemBase {
     // motor.setSensorPhase(true);
     collectorMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 12, 0.1));
 
-    collectorMotor.config_kP(0, 0.2);
+    collectorMotor.config_kP(0, 0.1);
     collectorMotor.config_kI(0, 0);
     collectorMotor.config_kD(0, 0.02);
     collectorMotor.config_kF(0, 0);
