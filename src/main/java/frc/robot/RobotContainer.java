@@ -178,6 +178,7 @@ public class RobotContainer {
 
   public void diagnostics(){
     //TODO insert diagnostics routines
+    boolean allGood = false;
     
     String armDiagnostics = m_arm.getDiagnostics();
     String blingDiagnostics = m_bling.getDiagnostics();
@@ -187,12 +188,20 @@ public class RobotContainer {
     String oiDiagnostics = m_OI.getDiagnostics();
     String aprilTagDiagnostics = m_frontCamera.getDiagnostics();
 
-    SmartDashboard.putString("Arm Diagnostics", armDiagnostics);
-    SmartDashboard.putString("Bling Diagnostics", blingDiagnostics);
-    SmartDashboard.putString("Claw Diagnostics", clawDiagnostics);
-    SmartDashboard.putString("Drive Subsystem Diagnostics", driveSubDiagnostics);
-    SmartDashboard.putString("OI Diagnostics", oiDiagnostics);
-    SmartDashboard.putString("AprilTag Diagnostics", aprilTagDiagnostics);
+    SmartDashboard.putString("Diag/Arm", armDiagnostics);
+    SmartDashboard.putString("Diag/Bling", blingDiagnostics);
+    SmartDashboard.putString("Diag/Claw", clawDiagnostics);
+    SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
+    SmartDashboard.putString("Diag/OI", oiDiagnostics);
+    SmartDashboard.putString("Diag/AprilTag", aprilTagDiagnostics);
+
+    if(armDiagnostics.isEmpty() && blingDiagnostics.isEmpty() && clawDiagnostics.isEmpty() && driveSubDiagnostics.isEmpty() && oiDiagnostics.isEmpty() && aprilTagDiagnostics.isEmpty()){
+      allGood = true;
+      SmartDashboard.putBoolean("Diag/All Good", allGood);
+    }
+    else{
+      SmartDashboard.putBoolean("Diag/All Good", allGood);
+    }
 
 
   }
