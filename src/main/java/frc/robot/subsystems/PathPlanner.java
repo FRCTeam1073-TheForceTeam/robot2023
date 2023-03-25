@@ -20,6 +20,7 @@ public class PathPlanner {
 		new Node(-2.0, 3.0, 0.0) //CONE_TOP_INTERMEDIATE
 	));
 
+
 	public final int STOW = 0;
 	public final int STOW_INTERMEDIATE = 1;
 	public final int CUBE_TOP = 2;
@@ -31,19 +32,65 @@ public class PathPlanner {
 
 	public final Connection CONNECTION1 = new Connection(nodes.get(STOW), nodes.get(STOW_INTERMEDIATE));
 
+	private Graph graph;
+
+	public PathPlanner(){
+		graph.nodes = nodes;
+	}
 
 	public class Node{
-		double shoulder;
-		double elbow;
-		double wrist;
-		Arm.CartesianPosition position;
-		Arm.JointPositions angles;
+		public double shoulder;
+		public double elbow;
+		public double wrist;
+		public boolean explored;
+		//Arm.CartesianPosition position;
+		//Arm.JointPositions angles;
 
 		public Node(double shoulder, double elbow, double wrist){
 			this.shoulder = shoulder;
 			this.elbow = elbow;
 			this.wrist = wrist;
-			angles = arm.new JointPositions(shoulder,elbow,wrist);
+			//angles = arm.new JointPositions(shoulder,elbow,wrist);
+		}
+	}
+
+	public class Graph{
+		public ArrayList<Node> nodes;
+		public ArrayList<ArrayList<Integer>> adj;
+
+		public Graph(){
+			nodes = new ArrayList<Node>();
+			adj = new ArrayList<ArrayList<Integer>>();
+		}
+
+		public void addNode(Node node){
+			node.explored = false;
+			nodes.add(node);
+			adj.add(new ArrayList<Integer>());
+		}
+
+		public void addEdge(int a, int b){
+			adj.get(a).add(b);
+			adj.get(b).add(a);
+		}
+
+		public int findClosestNode(double shoulder, double elbow, double wrist){
+			double bestDistnce = Double.MAX_VALUE;
+			int bestIdx = 0;
+			for(int i = 0; i < nodes.size(); i++){
+				double distance = Math.pow((shoulder - nodes.get(i).shoulder), 2) + Math.pow((elbow - nodes.get(i).elbow), 2) + Math.pow((wrist - nodes.get(i).wrist), 2);
+				if(distance < bestDistnce){
+					bestDistnce = distance;
+					bestIdx = i;
+				}
+			}
+			return bestIdx;
+		}
+
+		public ArrayList<Node> findPath(int startIdx, int endIdx){
+			ArrayList<Node> result = new ArrayList<Node>();
+
+			return result;
 		}
 	}
 
@@ -57,14 +104,4 @@ public class PathPlanner {
 		}
 	}
 
-	public Node findClosestNode(){
-		Arm.CartesianPosition currentPosition = arm.getCartesianPosition(arm.getJointAngles());
-		Node closestNode = nodes.get(0);
-		for(int i = 1; i < nodes.size(); i++){
-			if(Math.sqrt((currentPosition.getCartesianX() - nodes.get(i).position.getCartesianX()) * (currentPosition.getCartesianX() - nodes.get(i).position.getCartesianX())) < Math.sqrt((currentPosition.getCartesianX() - closestNode.position.getCartesianX()) * (currentPosition.getCartesianX() - closestNode.position.getCartesianX()))){
-				closestNode = nodes.get(i);
-			}
-		}
-		return closestNode;
-	}
 }
