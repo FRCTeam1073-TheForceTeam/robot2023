@@ -53,14 +53,14 @@ public class GamePieceFinder extends SubsystemBase {
     cubePieceEntry = cubeNetwork.getEntry("Cubes");
     cubeArray = new ArrayList<GamePiece>();
 
-    closestCube = "None";
+    closestCube = "No Cube to be found";
     closestCubeDistance = 99999.0;
 
     coneNetwork = NetworkTableInstance.getDefault().getTable(tableName);
     conePieceEntry = cubeNetwork.getEntry("Cones");
     coneArray = new ArrayList<GamePiece>();
 
-    closestCone = "None";
+    closestCone = "No Cone to be found";
     closestConeDistance = 99999.0;
   }
 
@@ -70,7 +70,7 @@ public class GamePieceFinder extends SubsystemBase {
     cubeArray.clear();
     int numCube = cubeData.length/4;
     // Reset search variables for clostest to empty:
-    closestCube = "None";
+    closestCube = "No Cube to be found";
     closestCubeDistance = 9999.0;
 
 
@@ -98,7 +98,7 @@ public class GamePieceFinder extends SubsystemBase {
     coneArray.clear();
     int numCone = coneData.length/4;
     // Reset search variables for clostest to empty:
-    closestCone = "None";
+    closestCone = "No Cone to be found";
     closestConeDistance = 9999.0;
 
     for (int i = 0; i < numCone; i = i +1){
@@ -127,7 +127,7 @@ public class GamePieceFinder extends SubsystemBase {
     SmartDashboard.putString(String.format("%s/ClosestGamePiece"), closestGamePiece);
     //~~~~~~~~~~~~~~~~~~~~ ENTERING CUBE AREA ~~~~~~~~~~~~~~~~~~~~
     SmartDashboard.putNumber(String.format("%s/NumCube", tableName), numCube);
-    if (closestCube != "None") {
+    if (closestCube != "No Cube to be found") {
       SmartDashboard.putString(String.format("%s/ClosestCube", tableName), closestCube);
       SmartDashboard.putNumber(String.format("%s/ClosestCubeDistance", tableName), closestCubeDistance);
       SmartDashboard.putNumber(String.format("%s/CubeX", tableName), cube.x);
@@ -136,7 +136,7 @@ public class GamePieceFinder extends SubsystemBase {
       SmartDashboard.putNumber(String.format("%s/CubeHeight", tableName), cube.h);
     }
     else{
-      SmartDashboard.putString(String.format("%s/ClosestCube", tableName), "None");
+      SmartDashboard.putString(String.format("%s/ClosestCube", tableName), "No Cube to be found");
       SmartDashboard.putNumber(String.format("%s/ClosestCubeDistance", tableName), 99999.0);
       SmartDashboard.putNumber(String.format("%s/CubeX", tableName), 0.0);
       SmartDashboard.putNumber(String.format("%s/CubeY", tableName), 0.0);
@@ -145,7 +145,7 @@ public class GamePieceFinder extends SubsystemBase {
     }
     //~~~~~~~~~~~~~~~~~~~~ ENTERING CONE AREA ~~~~~~~~~~~~~~~~~~~~
     SmartDashboard.putNumber(String.format("%s/NumCone", tableName), numCone);
-    if (closestCube != "None") {
+    if (closestCube != "No Cone to be found") {
       SmartDashboard.putString(String.format("%s/ClosestCone", tableName), closestCone);
       SmartDashboard.putNumber(String.format("%s/ClosestConeDistance", tableName), closestConeDistance);
       SmartDashboard.putNumber(String.format("%s/ConeX", tableName), cone.x);
@@ -154,7 +154,7 @@ public class GamePieceFinder extends SubsystemBase {
       SmartDashboard.putNumber(String.format("%s/ConeHeight", tableName), cone.h);
     }
     else{
-      SmartDashboard.putString(String.format("%s/ClosestCone", tableName), "None");
+      SmartDashboard.putString(String.format("%s/ClosestCone", tableName), "No Cone to be found");
       SmartDashboard.putNumber(String.format("%s/ClosestConeDistance", tableName), 99999.0);
       SmartDashboard.putNumber(String.format("%s/ConeX", tableName), 0.0);
       SmartDashboard.putNumber(String.format("%s/ConeY", tableName), 0.0);

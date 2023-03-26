@@ -64,10 +64,6 @@ public class AlignToGamePiece extends CommandBase {
     String closestCone = finder.getClosestCone();
    // TODO:Pose3d targetPose = finder.getClosestPose();
    double currentHeading = drivetrain.getWrappedHeading();
-
-   //TODO: if(targetPose != null){
-     //targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY(), targetPose.getZ()), targetPose.getRotation());
-  // }
   }
 
   // Called once the command ends or is interrupted.
