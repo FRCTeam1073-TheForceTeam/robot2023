@@ -30,8 +30,6 @@ public class PathPlanner {
 	public final int CONE_MID = 6;
 	public final int CONE_TOP_INTERMEDIATE = 7;
 
-	public final Connection CONNECTION1 = new Connection(nodes.get(STOW), nodes.get(STOW_INTERMEDIATE));
-
 	private Graph graph;
 
 	public PathPlanner(){
@@ -42,21 +40,61 @@ public class PathPlanner {
 		public double shoulder;
 		public double elbow;
 		public double wrist;
-		public boolean explored;
-		//Arm.CartesianPosition position;
-		//Arm.JointPositions angles;
+
+		private boolean explored = false;  // For a given plan has this node been explored already?
+		private int parent = -1;		   // What was the parent of this node in the exploration?
+		private double distance = Double.MAX_VALUE; // Distance along path at this node so far.
 
 		public Node(double shoulder, double elbow, double wrist){
 			this.shoulder = shoulder;
 			this.elbow = elbow;
 			this.wrist = wrist;
-			//angles = arm.new JointPositions(shoulder,elbow,wrist);
+		}
+
+		public void clearPlan() {
+			parent = -1;
+			explored = false;
+			distance = Double.MAX_VALUE;
+		}
+
+		public boolean isExplored() {
+			return explored;
+		}
+
+		public int getParent() {
+			return parent;
+		}
+
+		public double getDistance() {
+			return distance;
+		}
+
+		public void markExplored() {
+			explored = true;
+		}
+
+		public void setParent(int p) {
+			parent = p;
+		}
+
+		public void setDistance(double d) {
+			distance = d;
+		}
+
+		// Compute distance from a node to another node:
+		public double distance(Node n) {
+			return distance(n.shoulder, n.elbow, n.wrist);
+		}
+
+		// Compute distance from a node to joint values for finding nearest.
+		public double distance(double s, double e, double w) {
+			return Math.sqrt(Math.pow((shoulder -s), 2) + Math.pow((elbow - e), 2) + Math.pow((wrist - w), 2));	
 		}
 	}
 
 	public class Graph{
-		public ArrayList<Node> nodes;
-		public ArrayList<ArrayList<Integer>> adj;
+		public ArrayList<Node> nodes;					// List of all nodes in the graph.
+		public ArrayList<ArrayList<Integer>> adj;		// Set of edges in the graph as an array of edges at each node (a sparse adjacency matrix)
 
 		public Graph(){
 			nodes = new ArrayList<Node>();
@@ -65,11 +103,12 @@ public class PathPlanner {
 
 		public void addNode(Node node){
 			node.explored = false;
-			nodes.add(node);
-			adj.add(new ArrayList<Integer>());
+			nodes.add(node); // Add the node
+			adj.add(new ArrayList<Integer>()); // Add the adjacency list entry for the node.
 		}
 
 		public void addEdge(int a, int b){
+			// The adjacency matrix must be symmetric since the graph is not directed. We can go between nodes in either direction.
 			adj.get(a).add(b);
 			adj.get(b).add(a);
 		}
@@ -77,8 +116,8 @@ public class PathPlanner {
 		public int findClosestNode(double shoulder, double elbow, double wrist){
 			double bestDistnce = Double.MAX_VALUE;
 			int bestIdx = 0;
-			for(int i = 0; i < nodes.size(); i++){
-				double distance = Math.pow((shoulder - nodes.get(i).shoulder), 2) + Math.pow((elbow - nodes.get(i).elbow), 2) + Math.pow((wrist - nodes.get(i).wrist), 2);
+			for(int i = 0; i < nodes.size(); i++) {
+				double distance = nodes.get(i).distance(shoulder, elbow, wrist);
 				if(distance < bestDistnce){
 					bestDistnce = distance;
 					bestIdx = i;
@@ -87,21 +126,72 @@ public class PathPlanner {
 			return bestIdx;
 		}
 
-		public ArrayList<Node> findPath(int startIdx, int endIdx){
-			ArrayList<Node> result = new ArrayList<Node>();
 
-			return result;
+		// Implementation of basic depth-first search for a path in the graph.
+		// This stores a path in the graph nodes to recover with recoverPath() function.
+		// It returns true if it finds the end, else false.
+		public boolean findPath(int startIdx, int endIdx){
+			
+			// First we need to go through our graph and clear previous path out of all our nodes:
+			for (int nidx = 0; nidx < nodes.size(); nidx++) {
+				nodes.get(nidx).clearPlan();
+			}
+
+			// Now we're going to make an array list and use it as our search queue for DFS:
+			ArrayList<Integer> queue = new ArrayList<Integer>();
+
+			// Prime the pump by putting the first node into the queue with zero distance and no parent:
+			queue.add(startIdx);
+			nodes.get(startIdx).distance = 0; // We're starting here so distance is zero
+			nodes.get(startIdx).markExplored(); // We're exploring this one.
+
+			// Now process nodes in the queue on each iteration:
+			while (!queue.isEmpty()) {
+				int front = queue.get(0).intValue(); // Get first index in Q
+				queue.remove(0); // Pop the queue (remove the front item)
+
+				if (front == endIdx) {
+					// We're done. We found the end node!
+					return true;
+				}
+
+				// Otherwise check neighbors and insert into the queue, and mark we visited them.
+				// Look at the index of each adjacent node from this one.
+				for (int nidx = 0; nidx < adj.get(front).size(); nidx++) {
+					int adjacent = adj.get(front).get(nidx).intValue();
+					if (!nodes.get(adjacent).isExplored()) {
+						// We mark them explored as they go into the queue so we never add them to the queue again.
+						// Otherwise the algorithm won't terminate... it will just run around the graph forever.
+						nodes.get(adjacent).markExplored();
+						// We're storing breadcrumbs in the nodes so we can recover the path when we're done.
+						nodes.get(adjacent).setParent(front); // We got here from node in front of Q.
+
+						// Distances are optional at the moment, but this adds distance thus far to adjacent distance.
+						nodes.get(adjacent).setDistance(nodes.get(front).distance(nodes.get(adjacent))+ nodes.get(front).getDistance());
+						// Put the adjacent node into the queue to explore later in the loop.
+						queue.add(adjacent);
+					} // End processing unexplored adjacent node.
+				} // End loop over adjacent nodes.
+			} // End queue ! empty.
+
+			// If we get down here we never found our goal.
+			return false;
+		}
+
+		// This function takes a graph that has a succesfully found path in it and the end node
+		// It uses the parent links to recover the found path through the graph in order as nodes.
+		public ArrayList<Node> recoverPath(int endIdx) {
+			ArrayList<Node> path = new ArrayList<Node>();
+			path.add(nodes.get(endIdx));
+
+			while (path.get(0).getParent() >= 0) {
+				// Add the parent of this node as the front of the path unless it has no parent.
+				path.add(0, nodes.get(path.get(0).getParent()));
+			}
+
+			return path;
 		}
 	}
 
-	public class Connection{
-		Node node1;
-		Node node2;
-
-		public Connection(Node node1, Node node2){
-			this.node1 = node1;
-			this.node2 = node2;
-		}
-	}
 
 }
