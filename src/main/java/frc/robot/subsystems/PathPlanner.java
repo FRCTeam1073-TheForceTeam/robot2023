@@ -8,32 +8,51 @@ import java.util.Arrays;
 
 /** Add your docs here. */
 public class PathPlanner {
-	Arm arm;
-	public ArrayList<Node> nodes = new ArrayList<Node>(Arrays.asList(
-		new Node(-3.87, 2.9, -1.21), //STOW
-		new Node(-2.6, 2.8, -1.2), //STOW_INTERMEDIATE
-		new Node(-1.483, 3.570, -0.337), //CUBE_TOP
-		new Node(-1.72, 3.8, -0.26), //CUBE_MID
-		new Node(-2.0, 3.19, -0.77), //CUBE_TOP_INTERMEDIATE
-		new Node(-1.433, 3.143, 1.07), //CONE_TOP
-		new Node(-1.91, 3.451, 1.132), //CONE_MID
-		new Node(-2.0, 3.0, 0.0) //CONE_TOP_INTERMEDIATE
-	));
-
-
-	public final int STOW = 0;
-	public final int STOW_INTERMEDIATE = 1;
-	public final int CUBE_TOP = 2;
-	public final int CUBE_MID = 3;
-	public final int CUBE_TOP_INTERMEDIATE = 4;
-	public final int CONE_TOP = 5;
-	public final int CONE_MID = 6;
-	public final int CONE_TOP_INTERMEDIATE = 7;
 
 	private Graph graph;
 
 	public PathPlanner(){
-		graph.nodes = nodes;
+		graph = new Graph();
+		graph.addNode(new Node(-3.87, 2.9, -1.21)); //STOW 0
+		graph.addNode(new Node(-2.6, 2.8, -1.2)); //STOW_INTERMEDIATE 1
+		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 2
+		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 3
+		graph.addNode(new Node(-2.0, 3.19, -0.77)); //CUBE_TOP_INTERMEDIATE 4
+		graph.addNode(new Node(-1.433, 3.143, 1.07)); //CONE_TOP 5
+		graph.addNode(new Node(-1.91, 3.451, 1.132)); //CONE_MID 6
+		graph.addNode(new Node(-2.0, 3.0, 0.0)); //CONE_TOP_INTERMEDIATE 7
+		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 8  
+		graph.addNode(new Node(-2.11, 3.1, 1.41)); //DOUBLE_SUB_CONE 9
+		graph.addNode(new Node(-2.6, 2.8, -1.2)); //DOUBLE_SUB_CONE_INTERMEDIATE 10
+		graph.addNode(new Node(-2.6, 3.2, -0.6)); //DOUBLE_SUB_CUBE_INTERMEDIATE 11
+		graph.addNode(new Node(-1.19, 5.38, -1.21)); //GROUND_CUBE 12
+		graph.addNode(new Node(-1.73, 4.59, 0.67)); //GROUND_CONE 13
+		graph.addNode(new Node(-1.78, 3.98, -1.19)); //GROUND_INTERMEDIATE 14
+		
+		//previous connections
+		graph.addEdge(4, 2);
+		graph.addEdge(0, 4);
+		graph.addEdge(10, 0);
+		graph.addEdge(10, 9);
+		graph.addEdge(7, 5);
+		graph.addEdge(0,7);
+		graph.addEdge(0,11);
+		graph.addEdge(11, 8);
+		graph.addEdge(0,1);
+		graph.addEdge(1, 3);
+		graph.addEdge(1, 6);
+		graph.addEdge(1, 14);
+		graph.addEdge(14, 12);
+		graph.addEdge(14, 13);
+
+		//new connections
+		graph.addEdge(4, 7);
+		graph.addEdge(4, 1);
+		graph.addEdge(7, 1);
+		graph.addEdge(10, 11);
+		graph.addEdge(11, 1);
+		graph.addEdge(10, 1);
+		graph.addEdge(4, 10);
 	}
 
 	public class Node{
@@ -102,7 +121,7 @@ public class PathPlanner {
 		}
 
 		public void addNode(Node node){
-			node.explored = false;
+			node.clearPlan();
 			nodes.add(node); // Add the node
 			adj.add(new ArrayList<Integer>()); // Add the adjacency list entry for the node.
 		}
@@ -193,5 +212,15 @@ public class PathPlanner {
 		}
 	}
 
+	public ArrayList<Node> getPath(int startIdx, int endIdx){
+		graph.findPath(startIdx, endIdx);
+		return graph.recoverPath(endIdx);
+	}
+
+	public ArrayList<Node> getPathFromClosest(double shoulder, double elbow, double wrist, int endIdx){
+		return getPath(graph.findClosestNode(shoulder, elbow, wrist), endIdx);
+	}
+
+	
 
 }
