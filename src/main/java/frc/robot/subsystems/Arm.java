@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
@@ -58,14 +59,17 @@ public class Arm extends SubsystemBase{
   private final double gravityCompensationWristGain = 0.05;      // 1/20 gear ratio
 
 
-  private final double shoulderOffset = 0.0;
-  private final double shoulderAbsoluteOffset = 4.3828;
-  private final double elbowOffset = 0.0;
-  private final double elbowAbsoluteOffset = 3.25;
-  private final double wristOffset = 0.0;
+  //private final double shoulderOffset = 0.0;
+  //private final double shoulderAbsoluteOffset = 4.3828;
+  //private final double elbowOffset = 0.0;
+  //private final double elbowAbsoluteOffset = 3.25;
+  private final double shoulderAbsoluteOffset = -1.62295;
+  private final double elbowAbsoluteOffset = -7.2741;
   private final double wristAbsoluteOffset = -1.21;
-  private final double shoulderTicksPerRadian = -26931.24;
-  private final double elbowTicksPerRadian = 13465.62;
+  //private final double shoulderTicksPerRadian = -26931.24;
+  //private final double elbowTicksPerRadian = 13465.62;
+  private final double shoulderTicksPerRadian = -20.656*4*2048/(2*Math.PI);
+  private final double elbowTicksPerRadian = 20.656*4*2048/(2*Math.PI);
   private final double wristTicksPerRadian = -6518.5; // New 20:1 ratio.
   private final JointVelocities maxVelocities = new JointVelocities(1.5, 2.1, 1);
   private final double maxShoulderAcc = 1.5;
@@ -83,7 +87,9 @@ public class Arm extends SubsystemBase{
   private double profileStartTime;
   private Mode mode = Mode.DISABLED;
   
-  private Bling bling;
+  private int encoderPeriodicCounter;
+  private ErrorCode errorShoulder;
+  private ErrorCode errorElbow;
 
 
   public class JointPositions{
@@ -291,12 +297,12 @@ public class Arm extends SubsystemBase{
   /** Creates a new Arm. */
   //Set height limiter
   public Arm() {
-
     shoulderMotor = new TalonFX(16);
     elbowMotor = new TalonFX(18);
     wristMotor = new TalonFX(20); 
     shoulderEncoder = new CANCoder(15);
     elbowEncoder = new CANCoder(17);
+    encoderPeriodicCounter = 0;
 
     // Called to set up motors:
     setUpMotors();
@@ -324,10 +330,10 @@ public class Arm extends SubsystemBase{
 
   // Runs in periodic:
   private void updateAbsolutePositions() {
-    absoluteJointPositions.shoulder = (shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset);
-    absoluteJointPositions.elbow = elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
+    absoluteJointPositions.shoulder = -shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset;
+    absoluteJointPositions.elbow = -elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
     // No separate absolute sensor for wrist:
-    absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian - wristAbsoluteOffset;
+    absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian;
   }
 
   private void updatePositionLimits() {
@@ -412,7 +418,14 @@ public class Arm extends SubsystemBase{
       wristMotor.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, gravityCompensation[2]); 
     }
 
-
+    //tried doing this, won't work in periodic
+    // if(encoderPeriodicCounter >= 49){
+    //   encoderPeriodicCounter = 0;
+    //   updateMotorEncoders(0);
+    // }
+    // else{
+    //   encoderPeriodicCounter += 1;
+    // }
     // Output angles:
     SmartDashboard.putNumber("Arm.Shoulder", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Arm.Elbow", currentJointPositions.elbow);
@@ -427,6 +440,8 @@ public class Arm extends SubsystemBase{
 
     // Update health signals for absolute encoder magnets.
     updateMagnetHealth();
+
+    
 
     SmartDashboard.putBoolean("Arm.ElbowMagnetOk", isElbowMagnetOk);
     SmartDashboard.putBoolean("Arm.ShoulderMagnetOk", isShoulderMagnetOk);
@@ -476,11 +491,6 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setIntegralAccumulator(0, 0, 100);
     isShoulderInitialized = false;
 
-    //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.95 * shoulderTicksPerRadian, 0, 400);
-    if (errorShoulder != ErrorCode.OK) {
-      System.out.println("Shoulder: set selected sensor position failed.");
-    }
 
     // Elbow Motor Setup:
     elbowMotor.setNeutralMode(NeutralMode.Brake);
@@ -493,12 +503,6 @@ public class Arm extends SubsystemBase{
     elbowMotor.config_kF(0, 0, 100);
     elbowMotor.configMaxIntegralAccumulator(0, 500, 100);
     elbowMotor.setIntegralAccumulator(0);
-
-    //ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, 400);
-    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(2.95 * elbowTicksPerRadian, 0, 400);    
-    if (errorElbow != ErrorCode.OK) {
-      System.out.println("Elbow: set selected sensor position failed,");
-    }
 
 
     // Wrist Motor Setup:
@@ -540,6 +544,9 @@ public class Arm extends SubsystemBase{
 
     SmartDashboard.putBoolean("ArmInit/ElbowMagnetOk", isElbowMagnetOk);
     SmartDashboard.putBoolean("ArmInit/ShoulderMagnetOk", isShoulderMagnetOk);
+
+    //this sets the motor encoders to match the absolute sensor positions during initialization
+    updateMotorEncoders(200);
   }
   
   public String getDiagnostics() {
@@ -570,6 +577,7 @@ public class Arm extends SubsystemBase{
     return new JointPositions(currentJointPositions);
   }
 
+  /* 
   public boolean initializeShoulder() {
     ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
     if (errorShoulder != ErrorCode.OK) {
@@ -578,6 +586,24 @@ public class Arm extends SubsystemBase{
       return true;
     }
   }
+  */
+  public void updateMotorEncoders(int timeout){
+    //encoder health is already checked in periodic using u`dateMagnateHealth
+    if (isShoulderMagnetOk && isElbowMagnetOk) {
+      ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
+      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
+      if (errorShoulder != ErrorCode.OK) {
+          System.out.println("Shoulder: set selected sensor position failed.");
+        }
+        if(errorElbow != ErrorCode.OK){
+          System.out.println("Elbow: set selected sensor position failed.");
+        }
+
+      } else {
+        System.out.print("shoulder/elbow absolute encoder failed");
+      }
+    }
+
 
   public JointPositions getAbsoluteAngles(){
     return new JointPositions(absoluteJointPositions);
