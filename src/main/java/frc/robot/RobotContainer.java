@@ -46,6 +46,7 @@ import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GamePieceFinder;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
@@ -66,6 +67,7 @@ public class RobotContainer {
   //private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem, null, null);
   private final AprilTagFinder m_frontCamera = new AprilTagFinder(m_driveSubsystem, "FrontVision", 
     new Transform3d(new Translation3d(0.2159, 0.1397, 0.508), new Rotation3d(0, 0.2617, 0)));
+  private final GamePieceFinder m_gamePieceFinder = new GamePieceFinder(m_driveSubsystem, "FrontVision");
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();

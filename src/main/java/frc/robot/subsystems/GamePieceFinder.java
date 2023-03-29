@@ -23,45 +23,45 @@ public class GamePieceFinder extends SubsystemBase {
     public double h = 0.0;
   }
 
-  private NetworkTable cubeNetwork;
-  private NetworkTable coneNetwork;
+  private NetworkTable networkTable;
   private NetworkTableEntry cubePieceEntry;
   private NetworkTableEntry conePieceEntry;
   private String tableName;
-  private String closestCube;
-  private double closestCubeDistance;
-  private String closestCone;
-  private double closestConeDistance;
+  private int closestCube;
+  private double closestCubeArea;
+  private int closestCone;
+  private double closestConeArea;
   private DriveSubsystem driveSubsystem;
   private ArrayList<GamePiece> cubeArray;
   private ArrayList<GamePiece> coneArray;
   private Transform3d cameraTransform;
-  private GamePiece cube;
-  private GamePiece cone;
   private GamePiecePoseEstimator poseEstimator;
-  public String closestGamePiece;
+  public double closestCubeX;
+  public double closestCubeY;
+  public double closestConeX;
+  public double closestConeY;
 
   public class GamePiecePoseEstimator {
     //public Transform3d estimate(){
     //}
   }
 
-  public GamePieceFinder(DriveSubsystem ds, String tableName, Transform3d cameraTransform3d) {
+  public GamePieceFinder(DriveSubsystem ds, String tableName) {
     driveSubsystem = ds;
     this.tableName = tableName;
-    cubeNetwork = NetworkTableInstance.getDefault().getTable(tableName);
-    cubePieceEntry = cubeNetwork.getEntry("Cubes");
+    networkTable = NetworkTableInstance.getDefault().getTable(tableName);
+    cubePieceEntry = networkTable.getEntry("Cubes");
     cubeArray = new ArrayList<GamePiece>();
 
-    closestCube = "No Cube to be found";
-    closestCubeDistance = 99999.0;
+    closestCube = -1;
+    closestCubeArea = 0;
 
-    coneNetwork = NetworkTableInstance.getDefault().getTable(tableName);
-    conePieceEntry = cubeNetwork.getEntry("Cones");
+    networkTable = NetworkTableInstance.getDefault().getTable(tableName);
+    conePieceEntry = networkTable.getEntry("Cones");
     coneArray = new ArrayList<GamePiece>();
 
-    closestCone = "No Cone to be found";
-    closestConeDistance = 99999.0;
+    closestCone = -1;
+    closestConeArea = 0;
   }
 
   @Override
@@ -70,27 +70,34 @@ public class GamePieceFinder extends SubsystemBase {
     cubeArray.clear();
     int numCube = cubeData.length/4;
     // Reset search variables for clostest to empty:
-    closestCube = "No Cube to be found";
-    closestCubeDistance = 9999.0;
-
+    closestCube = -1;
+    closestCubeArea = 0;
+    closestCubeX = 0.0;
+    closestCubeY = 0.0;
 
     for (int i = 0; i < numCube; i = i +1){
       
-      double[] cubes = new double[3];
-      double[] cones = new double[3];
+      GamePiece cube = new GamePiece();
 
-      cubes[0] = cubeData[i*4 + 1].doubleValue();
-      cubes[1] = cubeData[i*4 + 2].doubleValue();
-      cubes[2] = cubeData[i*4 + 3].doubleValue();
-      cubes[3] = cubeData[i*4 + 4].doubleValue();
+      cube.x = cubeData[i*4 + 0].doubleValue();
+      cube.y = cubeData[i*4 + 1].doubleValue();
+      cube.w = cubeData[i*4 + 2].doubleValue();
+      cube.h = cubeData[i*4 + 3].doubleValue();
 
+      cubeArray.add(cube);
 
-      cube.x = cubes[0];
-      cube.y = cubes[1];
-      cube.w = cubes[2];
-      cube.h = cubes[3];
+      double area = cube.w * cube.h;
+      
+      if (area > closestCubeArea) {
+        closestCubeArea = area;
+        closestCube = i;
+      }
 
+    }
 
+    if (closestCube > 0) {
+      closestCubeX = cubeArray.get(closestCube).x + cubeArray.get(closestCube).w / 2;
+      closestCubeY = cubeArray.get(closestCube).y + cubeArray.get(closestCube).h / 2;
     }
 
 
@@ -98,69 +105,45 @@ public class GamePieceFinder extends SubsystemBase {
     coneArray.clear();
     int numCone = coneData.length/4;
     // Reset search variables for clostest to empty:
-    closestCone = "No Cone to be found";
-    closestConeDistance = 9999.0;
+    closestCone = -1;
+    closestConeArea = 0;
 
     for (int i = 0; i < numCone; i = i +1){
       
-      double[] cones = new double[3];
+      GamePiece cone = new GamePiece();
+      cone.x = coneData[i*4 + 0].doubleValue();
+      cone.y = coneData[i*4 + 1].doubleValue();
+      cone.w = coneData[i*4 + 2].doubleValue();
+      cone.h = coneData[i*4 + 3].doubleValue();
 
-      cones[0] = coneData[i*4 + 1].doubleValue();
-      cones[1] = coneData[i*4 + 2].doubleValue();
-      cones[2] = coneData[i*4 + 3].doubleValue();
-      cones[3] = coneData[i*4 + 4].doubleValue();
+      coneArray.add(cone);
 
-      cone.x = cones[0];
-      cone.y = cones[1];
-      cone.w = cones[2];
-      cone.h = cones[3];
+      double area = cone.w * cone.h;
+      
+      if (area > closestConeArea) {
+        closestConeArea = area;
+        closestCone = i;
+      }
     }
-
-    if (cone.x > cube.x && cone.y > cube.y){
-      closestGamePiece = "Cone";
-    }else if (cone.x < cube.x && cone.y < cube.y) {
-      closestGamePiece = "Cube";
-    }else{
-      closestGamePiece = "None";
+    if (closestCone > 0) {
+      closestConeX = coneArray.get(closestCone).x + coneArray.get(closestCone).w / 2;
+      closestConeY = coneArray.get(closestCone).y + coneArray.get(closestCone).h / 2;
     }
 
-    SmartDashboard.putString(String.format("%s/ClosestGamePiece"), closestGamePiece);
-    //~~~~~~~~~~~~~~~~~~~~ ENTERING CUBE AREA ~~~~~~~~~~~~~~~~~~~~
-    SmartDashboard.putNumber(String.format("%s/NumCube", tableName), numCube);
-    if (closestCube != "No Cube to be found") {
-      SmartDashboard.putString(String.format("%s/ClosestCube", tableName), closestCube);
-      SmartDashboard.putNumber(String.format("%s/ClosestCubeDistance", tableName), closestCubeDistance);
-      SmartDashboard.putNumber(String.format("%s/CubeX", tableName), cube.x);
-      SmartDashboard.putNumber(String.format("%s/CubeY", tableName), cube.y);
-      SmartDashboard.putNumber(String.format("%s/CubeWidth", tableName), cube.w);
-      SmartDashboard.putNumber(String.format("%s/CubeHeight", tableName), cube.h);
-    }
-    else{
-      SmartDashboard.putString(String.format("%s/ClosestCube", tableName), "No Cube to be found");
-      SmartDashboard.putNumber(String.format("%s/ClosestCubeDistance", tableName), 99999.0);
-      SmartDashboard.putNumber(String.format("%s/CubeX", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/CubeY", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/CubeWidth", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/CubeHeight", tableName), 0.0);
-    }
-    //~~~~~~~~~~~~~~~~~~~~ ENTERING CONE AREA ~~~~~~~~~~~~~~~~~~~~
-    SmartDashboard.putNumber(String.format("%s/NumCone", tableName), numCone);
-    if (closestCube != "No Cone to be found") {
-      SmartDashboard.putString(String.format("%s/ClosestCone", tableName), closestCone);
-      SmartDashboard.putNumber(String.format("%s/ClosestConeDistance", tableName), closestConeDistance);
-      SmartDashboard.putNumber(String.format("%s/ConeX", tableName), cone.x);
-      SmartDashboard.putNumber(String.format("%s/ConeY", tableName), cone.y);
-      SmartDashboard.putNumber(String.format("%s/ConeWidth", tableName), cone.w);
-      SmartDashboard.putNumber(String.format("%s/ConeHeight", tableName), cone.h);
-    }
-    else{
-      SmartDashboard.putString(String.format("%s/ClosestCone", tableName), "No Cone to be found");
-      SmartDashboard.putNumber(String.format("%s/ClosestConeDistance", tableName), 99999.0);
-      SmartDashboard.putNumber(String.format("%s/ConeX", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/ConeY", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/ConeWidth", tableName), 0.0);
-      SmartDashboard.putNumber(String.format("%s/ConeHeight", tableName), 0.0);
-    }
+
+    // if (!closestGamePiece.equals("None")){
+    //   SmartDashboard.putString(String.format("%s/ClosestGamePiece", tableName), closestGamePiece);
+    // }else{
+    //   SmartDashboard.putString(String.format("%s/ClosestGamePiece", tableName), closestGamePiece);
+    // }
+      SmartDashboard.putNumber("closestCube", closestCube);
+      SmartDashboard.putNumber("closestCone", closestCone);
+      SmartDashboard.putNumber("closestCubeArea", closestCubeArea);
+      SmartDashboard.putNumber("closestConeArea", closestConeArea);
+      SmartDashboard.putNumber("cloestCubeX", closestCubeX);
+      SmartDashboard.putNumber("cloestCubeY", closestCubeY);
+      SmartDashboard.putNumber("cloestConeX", closestConeX);
+      SmartDashboard.putNumber("cloestConeY", closestConeY);
   }
 
 
@@ -183,11 +166,11 @@ public class GamePieceFinder extends SubsystemBase {
   }
 
 
-  public String getClosestCube() {
+  public int getClosestCube() {
     return closestCube;
   }
 
-  public String getClosestCone() {
+  public int getClosestCone() {
     return closestCone;
   }
 }

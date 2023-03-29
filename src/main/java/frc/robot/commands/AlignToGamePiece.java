@@ -22,7 +22,7 @@ public class AlignToGamePiece extends CommandBase {
 
 
   // State variables for execution:
-  String targetGamePiece;
+  Boolean targetGamePiece;
   double targetGamePieceDistance;
   private ChassisSpeeds chassisSpeeds;
   int glitchCounter;
@@ -43,25 +43,25 @@ public class AlignToGamePiece extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    String closestCone = finder.getClosestCone();
-    String closestCube = finder.getClosestCube();
+    int closestCone = finder.getClosestCone();
+    int closestCube = finder.getClosestCube();
     bling.clearLEDs();
-    if(finder.closestGamePiece != "None"){
-      System.out.println(String.format("AlignToGamePiece Initialized to %s", finder.closestGamePiece));
-      targetGamePiece = finder.closestGamePiece;
-    } 
-    else {
-      targetGamePiece = "None";
-      System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
-    }
+    // if(finder.closestGamePiece != false){
+    //   System.out.println(String.format("AlignToGamePiece Initialized to %s", finder.closestGamePiece));
+    //   targetGamePiece = finder.closestGamePiece;
+    // } 
+    // else {
+    //   targetGamePiece = false;
+    //   System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
+    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     bling.setColorRGBAll(255, 255, 255);
-    String closestCube = finder.getClosestCube();
-    String closestCone = finder.getClosestCone();
+    int closestCube = finder.getClosestCube();
+    int closestCone = finder.getClosestCone();
    // TODO:Pose3d targetPose = finder.getClosestPose();
    double currentHeading = drivetrain.getWrappedHeading();
   }
