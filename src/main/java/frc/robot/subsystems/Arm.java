@@ -588,7 +588,7 @@ public class Arm extends SubsystemBase{
   }
   */
   public void updateMotorEncoders(int timeout){
-    //encoder health is already checked in periodic using u`dateMagnateHealth
+    //encoder health is already checked in periodic using updateMagnateHealth
     if (isShoulderMagnetOk && isElbowMagnetOk) {
       ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
       ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
