@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -40,6 +42,7 @@ import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
+import frc.robot.commands.UpdateMotorEncoders;
 import frc.robot.commands.CollectCommand;
 import frc.robot.commands.DepositCommand;
 import frc.robot.commands.EngageDriveUp;
@@ -248,9 +251,10 @@ public class RobotContainer {
 
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
-    }
 
-  
+      Trigger armEncoderResetTrigger = new Trigger(m_OI :: getOperatorDPadUp);
+      armEncoderResetTrigger.onTrue(updateMotorEncoders());
+    }
 
 
   /**Sets test mode
@@ -322,6 +326,7 @@ public class RobotContainer {
         waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
     return new SequentialCommandGroup(
         new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
+        
 
   }
 
@@ -625,6 +630,12 @@ public class RobotContainer {
     waypoints.add(new Pose2d(0, 0.5, new Rotation2d(0)));
     waypoints.add(new Pose2d(0.1,0.2, new Rotation2d(3.14)));
     return new DriveThroughTrajectory(m_driveSubsystem, waypoints, 0.3, 0.4, 0.5, 0.5);
+  }
+
+  public Command updateMotorEncoders(){
+      //encoder health is already checked in periodic using u`dateMagnateHealth
+      return new UpdateMotorEncoders(m_arm);
+        
   }
 
   /**A way to test OI and DriveSubsystem while debug mode in DriveSubsystem is on
