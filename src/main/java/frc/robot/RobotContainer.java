@@ -45,11 +45,13 @@ import frc.robot.commands.DepositCommand;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
+import frc.robot.commands.PlannedArmPath;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
 import frc.robot.subsystems.OpenMV;
+import frc.robot.subsystems.PathPlanner;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Arm;
@@ -69,6 +71,7 @@ public class RobotContainer {
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
+  private final PathPlanner m_pathPlanner = new PathPlanner();
   private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
   private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
@@ -320,9 +323,11 @@ public class RobotContainer {
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
         waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
         waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
-    return new SequentialCommandGroup(
-        new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5));
 
+
+    return new SequentialCommandGroup(
+        new PlannedArmPath(m_arm, m_pathPlanner, 0, 0.5)
+    );
   }
 
   public Command groundPickupCommand(OI oi){ 
@@ -337,8 +342,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
 
     return new ConditionalCommand(
-      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 12, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 13, 0.5),
       oi :: isCubeMode);
   }
   
@@ -361,8 +366,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
 
     return new ConditionalCommand(
-      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 8, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 9, 0.5),
       oi :: isCubeMode);
   }
 
@@ -382,8 +387,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
     return new ConditionalCommand(
-      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 3, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 6, 0.5),
       oi :: isCubeMode);
   }
 
@@ -403,8 +408,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
     return new ConditionalCommand(
-      new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
-      new ArmSplinePosition(m_arm, coneWaypoints, 0.5, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 2, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 5, 0.5),
       oi :: isCubeMode);
   }
 

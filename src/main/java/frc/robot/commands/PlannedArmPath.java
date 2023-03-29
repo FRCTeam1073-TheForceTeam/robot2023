@@ -22,6 +22,7 @@ public class PlannedArmPath extends CommandBase {
   double maxAcceleration;
   double time;
   double endTime;
+  int endIdx;
   Arm.JointPositions endPose;
   final double shoulderTolerance = 0.01;
   final double elbowTolerance = 0.01;
@@ -32,16 +33,26 @@ public class PlannedArmPath extends CommandBase {
     this.arm = arm;
     this.planner = planner;
     this.maxAcceleration = maxAcceleration;
-    path = planner.getPathFromClosest(arm.getJointAngles().shoulder , arm.getJointAngles().elbow, arm.getAbsoluteAngles().wrist, endIdx);
-
-    for(int i = 0; i < path.size(); i++){
-      waypoints.add(arm.new JointWaypoints(path.get(i).shoulder, path.get(i).elbow, path.get(i).wrist, i * 3));
-    }
+    this.endIdx = endIdx;
+    waypoints = new ArrayList<Arm.JointWaypoints>();
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    path = planner.getPathFromClosest(arm.getJointAngles().shoulder , arm.getJointAngles().elbow, arm.getJointAngles().wrist, endIdx);
+    waypoints.clear();
+    for(int i = 0; i < path.size(); i++){
+      waypoints.add(arm.new JointWaypoints(path.get(i).shoulder, path.get(i).elbow, path.get(i).wrist, (i + 1) * 3));
+    }
+
+    for(int i = 0; i < waypoints.size(); i++){
+      System.out.println(waypoints.get(i).time);
+      System.out.println(waypoints.get(i).shoulder);
+      System.out.println(waypoints.get(i).elbow);
+      System.out.println(waypoints.get(i).wrist);
+    }
     arm.setArmTrajectories(waypoints, arm.new JointVelocities(1, 1, 1), maxAcceleration);
   }
 
@@ -51,7 +62,9 @@ public class PlannedArmPath extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    waypoints.clear();
+  }
 
   // Returns true when the command should end.
   @Override
