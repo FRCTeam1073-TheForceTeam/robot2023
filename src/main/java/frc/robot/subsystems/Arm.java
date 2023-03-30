@@ -235,11 +235,22 @@ public class Arm extends SubsystemBase{
       shoulderPositions[0] = pos.shoulder;
       wristPositions[0] = pos.wrist;
       times[0] = 0;
+      double[] speedBasedTimes = new double[times.length];
+
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i + 1] = waypoints.get(i).elbow;
         shoulderPositions[i + 1] = waypoints.get(i).shoulder;
         wristPositions[i + 1] = waypoints.get(i).wrist;
-        times[i + 1] = waypoints.get(i).time;
+        //times[i + 1] = waypoints.get(i).time;
+      }
+
+      for(int s = 0; s < (speedBasedTimes.length - 1); s++){
+        double sTime = Math.abs((waypoints.get(s).shoulder - waypoints.get(s + 1).shoulder) / maxVelocity.shoulder);
+        double eTime = Math.abs((waypoints.get(s).shoulder - waypoints.get(s + 1).shoulder) / maxVelocity.shoulder);
+        double wTime = Math.abs((waypoints.get(s).shoulder - waypoints.get(s + 1).shoulder) / maxVelocity.shoulder);
+
+        double movementTime = Math.max(Math.max(sTime, eTime), wTime);
+        times[s + 1] = movementTime;
       }
 
       if (times.length > 1)
