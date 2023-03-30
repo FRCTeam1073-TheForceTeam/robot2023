@@ -254,8 +254,12 @@ public class RobotContainer {
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
 
-      Trigger armEncoderResetTrigger = new Trigger(m_OI :: getOperatorDPadUp);
-      armEncoderResetTrigger.onTrue(updateMotorEncoders());
+
+      //TODO bind updateMotorEncoders to operator left trigger
+      //Trigger armEncoderResetTrigger = new Trigger(m_OI :: getOperatorDPadUp);
+      //armEncoderResetTrigger.onTrue(updateMotorEncoders());
+      
+     
     }
 
 
