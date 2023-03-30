@@ -34,19 +34,19 @@ public class TeleopClaw extends CommandBase {
     //reversed for cube
     if(oi.getOperatorLeftBumper()){
       if(oi.isCubeMode() == true) {
-        claw.setCollectorSpeed(30);
+        claw.setCollectorSpeed(45);
       }
       if(oi.isCubeMode() == false){
-        claw.setCollectorSpeed(-30);
+        claw.setCollectorSpeed(-45);
       }
       System.out.println("Operator Left Bumper");
     }
     else if(oi.getOperatorRightBumper()){
       if(oi.isCubeMode() == true) {
-        claw.setCollectorSpeed(-30);
+        claw.setCollectorSpeed(-45);
       }
       if(oi.isCubeMode() == false){
-        claw.setCollectorSpeed(30);
+        claw.setCollectorSpeed(45);
       }
       System.out.println("Operator Right Bumper");
     }
