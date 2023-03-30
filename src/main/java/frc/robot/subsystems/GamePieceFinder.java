@@ -28,9 +28,9 @@ public class GamePieceFinder extends SubsystemBase {
   private NetworkTableEntry conePieceEntry;
   private String tableName;
   private int closestCube;
-  private double closestCubeArea;
+  public double closestCubeArea;
   private int closestCone;
-  private double closestConeArea;
+  public double closestConeArea;
   private DriveSubsystem driveSubsystem;
   private ArrayList<GamePiece> cubeArray;
   private ArrayList<GamePiece> coneArray;
@@ -95,9 +95,9 @@ public class GamePieceFinder extends SubsystemBase {
 
     }
 
-    if (closestCube > 0) {
-      closestCubeX = cubeArray.get(closestCube).x + cubeArray.get(closestCube).w / 2;
-      closestCubeY = cubeArray.get(closestCube).y + cubeArray.get(closestCube).h / 2;
+    if (closestCube > -1) {
+      closestCubeX = (cubeArray.get(closestCube).x) + (cubeArray.get(closestCube).w/2);
+      closestCubeY = (cubeArray.get(closestCube).y) + (cubeArray.get(closestCube).h/2);
     }
 
 
@@ -125,9 +125,10 @@ public class GamePieceFinder extends SubsystemBase {
         closestCone = i;
       }
     }
-    if (closestCone > 0) {
-      closestConeX = coneArray.get(closestCone).x + coneArray.get(closestCone).w / 2;
-      closestConeY = coneArray.get(closestCone).y + coneArray.get(closestCone).h / 2;
+
+    if (closestCone > -1) {
+      closestConeX = (coneArray.get(closestCone).x) + (coneArray.get(closestCone).w/2);
+      closestConeY = (coneArray.get(closestCone).y) + (coneArray.get(closestCone).h/2);
     }
 
 

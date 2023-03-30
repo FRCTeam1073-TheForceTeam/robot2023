@@ -84,7 +84,7 @@ public class AlignToAprilTag extends CommandBase {
    * @param x - The x component of the translation.
    * @param y - The y component of the translation.
    * @param z - The z component of the translation.
-   * @param trasnlation - The translational component of the pose.
+   * @param translation - The translational component of the pose.
    * @param rotation - The rotational component of the pose.
    * @param value - Value to clamp
    * @param low - The lower boundary to which to clamp value.
@@ -101,9 +101,10 @@ public class AlignToAprilTag extends CommandBase {
     double currentHeading = drivetrain.getWrappedHeading() * (Math.PI / 180.0);
     //apply offset to target pose
     if (targetPose != null){
-    targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
+      targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
     }
 
+    
     // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
     if (closestID == targetTagID && targetPose != null) {
       
