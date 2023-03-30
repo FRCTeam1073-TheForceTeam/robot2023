@@ -18,7 +18,7 @@ public class PlannedArmPath extends CommandBase {
   ArrayList<PathPlanner.Node> path;
   ArrayList<Arm.JointWaypoints> waypoints;
   Arm.ArmTrajectory armTraj;
-  double maxVelocity;
+  Arm.JointVelocities maxVelocity;
   double maxAcceleration;
   double time;
   double endTime;
@@ -28,12 +28,13 @@ public class PlannedArmPath extends CommandBase {
   final double elbowTolerance = 0.01;
   final double wristTolerance = 0.01; 
   
-  public PlannedArmPath(Arm arm, PathPlanner planner, int endIdx, double maxAcceleration) {
+  public PlannedArmPath(Arm arm, PathPlanner planner, int endIdx, Arm.JointVelocities maxVelocities) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     this.planner = planner;
     this.maxAcceleration = maxAcceleration;
     this.endIdx = endIdx;
+    this.maxVelocity = maxVelocities;
     waypoints = new ArrayList<Arm.JointWaypoints>();
     addRequirements(arm);
   }
@@ -53,7 +54,7 @@ public class PlannedArmPath extends CommandBase {
       System.out.println(waypoints.get(i).elbow);
       System.out.println(waypoints.get(i).wrist);
     }
-    arm.setArmTrajectories(waypoints, arm.new JointVelocities(1, 1, 1), maxAcceleration);
+    arm.setArmTrajectories(waypoints, maxVelocity, maxAcceleration);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

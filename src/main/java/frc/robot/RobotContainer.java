@@ -330,12 +330,12 @@ public class RobotContainer {
 
 
     return new SequentialCommandGroup(
-        new PlannedArmPath(m_arm, m_pathPlanner, 0, 0.5)
+        new PlannedArmPath(m_arm, m_pathPlanner, 0, m_arm.new JointVelocities(0.5, 0.5, 0.5))
     );
   }
 
   public Command alternateArmStowCommand(){
-    return new PlannedArmPath(m_arm, m_pathPlanner, 16, 0.5);
+    return new PlannedArmPath(m_arm, m_pathPlanner, 16, m_arm.new JointVelocities(0.5, 0.5, 0.5));
 
   }
 
@@ -351,8 +351,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 12, 0.5),
-      new PlannedArmPath(m_arm, m_pathPlanner, 13, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 12, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 13, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
       oi :: isCubeMode);
   }
   
@@ -375,8 +375,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 8, 0.5),
-      new PlannedArmPath(m_arm, m_pathPlanner, 9, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 8, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 9, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
       oi :: isCubeMode);
   }
 
@@ -396,8 +396,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 3, 0.5),
-      new PlannedArmPath(m_arm, m_pathPlanner, 6, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 3, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 6, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
       oi :: isCubeMode);
   }
 
@@ -417,8 +417,8 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 2, 0.5),
-      new PlannedArmPath(m_arm, m_pathPlanner, 5, 0.5),
+      new PlannedArmPath(m_arm, m_pathPlanner, 2, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 5, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
       oi :: isCubeMode);
   }
 
