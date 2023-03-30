@@ -251,6 +251,10 @@ public class RobotContainer {
 
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
+
+      Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
+      alternateStowTrigger.onTrue(alternateArmStowCommand());
+      
     }
 
   
@@ -328,6 +332,11 @@ public class RobotContainer {
     return new SequentialCommandGroup(
         new PlannedArmPath(m_arm, m_pathPlanner, 0, 0.5)
     );
+  }
+
+  public Command alternateArmStowCommand(){
+    return new PlannedArmPath(m_arm, m_pathPlanner, 16, 0.5);
+
   }
 
   public Command groundPickupCommand(OI oi){ 

@@ -196,6 +196,10 @@ public class OI extends SubsystemBase
         return driverController.getRawAxis(2);
     }
 
+    public double getOperatorLeftTrigger(){
+        return operatorController.getRawAxis(2);
+    }
+
         /**
      * @return The Value of the driver controller's left bumper
      * @param input - The current value of the input stream.
@@ -214,6 +218,7 @@ public class OI extends SubsystemBase
     {
         return driverController.getRawButton(6);
     }
+    
 
      /**
      * @return The Value of the driver controller's 2 square button
@@ -301,9 +306,6 @@ public class OI extends SubsystemBase
      * @param axis - The axis to read, starting at 0.
      * @return The value of the axis.
      */
-    public double getOperatorLeftTrigger(){
-        return driverController.getRawAxis(2);
-    }
 
     /**
      * @return The Value of the operator controller's left bumper
