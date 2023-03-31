@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AlignToAprilTag;
+import frc.robot.commands.AllianceUnderglow;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmSetPosition;
@@ -76,9 +77,10 @@ public class RobotContainer {
   private final Arm m_arm = new Arm();
   private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
-  private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
+  //private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
   private final TeleopClaw m_clawCommand = new TeleopClaw(m_claw, m_OI);
+  private final AllianceUnderglow m_allianceUnderglow = new AllianceUnderglow(m_underglow);
 
   //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
@@ -112,11 +114,12 @@ public class RobotContainer {
    */
   public RobotContainer() {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
-    CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
+    //CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_allianceUnderglow);
 
    
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
@@ -746,5 +749,4 @@ public class RobotContainer {
       m_bling.setColorRGBAll(0, 0, 255);
     }
   }
-
 }

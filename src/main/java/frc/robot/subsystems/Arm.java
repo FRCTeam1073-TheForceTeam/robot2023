@@ -583,31 +583,20 @@ public class Arm extends SubsystemBase{
   //TODO put in encoders differances
   public void updateMotorEncoders(int timeout){
     //encoder health is already checked in periodic using updateMagnateHealth
-  
+
     if (isShoulderMagnetOk && isElbowMagnetOk) {
+      double elbowDifference = absoluteJointPositions.shoulder + absoluteJointPositions.elbow;
       ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
-      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
-      if (errorShoulder != ErrorCode.OK) {
-          System.out.println("Shoulder: set selected sensor position failed.");
-        }
-        else if(errorElbow != ErrorCode.OK){
-          System.out.println("Elbow: set selected sensor position failed.");
-        }
-        else{
-          double changeInElbowOffset = 0.0;
-          double encoderShoulderDifferance = absoluteJointPositions.shoulder - shoulderEncoder.getPosition();
-          double encoderElbowDifferance = absoluteJointPositions.elbow - elbowEncoder.getPosition();
-        
-          //shoulderMotor.setSelectedSensorPosition(encoderShoulderDifferance, timeout);
-          //elbowMotor.setSelectedSensorPosition(encoderElbowDifferance, timeout);
-
-          System.out.println("Encoders Ok");
-        }
-
-      } else {
-        System.out.print("shoulder/elbow absolute encoder failed");
+      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(elbowDifference * elbowTicksPerRadian, 0, timeout);
+          System.out.println("Encoders Ok"); 
       }
+      if (errorShoulder != ErrorCode.OK) {
+        System.out.println("Shoulder: set selected sensor position failed.");
+      }
+      if(errorElbow != ErrorCode.OK){
+        System.out.println("Elbow: set selected sensor position failed.");
     }
+  }
 
 
   public JointPositions getAbsoluteAngles(){
