@@ -95,6 +95,7 @@ public class RobotContainer {
   private static final String kScoreCubeAndEngage = "Score Cube and Engage";
   private static final String kCubeEngageLeaveCommand = "Score Cube, Leave Community, Engage";
   private static final String kCubeLeaveCommand = "Score Cube and Leave Community";
+  private static final String kShootHighCubeLeaveEngage = "Shoot Cube, Leave Commmunity, Engage";
 
   private static final String kArmTest = "Arm Test Command";
   private static final String kTrajectoryTest = "Drive trajectory Test";
@@ -131,6 +132,7 @@ public class RobotContainer {
     m_chooser.addOption("2_D_2023_1073", kEngagePlus);
     m_chooser.addOption("Arm test", kArmTest);
     m_chooser.addOption("Drive Trajectory Test", kTrajectoryTest);
+    m_chooser.addOption("Shoot Cube Leave Engage", kShootHighCubeLeaveEngage);
    
     //m_chooser.addOption("Test Mode", kTestMode);
     //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
@@ -315,6 +317,8 @@ public class RobotContainer {
         return cubeLeaveCommand();
       case kTrajectoryTest:
         return testTrajectory();
+      case kShootHighCubeLeaveEngage:
+        return shootHighCubeLeaveEngage();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -461,6 +465,25 @@ public class RobotContainer {
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling))));
+  }
+  /**Autonomous command that aligns to april tag, scores a cube in high node, and then engages on the charge station.
+   * 
+   * @return Command to do the autonomous outlined above
+   */
+  public Command shootHighCubeLeaveEngage(){    
+    ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
+      communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
+    
+    return new SequentialCommandGroup(
+      new CollectCommand(m_claw, true, 0.5),
+      new DepositCommand(m_claw, true, .5),
+      new SequentialCommandGroup(
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 0.8, 
+        1.0, 0.5, 0.5),
+        new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true),
+        new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
+        new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
+        new ParkingBrake(m_driveSubsystem, m_bling)));
   }
 
   /** Autonomous command that aligns to april tags, scores a cube, leaves community, and then comes back to engage.
