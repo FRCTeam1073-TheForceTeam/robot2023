@@ -328,14 +328,15 @@ public class RobotContainer {
         waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
         waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
 
-
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
     return new SequentialCommandGroup(
-        new PlannedArmPath(m_arm, m_pathPlanner, 0, m_arm.new JointVelocities(0.5, 0.5, 0.5))
-    );
+      
+        new PlannedArmPath(m_arm, m_pathPlanner, 0, velocity));
   }
 
   public Command alternateArmStowCommand(){
-    return new PlannedArmPath(m_arm, m_pathPlanner, 16, m_arm.new JointVelocities(0.5, 0.5, 0.5));
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+    return new PlannedArmPath(m_arm, m_pathPlanner, 16, velocity);
 
   }
 
@@ -349,10 +350,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, 0.0, 2.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 12, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
-      new PlannedArmPath(m_arm, m_pathPlanner, 13, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 12, velocity),
+      new PlannedArmPath(m_arm, m_pathPlanner, 13, velocity),
       oi :: isCubeMode);
   }
   
@@ -374,9 +376,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.35, 2.95, 0.1, 3.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 8, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
-      new PlannedArmPath(m_arm, m_pathPlanner, 9, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 8, velocity),
+      new PlannedArmPath(m_arm, m_pathPlanner, 9, velocity),
       oi :: isCubeMode);
   }
 
@@ -395,9 +399,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.25, 3.13, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 3, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
-      new PlannedArmPath(m_arm, m_pathPlanner, 6, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 3, velocity),
+      new PlannedArmPath(m_arm, m_pathPlanner, 6, velocity),
       oi :: isCubeMode);
   }
 
@@ -416,9 +422,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 2, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
-      new PlannedArmPath(m_arm, m_pathPlanner, 5, m_arm.new JointVelocities(0.5, 0.5, 0.5)),
+      new PlannedArmPath(m_arm, m_pathPlanner, 2, velocity),
+      new PlannedArmPath(m_arm, m_pathPlanner, 5, velocity),
       oi :: isCubeMode);
   }
 
