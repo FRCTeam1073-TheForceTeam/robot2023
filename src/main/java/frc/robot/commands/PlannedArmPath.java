@@ -44,7 +44,7 @@ public class PlannedArmPath extends CommandBase {
     path = planner.getPathFromClosest(arm.getJointAngles().shoulder , arm.getJointAngles().elbow, arm.getJointAngles().wrist, endIdx);
     waypoints.clear();
     for(int i = 0; i < path.size(); i++){
-      waypoints.add(arm.new JointWaypoints(path.get(i).shoulder, path.get(i).elbow, path.get(i).wrist, (i + 1) * 1.0));
+      waypoints.add(arm.new JointWaypoints(path.get(i).shoulder, path.get(i).elbow, path.get(i).wrist, (i + 1) * 1.5));
     }
 
     for(int i = 0; i < waypoints.size(); i++){

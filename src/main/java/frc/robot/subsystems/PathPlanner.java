@@ -18,8 +18,8 @@ public class PathPlanner {
 		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 2
 		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 3
 		graph.addNode(new Node(-2.0, 3.19, -0.77)); //CUBE_TOP_INTERMEDIATE 4
-		graph.addNode(new Node(-1.433, 3.143, 1.07)); //CONE_TOP 5
-		graph.addNode(new Node(-1.91, 3.451, 1.132)); //CONE_MID 6
+		graph.addNode(new Node(-1.209, 3.224, 1.137)); //CONE_TOP 5
+		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 6
 		graph.addNode(new Node(-2.0, 3.0, 0.0)); //CONE_TOP_INTERMEDIATE 7
 		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 8  
 		graph.addNode(new Node(-2.11, 3.1, 1.41)); //DOUBLE_SUB_CONE 9
