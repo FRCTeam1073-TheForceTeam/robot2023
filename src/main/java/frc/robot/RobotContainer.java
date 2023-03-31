@@ -466,7 +466,7 @@ public class RobotContainer {
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling))));
   }
-  /**Autonomous command that aligns to april tag, scores a cube in high node, and then engages on the charge station.
+  /**Autonomous command that scores a cube in high node, leaves the community, and then engages on the charge station.
    * 
    * @return Command to do the autonomous outlined above
    */
