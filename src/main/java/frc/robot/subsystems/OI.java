@@ -250,7 +250,7 @@ public class OI extends SubsystemBase
      */
     public boolean getXButton()
     {
-        return xDriverButtonDebouncer.calculate(driverController.getRawButtonPressed(3));
+        return xDriverButtonDebouncer.calculate(driverController.getRawButton(3));
     }
 
      /**

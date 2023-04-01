@@ -233,13 +233,13 @@ public class RobotContainer {
     stowTrigger.onTrue(armStowCommand(m_OI));
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
-    alignToAprilTag.whileTrue(alignToAprilTag(0));
+    alignToAprilTag.whileTrue(alignToAprilTag(-0.09, 0.8));
     
     Trigger leftAlignToAprilTag = new Trigger(m_OI::getXButton);
-    leftAlignToAprilTag.whileTrue(alignToAprilTag(-0.59));
+    leftAlignToAprilTag.whileTrue(alignToAprilTag(0.44, 1.0));
 
     Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
-    rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
+    rightAlignToAprilTag.whileTrue(alignToAprilTag(-0.62, 1.0));
 
     Trigger operatorCubeMode = new Trigger(m_OI::getOperatorViewButton);
     operatorCubeMode.onTrue(new InstantCommand(m_OI :: setCubeMode));
@@ -303,7 +303,7 @@ public class RobotContainer {
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
       case kAlignToAprilTag:
-        return alignToAprilTag(0);
+        return alignToAprilTag(-0.9, 0.8);
       case kArmTest:
         return armSetTest();
       case kScoreCube:
@@ -711,8 +711,8 @@ public class RobotContainer {
    * @param offset - the lateral distance away from the AprilTag the Robot should align to
    * @return A command that moves the robot to the correct alignment
    */
-  public Command alignToAprilTag(double offset){
-    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
+  public Command alignToAprilTag(double yOffset, double xOffset){
+    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, yOffset, xOffset);
   }
 
   /** Sets the bling and underglow of the Robot on startup. Underglow to the color of the alliance.
