@@ -70,7 +70,7 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void initialize() {
     int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
-    if (finder.getClosestPose().getTranslation().getNorm() > 1.7) {
+    if (closestID >=0 && finder.getClosestPose().getTranslation().getNorm() > 1.7) {
       closestID = -1;
     }
 
