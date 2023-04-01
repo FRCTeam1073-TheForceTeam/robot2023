@@ -289,6 +289,11 @@ public class Arm extends SubsystemBase{
           double elbowSlope = (elbowPositions[i] - elbowPositions[i - 1]) / (times[i] - times[i - 1]);
           double wristSlope = (wristPositions[i] - wristPositions[i - 1]) / (times[i] - times[i - 1]);
 
+          //could try getting the derivativeStructure out of the splines and then getting the value out of that
+          //seems that the values are being overriden since each index of value is only one value
+          //this could explain why the elbow was going all the way up at the start.
+          //could need to make different splines for each joint
+
           // double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
           // if(nextShoulderDifference * shoulderSlope < 0){
           //   derivative[0] = 0;
