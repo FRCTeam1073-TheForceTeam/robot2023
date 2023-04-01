@@ -252,8 +252,8 @@ public class RobotContainer {
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
 
-      Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
-      alternateStowTrigger.onTrue(alternateArmStowCommand());
+      // Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
+      // alternateStowTrigger.onTrue(alternateArmStowCommand());
       
     }
 
@@ -325,20 +325,20 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
-        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 3));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 6));
 
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
     return new SequentialCommandGroup(
       
-        new PlannedArmPath(m_arm, m_pathPlanner, 0, velocity));
+        new ArmSplinePosition(m_arm, waypoints, velocity, 0));
   }
 
-  public Command alternateArmStowCommand(){
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
-    return new PlannedArmPath(m_arm, m_pathPlanner, 16, velocity);
+  // public Command alternateArmStowCommand(){
+  //   Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+  //   return new PlannedArmPath(m_arm, m_pathPlanner, 16, velocity);
 
-  }
+  // }
 
   public Command groundPickupCommand(OI oi){ 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
@@ -350,11 +350,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, 0.0, 2.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 12, velocity),
-      new PlannedArmPath(m_arm, m_pathPlanner, 13, velocity),
+      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
       oi :: isCubeMode);
   }
   
@@ -376,11 +376,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.35, 2.95, 0.1, 3.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 8, velocity),
-      new PlannedArmPath(m_arm, m_pathPlanner, 9, velocity),
+      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
       oi :: isCubeMode);
   }
 
@@ -399,11 +399,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.25, 3.13, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 3, velocity),
-      new PlannedArmPath(m_arm, m_pathPlanner, 6, velocity),
+      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
       oi :: isCubeMode);
   }
 
@@ -422,11 +422,11 @@ public class RobotContainer {
         coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
 
     return new ConditionalCommand(
-      new PlannedArmPath(m_arm, m_pathPlanner, 2, velocity),
-      new PlannedArmPath(m_arm, m_pathPlanner, 5, velocity),
+      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
       oi :: isCubeMode);
   }
 
@@ -458,10 +458,12 @@ public class RobotContainer {
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
+
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
     
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
         //new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.5, 0),
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
@@ -488,9 +490,11 @@ public class RobotContainer {
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
@@ -523,9 +527,11 @@ public class RobotContainer {
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
@@ -544,9 +550,11 @@ public class RobotContainer {
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
       armStowCommand(m_OI)
@@ -567,9 +575,11 @@ public class RobotContainer {
         cubeGroundWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeGroundWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-        new ArmSplinePosition(m_arm, cubeWaypoints, 0.5, 0.5),
+        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
         new CollectCommand(m_claw, true, 0.8)),
       new DepositCommand(m_claw, true, 1.0),
       new ParallelDeadlineGroup( 
@@ -637,7 +647,9 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
     waypoints.add(m_arm.new JointWaypoints(-1.0, 2.6, 0.0, 6.0));
     waypoints.add(m_arm.new JointWaypoints(-1.55, 2.4, 0.0, 9.0));
-    return new ArmSplinePosition(m_arm, waypoints, 0.5, 0.5);
+
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
+    return new ArmSplinePosition(m_arm, waypoints, velocity, 0.5);
   }
 
   public Command testTrajectory(){

@@ -252,7 +252,7 @@ public class Arm extends SubsystemBase{
         double wTime = Math.abs((wristPositions[s - 1] - wristPositions[s])) / maxVelocity.wrist;
 
         double movementTime = Math.max(Math.max(sTime, eTime), wTime);
-        totalMovementTime += movementTime + 0.6;
+        totalMovementTime += movementTime + 1.0;
         times[s] = totalMovementTime;
       }
 
@@ -289,33 +289,35 @@ public class Arm extends SubsystemBase{
           double elbowSlope = (elbowPositions[i] - elbowPositions[i - 1]) / (times[i] - times[i - 1]);
           double wristSlope = (wristPositions[i] - wristPositions[i - 1]) / (times[i] - times[i - 1]);
 
-          //could try getting the derivativeStructure out of the splines and then getting the value out of that
+          double nexShoulderSlope = (shoulderPositions[i + 1] - shoulderPositions[i]) / (times[i + 1] - times[i]);
+          double nextElbowSlope = (elbowPositions[i + 1] - elbowPositions[i]) / (times[i + 1] - times[i]);
+          double nextWristSlope = (wristPositions[i + 1] - wristPositions[i]) / (times[i + 1] - times[i]);
 
-          // double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
-          // if(nextShoulderDifference * shoulderSlope < 0){
-          //   derivative[0] = 0;
-          // }
-          // else{
-          //   derivative[0] = shoulderSlope;
-          // }
+          double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
+          if(nexShoulderSlope * shoulderSlope < 0){
+            derivative[0] = 0;
+          }
+          else{
+            derivative[0] = (shoulderSlope + nexShoulderSlope) / 2;
+          }
 
-          // double nextElbowDifference = elbowPositions[i + 1] - elbowPositions[i];
-          // if(nextElbowDifference * elbowSlope < 0){
-          //   derivative[1] = 0;
-          // }
-          // else{
-          //   derivative[1] = elbowSlope;
-          // }
+          double nextElbowDifference = elbowPositions[i + 1] - elbowPositions[i];
+          if(nextElbowSlope * elbowSlope < 0){
+            derivative[1] = 0;
+          }
+          else{
+            derivative[1] = (elbowSlope + nextElbowSlope) / 2;
+          }
 
-          // double nextWristDifference = wristPositions[i + 1] - wristPositions[i];
-          // if(nextWristDifference * wristSlope < 0){
-          //   derivative[2] = 0;
-          // }
-          // else{
-          //   derivative[2] = wristSlope;
-          // }
+          double nextWristDifference = wristPositions[i + 1] - wristPositions[i];
+          if(nextWristSlope * wristSlope < 0){
+            derivative[2] = 0;
+          }
+          else{
+            derivative[2] = (wristSlope + nextWristSlope) / 2;
+          }
 
-          splines.addSamplePoint(times[i], value);
+          splines.addSamplePoint(times[i], value, derivative);
         }
       }
 

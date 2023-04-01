@@ -15,7 +15,7 @@ public class ArmSplinePosition extends CommandBase {
   Arm arm;
   ArrayList<Arm.JointWaypoints> waypoints;
   Arm.ArmTrajectory armTraj;
-  double maxVelocity;
+  Arm.JointVelocities maxVelocity;
   double maxAcceleration;
   double time;
   double endTime;
@@ -24,7 +24,7 @@ public class ArmSplinePosition extends CommandBase {
   final double elbowTolerance = 0.01;
   final double wristTolerance = 0.01;
   
-  public ArmSplinePosition(Arm arm, ArrayList<Arm.JointWaypoints> mWaypoints, double maxVelocity, double maxAcceleration) {
+  public ArmSplinePosition(Arm arm, ArrayList<Arm.JointWaypoints> mWaypoints, Arm.JointVelocities maxVelocity, double maxAcceleration) {
     this.arm = arm;
     this.waypoints = mWaypoints;
     this.maxVelocity = maxVelocity;
@@ -36,7 +36,7 @@ public class ArmSplinePosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arm.setArmTrajectories(waypoints, arm.new JointVelocities(1, 1, 1), maxAcceleration);
+    arm.setArmTrajectories(waypoints, maxVelocity, maxAcceleration);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
