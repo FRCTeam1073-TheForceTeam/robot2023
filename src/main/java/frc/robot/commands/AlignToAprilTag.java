@@ -44,8 +44,9 @@ public class AlignToAprilTag extends CommandBase {
   private ChassisSpeeds chassisSpeeds;
   int glitchCounter;
   double yOffset;
+  double xOffset = 0.8;
 
-  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity, double yOffset) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity, double yOffset, double xOffset) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
@@ -55,6 +56,7 @@ public class AlignToAprilTag extends CommandBase {
     this.linearTolerance = 0.05;
     this.rotationalTolerance = 0.05;
     this.yOffset = yOffset;
+    this.xOffset = xOffset;
     // Create these just once and reuse them in execute loops.
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     addRequirements(drivetrain);
@@ -68,6 +70,10 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void initialize() {
     int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
+    if (finder.getClosestPose().getTranslation().getNorm() > 1.7) {
+      closestID = -1;
+    }
+
     bling.clearLEDs();
     if(closestID != -1){
       System.out.println(String.format("AlignToAprilTag Initialized to Tag: %d", closestID));
@@ -84,7 +90,7 @@ public class AlignToAprilTag extends CommandBase {
    * @param x - The x component of the translation.
    * @param y - The y component of the translation.
    * @param z - The z component of the translation.
-   * @param trasnlation - The translational component of the pose.
+   * @param translation - The translational component of the pose.
    * @param rotation - The rotational component of the pose.
    * @param value - Value to clamp
    * @param low - The lower boundary to which to clamp value.
@@ -101,20 +107,28 @@ public class AlignToAprilTag extends CommandBase {
     double currentHeading = drivetrain.getWrappedHeading() * (Math.PI / 180.0);
     //apply offset to target pose
     if (targetPose != null){
-    targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() + yOffset, targetPose.getZ()), targetPose.getRotation());
+      targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() - yOffset, targetPose.getZ()), targetPose.getRotation());
     }
 
+    
     // If we get a pose and the closestID is the one we were targeting => drive towards alignment left/right.
     if (closestID == targetTagID && targetPose != null) {
       
       // Robot relative movement:
       chassisSpeeds.vxMetersPerSecond = 0.0;
       double rotationSpeed = (Math.PI - currentHeading) * 0.5;
-      rotationSpeed = MathUtil.clamp(rotationSpeed, -0.5, 0.5);
-      // chassisSpeeds.omegaRadiansPerSecond = targetPose.getRotation().getZ() * 0.5; // Rotate such that Z rotation goes to zero.
+      rotationSpeed = MathUtil.clamp(rotationSpeed, -maxAngularVelocity, maxAngularVelocity);
+      double alignmentScale =  (maxAngularVelocity - (Math.abs(rotationSpeed))) / maxAngularVelocity;
+      double alignmentSpeedY = -targetPose.getTranslation().getY() * alignmentScale * 0.5;
+      double alignmentSpeedX = (xOffset - targetPose.getTranslation().getX()) * alignmentScale * 0.5;
+      alignmentSpeedX = MathUtil.clamp(alignmentSpeedX, -maxVelocity, maxVelocity);
+      alignmentSpeedY = MathUtil.clamp(alignmentSpeedY, -maxVelocity, maxVelocity);
+
+      
+      
       chassisSpeeds.omegaRadiansPerSecond = rotationSpeed;
-      chassisSpeeds.vyMetersPerSecond = -targetPose.getTranslation().getY() * 1.0;   // Slide along such that Y offset goes to zero.
-      chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
+      chassisSpeeds.vyMetersPerSecond = alignmentSpeedY;   // Slide along such that Y offset goes to zero.
+      chassisSpeeds.vxMetersPerSecond = alignmentSpeedX;
       ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond, 
         Rotation2d.fromDegrees(drivetrain.getHeading()));

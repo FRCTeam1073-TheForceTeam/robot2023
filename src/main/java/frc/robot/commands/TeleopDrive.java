@@ -43,6 +43,7 @@ public class TeleopDrive extends CommandBase
   double last_error = 0; //for snap-to-positions derivative
   double last_time = 0; //for snap-to-positions derivative
   boolean lastParkingBreakButton = false;
+  boolean lastRobotCentricButton = false;
 
   PIDController snapPidProfile;
 
@@ -154,9 +155,10 @@ public class TeleopDrive extends CommandBase
     }
 */
     // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(leftY * 0.5, leftX * 0.5, rightX); //debug
-    if (m_OI.getFieldCentricToggle()){
+    if (m_OI.getFieldCentricToggle() && lastRobotCentricButton == false){
       fieldCentric = !fieldCentric;
     }
+    lastRobotCentricButton = m_OI.getFieldCentricToggle();
     SmartDashboard.putBoolean("Field Centric", fieldCentric);
     
     if(m_OI.getLeftBumper() && lastParkingBreakButton == false){

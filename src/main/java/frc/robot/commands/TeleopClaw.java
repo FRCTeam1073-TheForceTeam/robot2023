@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Claw;
@@ -34,24 +36,25 @@ public class TeleopClaw extends CommandBase {
     //reversed for cube
     if(oi.getOperatorLeftBumper()){
       if(oi.isCubeMode() == true) {
-        claw.setCollectorSpeed(30);
+        claw.setCollectorSpeed(45);
       }
       if(oi.isCubeMode() == false){
-        claw.setCollectorSpeed(-30);
+        claw.setCollectorSpeed(-45);
       }
       System.out.println("Operator Left Bumper");
     }
     else if(oi.getOperatorRightBumper()){
       if(oi.isCubeMode() == true) {
-        claw.setCollectorSpeed(-30);
+        claw.setCollectorSpeed(-45);
       }
       if(oi.isCubeMode() == false){
-        claw.setCollectorSpeed(30);
+        claw.setCollectorSpeed(45);
       }
       System.out.println("Operator Right Bumper");
     }
     else {
       claw.setCollectorSpeed(0);
+      //collectorMotor.setNeutralMode(NeutralMode.Brake);
     }
   }
 

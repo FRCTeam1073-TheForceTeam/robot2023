@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix.ErrorCode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AlignToAprilTag;
+import frc.robot.commands.AllianceUnderglow;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmSetPosition;
@@ -40,6 +43,7 @@ import frc.robot.commands.TeleopClaw;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TeleopSetArm;
 import frc.robot.commands.UnderglowSetCommand;
+import frc.robot.commands.UpdateMotorEncoders;
 import frc.robot.commands.CollectCommand;
 import frc.robot.commands.DepositCommand;
 import frc.robot.commands.EngageDriveUp;
@@ -47,6 +51,7 @@ import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
 import frc.robot.commands.PlannedArmPath;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GamePieceFinder;
 import frc.robot.subsystems.SwerveModuleConfig;
 import frc.robot.subsystems.Underglow;
 import frc.robot.subsystems.OI;
@@ -68,15 +73,17 @@ public class RobotContainer {
   //private final AprilTagFinder m_aprilTagFinder = new AprilTagFinder(m_driveSubsystem, null, null);
   private final AprilTagFinder m_frontCamera = new AprilTagFinder(m_driveSubsystem, "FrontVision", 
     new Transform3d(new Translation3d(0.2159, 0.1397, 0.508), new Rotation3d(0, 0.2617, 0)));
+  private final GamePieceFinder m_gamePieceFinder = new GamePieceFinder(m_driveSubsystem, "FrontVision");
   //private final AprilTagFinder m_rearCamera = new AprilTagFinder(m_driveSubsystem, "RearVision", 
     //new Transform3d(new Translation3d(0.2159, -0.1397, 0.508), new Rotation3d(0, -0.2617, 0)));
   private final Arm m_arm = new Arm();
   private final PathPlanner m_pathPlanner = new PathPlanner();
   private final TeleopSetArm m_armSetCommand = new TeleopSetArm(m_arm, m_OI);
   private final Underglow m_underglow = new Underglow();
-  private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
+  //private final UnderglowSetCommand m_underglowSetCommand = new UnderglowSetCommand(m_underglow, m_OI);
   private final Claw m_claw = new Claw();
   private final TeleopClaw m_clawCommand = new TeleopClaw(m_claw, m_OI);
+  private final AllianceUnderglow m_allianceUnderglow = new AllianceUnderglow(m_underglow);
 
   //private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
   
@@ -93,6 +100,7 @@ public class RobotContainer {
   private static final String kScoreCubeAndEngage = "Score Cube and Engage";
   private static final String kCubeEngageLeaveCommand = "Score Cube, Leave Community, Engage";
   private static final String kCubeLeaveCommand = "Score Cube and Leave Community";
+  private static final String kShootHighCubeLeaveEngage = "Shoot Cube, Leave Commmunity, Engage";
 
   private static final String kArmTest = "Arm Test Command";
   private static final String kTrajectoryTest = "Drive trajectory Test";
@@ -109,11 +117,11 @@ public class RobotContainer {
    */
   public RobotContainer() {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
-    CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_allianceUnderglow);
 
    
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
@@ -129,6 +137,7 @@ public class RobotContainer {
     m_chooser.addOption("2_D_2023_1073", kEngagePlus);
     m_chooser.addOption("Arm test", kArmTest);
     m_chooser.addOption("Drive Trajectory Test", kTrajectoryTest);
+    m_chooser.addOption("Shoot Cube Leave Engage", kShootHighCubeLeaveEngage);
    
     //m_chooser.addOption("Test Mode", kTestMode);
     //m_chooser.addOption("Align To AprilTag", kAlignToAprilTag);
@@ -193,6 +202,7 @@ public class RobotContainer {
 
     SmartDashboard.putString("Diag/Arm", armDiagnostics);
     SmartDashboard.putString("Diag/Bling", blingDiagnostics);
+    SmartDashboard. putString("Diag/Underglow", underglowDiagnostics);
     SmartDashboard.putString("Diag/Claw", clawDiagnostics);
     SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
     SmartDashboard.putString("Diag/OI", oiDiagnostics);
@@ -226,13 +236,13 @@ public class RobotContainer {
     stowTrigger.onTrue(armStowCommand(m_OI));
 
     Trigger alignToAprilTag = new Trigger(m_OI::getYButton);
-    alignToAprilTag.whileTrue(alignToAprilTag(0));
+    alignToAprilTag.whileTrue(alignToAprilTag(-0.09, 0.8));
     
     Trigger leftAlignToAprilTag = new Trigger(m_OI::getXButton);
-    leftAlignToAprilTag.whileTrue(alignToAprilTag(-0.59));
+    leftAlignToAprilTag.whileTrue(alignToAprilTag(0.44, 1.0));
 
     Trigger rightAlignToAprilTag = new Trigger(m_OI::getBButton);
-    rightAlignToAprilTag.whileTrue(alignToAprilTag(0.57));
+    rightAlignToAprilTag.whileTrue(alignToAprilTag(-0.62, 1.0));
 
     Trigger operatorCubeMode = new Trigger(m_OI::getOperatorViewButton);
     operatorCubeMode.onTrue(new InstantCommand(m_OI :: setCubeMode));
@@ -257,7 +267,9 @@ public class RobotContainer {
       
     }
 
-  
+      // Trigger updateMotorEncodersTrigger = new Trigger(m_OI :: getOperatorLeftTriggerButton);
+      // updateMotorEncodersTrigger.onTrue(updateMotorEncoders());
+    
 
 
   /**Sets test mode
@@ -299,7 +311,7 @@ public class RobotContainer {
 //      case kTrajectoryWaypoint:
 //        return trajectoryWaypoint();
       case kAlignToAprilTag:
-        return alignToAprilTag(0);
+        return alignToAprilTag(-0.9, 0.8);
       case kArmTest:
         return armSetTest();
       case kScoreCube:
@@ -312,6 +324,8 @@ public class RobotContainer {
         return cubeLeaveCommand();
       case kTrajectoryTest:
         return testTrajectory();
+      case kShootHighCubeLeaveEngage:
+        return shootHighCubeLeaveEngage();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -325,8 +339,8 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 3.0));
-        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 6.0));
+        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
     return new SequentialCommandGroup(
@@ -474,6 +488,25 @@ public class RobotContainer {
       new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), false),
       new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), false),
       new ParkingBrake(m_driveSubsystem, m_bling))));
+  }
+  /**Autonomous command that scores a cube in high node, leaves the community, and then engages on the charge station.
+   * 
+   * @return Command to do the autonomous outlined above
+   */
+  public Command shootHighCubeLeaveEngage(){    
+    ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
+      communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
+    
+    return new SequentialCommandGroup(
+      new CollectCommand(m_claw, true, 0.5),
+      new DepositCommand(m_claw, true, .5),
+      new SequentialCommandGroup(
+        new DriveThroughTrajectory(m_driveSubsystem, communityWaypoints, 0.8, 
+        1.0, 0.5, 0.5),
+        new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true),
+        new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
+        new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
+        new ParkingBrake(m_driveSubsystem, m_bling)));
   }
 
   /** Autonomous command that aligns to april tags, scores a cube, leaves community, and then comes back to engage.
@@ -661,6 +694,12 @@ public class RobotContainer {
     return new DriveThroughTrajectory(m_driveSubsystem, waypoints, 0.3, 0.4, 0.5, 0.5);
   }
 
+  public Command updateMotorEncoders(){
+      //encoder health is already checked in periodic using u`dateMagnateHealth
+      return new UpdateMotorEncoders(m_arm);
+        
+  }
+
   /**A way to test OI and DriveSubsystem while debug mode in DriveSubsystem is on
    * 
    * @return the Command that tests the subsystems
@@ -706,8 +745,8 @@ public class RobotContainer {
    * @param offset - the lateral distance away from the AprilTag the Robot should align to
    * @return A command that moves the robot to the correct alignment
    */
-  public Command alignToAprilTag(double offset){
-    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, offset);
+  public Command alignToAprilTag(double yOffset, double xOffset){
+    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera , 0.52, yOffset, xOffset);
   }
 
   /** Sets the bling and underglow of the Robot on startup. Underglow to the color of the alliance.
@@ -740,5 +779,4 @@ public class RobotContainer {
       m_bling.setColorRGBAll(0, 0, 255);
     }
   }
-
 }
