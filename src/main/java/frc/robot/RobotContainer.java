@@ -262,6 +262,9 @@ public class RobotContainer {
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
 
+      Trigger singleSubstationTrigger = new Trigger(m_OI :: getOperatorDPadRight);
+      singleSubstationTrigger.onTrue(singleSubstation(m_OI));
+
       // Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
       // alternateStowTrigger.onTrue(alternateArmStowCommand());
       
@@ -339,7 +342,7 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.8));
+        waypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.8));
         waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 2.9));
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
@@ -411,7 +414,7 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
         coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
         //coneWaypoints.add(m_arm.new JointWaypoints(-2.25, 3.13, 0.0, 2.25));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.72, 3.545, 1.189, 3.0));
 
         Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
@@ -434,7 +437,26 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
         coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
         //coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-1.209, 3.224, 1.137, 3.0));
+
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+
+    return new ConditionalCommand(
+      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+      oi :: isCubeMode);
+  }
+
+  public Command singleSubstation(OI oi){
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.85, 2.89, 0.25, 3.0));
+
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+        coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
+        coneWaypoints.add(m_arm.new JointWaypoints(-2.21, 4.549, -1.209, 3.0));
 
         Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 

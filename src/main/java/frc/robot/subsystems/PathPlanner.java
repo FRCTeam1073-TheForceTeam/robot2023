@@ -34,6 +34,7 @@ public class PathPlanner {
 		graph.addNode(new Node(-1.77745, 3.7791, -1.00345)); // CUBE_TOP to STOW_ALT INTERMEDIATE 18
 		graph.addNode(new Node(-2.26095, 4.1141, -0.56845)); // DOUBLE_SUB_CUBE to STOW_ALT INTERMEDIATE 19
 		graph.addNode(new Node(-1.815, 3.5105, 0.436)); //CUBE_MID to INTERMEDIATE_MID 20
+		graph.addNode(new Node(-3.85, 2.89, 0.25)); //SINGLESUB_CUBE 21
 		
 		//previous connections
 		graph.addEdge(4, 2);
