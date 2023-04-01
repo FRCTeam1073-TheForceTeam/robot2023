@@ -24,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -210,9 +211,9 @@ public class Arm extends SubsystemBase{
 
   public class ArmTrajectory {
 
-    private HermiteInterpolator elbowSplines;
-    private HermiteInterpolator splines;
-    private HermiteInterpolator wristSplines;
+    private InterpolatingTreeMap<Double,Double> shoulderSplines;
+    private InterpolatingTreeMap<Double,Double> elbowSplines;
+    private InterpolatingTreeMap<Double,Double> wristSplines;
     double[] elbowPositions;
     double[] shoulderPositions;
     double[] wristPositions;
@@ -222,7 +223,10 @@ public class Arm extends SubsystemBase{
 
 
     public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration) {
-      splines = new HermiteInterpolator();
+      shoulderSplines = new InterpolatingTreeMap<Double, Double>();
+      elbowSplines = new InterpolatingTreeMap<Double, Double>();
+      wristSplines = new InterpolatingTreeMap<Double, Double>();
+      //splines = new HermiteInterpolator();
       // elbowSplines = new HermiteInterpolator();
       // wristSplines = new HermiteInterpolator();
       elbowPositions = new double[waypoints.size() + 1];
@@ -252,7 +256,7 @@ public class Arm extends SubsystemBase{
         double wTime = Math.abs((wristPositions[s - 1] - wristPositions[s])) / maxVelocity.wrist;
 
         double movementTime = Math.max(Math.max(sTime, eTime), wTime);
-        totalMovementTime += movementTime + 1.0;
+        totalMovementTime += movementTime + 0.01;
         times[s] = totalMovementTime;
       }
 
@@ -265,61 +269,71 @@ public class Arm extends SubsystemBase{
       System.out.println("Trajectory start time: " + startTime);
       System.out.println("Trajectory end time: " + finalTime);
 
+      shoulderSplines.clear();
+      elbowSplines.clear();
+      wristSplines.clear();
+
       for(int i = 0; i < times.length; i++){
-        if(i == 0 || i == times.length - 1){
-          double[] value = new double[3];
-          value[0] = shoulderPositions[i];
-          value[1] = elbowPositions[i];
-          value[2] = wristPositions[i];
-
-          double[] derivative = new double[3];
-          derivative[0] = 0;
-          derivative[1] = 0;
-          derivative[2] = 0;
-          splines.addSamplePoint(times[i], value, derivative);
-        }
-        else{
-          double[] value = new double[3];
-          value[0] = shoulderPositions[i];
-          value[1] = elbowPositions[i];
-          value[2] = wristPositions[i];
-
-          double[] derivative = new double[3];
-          double shoulderSlope = (shoulderPositions[i] - shoulderPositions[i - 1]) / (times[i] - times[i - 1]);
-          double elbowSlope = (elbowPositions[i] - elbowPositions[i - 1]) / (times[i] - times[i - 1]);
-          double wristSlope = (wristPositions[i] - wristPositions[i - 1]) / (times[i] - times[i - 1]);
-
-          double nexShoulderSlope = (shoulderPositions[i + 1] - shoulderPositions[i]) / (times[i + 1] - times[i]);
-          double nextElbowSlope = (elbowPositions[i + 1] - elbowPositions[i]) / (times[i + 1] - times[i]);
-          double nextWristSlope = (wristPositions[i + 1] - wristPositions[i]) / (times[i + 1] - times[i]);
-
-          double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
-          if(nexShoulderSlope * shoulderSlope < 0){
-            derivative[0] = 0;
-          }
-          else{
-            derivative[0] = (shoulderSlope + nexShoulderSlope) / 2;
-          }
-
-          double nextElbowDifference = elbowPositions[i + 1] - elbowPositions[i];
-          if(nextElbowSlope * elbowSlope < 0){
-            derivative[1] = 0;
-          }
-          else{
-            derivative[1] = (elbowSlope + nextElbowSlope) / 2;
-          }
-
-          double nextWristDifference = wristPositions[i + 1] - wristPositions[i];
-          if(nextWristSlope * wristSlope < 0){
-            derivative[2] = 0;
-          }
-          else{
-            derivative[2] = (wristSlope + nextWristSlope) / 2;
-          }
-
-          splines.addSamplePoint(times[i], value, derivative);
-        }
+        shoulderSplines.put(times[i], shoulderPositions[i]);
+        elbowSplines.put(times[i], elbowPositions[i]);
+        wristSplines.put(times[i], wristPositions[i]);
       }
+
+      // for(int i = 0; i < times.length; i++){
+      //   if(i == 0 || i == times.length - 1){
+      //     double[] value = new double[3];
+      //     value[0] = shoulderPositions[i];
+      //     value[1] = elbowPositions[i];
+      //     value[2] = wristPositions[i];
+
+      //     double[] derivative = new double[3];
+      //     derivative[0] = 0;
+      //     derivative[1] = 0;
+      //     derivative[2] = 0;
+      //     splines.addSamplePoint(times[i], value, derivative);
+      //   }
+      //   else{
+      //     double[] value = new double[3];
+      //     value[0] = shoulderPositions[i];
+      //     value[1] = elbowPositions[i];
+      //     value[2] = wristPositions[i];
+
+      //     double[] derivative = new double[3];
+      //     double shoulderSlope = (shoulderPositions[i] - shoulderPositions[i - 1]) / (times[i] - times[i - 1]);
+      //     double elbowSlope = (elbowPositions[i] - elbowPositions[i - 1]) / (times[i] - times[i - 1]);
+      //     double wristSlope = (wristPositions[i] - wristPositions[i - 1]) / (times[i] - times[i - 1]);
+
+      //     double nexShoulderSlope = (shoulderPositions[i + 1] - shoulderPositions[i]) / (times[i + 1] - times[i]);
+      //     double nextElbowSlope = (elbowPositions[i + 1] - elbowPositions[i]) / (times[i + 1] - times[i]);
+      //     double nextWristSlope = (wristPositions[i + 1] - wristPositions[i]) / (times[i + 1] - times[i]);
+
+      //     double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
+      //     if(nexShoulderSlope * shoulderSlope < 0){
+      //       derivative[0] = 0;
+      //     }
+      //     else{
+      //       derivative[0] = (shoulderSlope + nexShoulderSlope) / 2;
+      //     }
+
+      //     double nextElbowDifference = elbowPositions[i + 1] - elbowPositions[i];
+      //     if(nextElbowSlope * elbowSlope < 0){
+      //       derivative[1] = 0;
+      //     }
+      //     else{
+      //       derivative[1] = (elbowSlope + nextElbowSlope) / 2;
+      //     }
+
+      //     double nextWristDifference = wristPositions[i + 1] - wristPositions[i];
+      //     if(nextWristSlope * wristSlope < 0){
+      //       derivative[2] = 0;
+      //     }
+      //     else{
+      //       derivative[2] = (wristSlope + nextWristSlope) / 2;
+      //     }
+
+      //     splines.addSamplePoint(times[i], value, derivative);
+      //   }
+      // }
 
       // elbowSplines = interpolator.interpolate(times, elbowPositions);
       // shoulderSplines = interpolator.interpolate(times, shoulderPositions);
@@ -338,9 +352,9 @@ public class Arm extends SubsystemBase{
     public void getVelocitiesAtTime(double time, JointVelocities velocities) {
       double t = time - startTime;
       if (time <= finalTime) {
-        velocities.shoulder = splines.value(t)[0];
-        velocities.elbow = splines.value(t)[1];
-        velocities.wrist = splines.value(t)[2];
+        // velocities.shoulder = splines.value(t)[0];
+        // velocities.elbow = splines.value(t)[1];
+        // velocities.wrist = splines.value(t)[2];
       } else {
         velocities.shoulder = 0.0;
         velocities.elbow = 0.0;
@@ -353,9 +367,9 @@ public class Arm extends SubsystemBase{
       double t = time - startTime;
       if (time <= finalTime) {
         // Placeholder for joint angles
-        positions.shoulder = splines.value(t)[0];
-        positions.elbow = splines.value(t)[1];
-        positions.wrist = splines.value(t)[2];
+        positions.shoulder = shoulderSplines.get(t);
+        positions.elbow = elbowSplines.get(t);
+        positions.wrist = wristSplines.get(t);
       } else {
         positions.shoulder = shoulderPositions[shoulderPositions.length - 1];
         positions.elbow = elbowPositions[elbowPositions.length - 1];

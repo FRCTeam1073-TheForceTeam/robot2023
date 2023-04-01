@@ -325,10 +325,10 @@ public class RobotContainer {
    */
   public Command armStowCommand(OI oi){
       ArrayList<Arm.JointWaypoints> waypoints = new ArrayList<Arm.JointWaypoints>();
-        waypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 3));
-        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 6));
+        waypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 3.0));
+        waypoints.add(m_arm.new JointWaypoints(-3.87, 2.9, -1.21, 6.0));
 
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
     return new SequentialCommandGroup(
       
         new ArmSplinePosition(m_arm, waypoints, velocity, 0));
@@ -342,15 +342,15 @@ public class RobotContainer {
 
   public Command groundPickupCommand(OI oi){ 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
-        cubeWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
+        //cubeWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.19, 5.38, -1.21, 4.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.0));
-        coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, 0.0, 2.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
+        //coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, 0.0, 2.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
@@ -367,16 +367,16 @@ public class RobotContainer {
 
   public Command doubleSubstationScore(OI oi){
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 3.2, -0.6, 2.0));
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.5, 3.3, -0.5, 3.0));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 2.0));
+        //cubeWaypoints.add(m_arm.new JointWaypoints(-2.5, 3.3, -0.5, 3.0));
         cubeWaypoints.add(m_arm.new JointWaypoints(-2.45, 3.47, -0.33, 4.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 2.0));
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.35, 2.95, 0.1, 3.0));
+        coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 2.0));
+        //coneWaypoints.add(m_arm.new JointWaypoints(-2.35, 2.95, 0.1, 3.0));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.11, 3.1, 1.41, 4.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
@@ -390,16 +390,16 @@ public class RobotContainer {
    */
   public Command midScoreCommand(OI oi){
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.16, 3.3, -0.73, 2.25));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //cubeWaypoints.add(m_arm.new JointWaypoints(-2.16, 3.3, -0.73, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.72, 3.8, -0.26, 3.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.25, 3.13, 0.0, 2.25));
+        coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //coneWaypoints.add(m_arm.new JointWaypoints(-2.25, 3.13, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.91, 3.451, 1.132, 3.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
@@ -413,16 +413,16 @@ public class RobotContainer {
    */
   public Command highScoreCommand(OI oi){
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
+        cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //cubeWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.19, -0.77, 2.25));
         cubeWaypoints.add(m_arm.new JointWaypoints(-1.483, 3.570, -0.337, 3.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.6, 2.8, -1.2, 1.5));
-        coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
+        coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.5));
+        //coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-1.433, 3.143, 1.07, 3.0));
 
-        Arm.JointVelocities velocity = m_arm.new JointVelocities(0.3, 0.3, 0.3);
+        Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
     return new ConditionalCommand(
       new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
