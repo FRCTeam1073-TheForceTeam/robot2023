@@ -24,6 +24,7 @@ public class OI extends SubsystemBase
     public Debouncer aButtonDebouncer = new Debouncer(0.05);
     public Debouncer bButtonDebouncer = new Debouncer(0.05);
     public Debouncer menuButtonDebouncer = new Debouncer(0.05);
+    public Debouncer fieldCentricDebouncer = new Debouncer(.05);
 
     /** Setting up which controllor is which
      * Drive Controller is controllor 0
@@ -222,7 +223,7 @@ public class OI extends SubsystemBase
      */
     public boolean getFieldCentricToggle()
     {
-        return driverController.getRawButtonPressed(7);
+        return fieldCentricDebouncer.calculate(driverController.getRawButtonPressed(7));
     }
     
      /**
