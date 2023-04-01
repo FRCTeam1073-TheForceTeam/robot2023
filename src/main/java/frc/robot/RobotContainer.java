@@ -114,7 +114,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
-    //CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_underglowSetCommand);
     //CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
@@ -200,6 +199,7 @@ public class RobotContainer {
 
     SmartDashboard.putString("Diag/Arm", armDiagnostics);
     SmartDashboard.putString("Diag/Bling", blingDiagnostics);
+    SmartDashboard. putString("Diag/Underglow", underglowDiagnostics);
     SmartDashboard.putString("Diag/Claw", clawDiagnostics);
     SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
     SmartDashboard.putString("Diag/OI", oiDiagnostics);
@@ -259,12 +259,8 @@ public class RobotContainer {
       Trigger groundPickupTrigger = new Trigger(m_OI :: getOperatorDPadDown);
       groundPickupTrigger.onTrue(groundPickupCommand(m_OI));
 
-
-      //TODO bind updateMotorEncoders to operator left trigger
-      //Trigger armEncoderResetTrigger = new Trigger(m_OI :: getOperatorDPadUp);
-      //armEncoderResetTrigger.onTrue(updateMotorEncoders());
-      
-     
+      Trigger updateMotorEncodersTrigger = new Trigger(m_OI :: getOperatorLeftTriggerButton);
+      updateMotorEncodersTrigger.onTrue(updateMotorEncoders());
     }
 
 

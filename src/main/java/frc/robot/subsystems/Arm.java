@@ -66,6 +66,7 @@ public class Arm extends SubsystemBase{
   private final double shoulderAbsoluteOffset = -1.62295;
   private final double elbowAbsoluteOffset = -7.2741;
   private final double wristAbsoluteOffset = -1.21;
+  public final double elbowDifferenceOffset = 0.0;
   //private final double shoulderTicksPerRadian = -26931.24;
   //private final double elbowTicksPerRadian = 13465.62;
   private final double shoulderTicksPerRadian = -20.656*4*2048/(2*Math.PI);
@@ -90,7 +91,7 @@ public class Arm extends SubsystemBase{
   private int encoderPeriodicCounter;
   private ErrorCode errorShoulder;
   private ErrorCode errorElbow;
-  private double elbowDifference = absoluteJointPositions.shoulder + absoluteJointPositions.elbow;
+  private double elbowDifference = 0;
 
 
   public class JointPositions{
@@ -335,6 +336,7 @@ public class Arm extends SubsystemBase{
     absoluteJointPositions.elbow = -elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
     // No separate absolute sensor for wrist:
     absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian;
+    elbowDifference = absoluteJointPositions.shoulder - absoluteJointPositions.elbow + elbowDifferenceOffset;
   }
 
   private void updatePositionLimits() {
@@ -431,7 +433,7 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Arm.ElbowAbs", absoluteJointPositions.elbow);
     SmartDashboard.putNumber("Arm.WristAbs", absoluteJointPositions.wrist);
 
-    SmartDashboard.putNumber("Elbow.Difference", elbowDifference);
+    SmartDashboard.putNumber("Arm.Elbow.Difference", elbowDifference);
 
     // Update health signals for absolute encoder magnets.
     updateMagnetHealth();
@@ -588,8 +590,8 @@ public class Arm extends SubsystemBase{
 
     if (isShoulderMagnetOk && isElbowMagnetOk) {
       ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
-      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(elbowDifference * elbowTicksPerRadian, 0, timeout);
-          System.out.println("Encoders Ok"); 
+      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
+      System.out.println("Encoders Ok"); 
       }
       if (errorShoulder != ErrorCode.OK) {
         System.out.println("Shoulder: set selected sensor position failed.");
