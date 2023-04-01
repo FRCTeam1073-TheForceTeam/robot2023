@@ -223,7 +223,7 @@ public class OI extends SubsystemBase
      */
     public boolean getFieldCentricToggle()
     {
-        return fieldCentricDebouncer.calculate(driverController.getRawButtonPressed(7));
+        return fieldCentricDebouncer.calculate(driverController.getRawButton(7));
     }
     
      /**
