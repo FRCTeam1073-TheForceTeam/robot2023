@@ -50,23 +50,23 @@ public class PathPlanner {
 		graph.addEdge(12, 11);
 		
 		//Other Connections
-		graph.addEdge(13, 7);
-		graph.addEdge(13, 8);
-		graph.addEdge(14, 10);
-		graph.addEdge(14, 11);
-		graph.addEdge(15, 1);
-		graph.addEdge(15, 3);
-		graph.addEdge(16, 2);
-		graph.addEdge(16, 4);
-		graph.addEdge(17, 5);
-		graph.addEdge(17, 6);
-		graph.addEdge(13, 14);
-		graph.addEdge(9, 15);
-		graph.addEdge(9, 16);
-		graph.addEdge(9, 17);
-		graph.addEdge(17, 15);
-		graph.addEdge(17, 16);
-		graph.addEdge(16, 15);
+		// graph.addEdge(13, 7);
+		// graph.addEdge(13, 8);
+		// graph.addEdge(14, 10);
+		// graph.addEdge(14, 11);
+		// graph.addEdge(15, 1);
+		// graph.addEdge(15, 3);
+		// graph.addEdge(16, 2);
+		// graph.addEdge(16, 4);
+		// graph.addEdge(17, 5);
+		// graph.addEdge(17, 6);
+		// graph.addEdge(13, 14);
+		// graph.addEdge(9, 15);
+		// graph.addEdge(9, 16);
+		// graph.addEdge(9, 17);
+		// graph.addEdge(17, 15);
+		// graph.addEdge(17, 16);
+		// graph.addEdge(16, 15);
 	}
 
 	public class Node{
