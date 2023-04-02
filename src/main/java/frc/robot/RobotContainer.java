@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AlignToAprilTag;
+import frc.robot.commands.AlignToGamePiece;
 import frc.robot.commands.AllianceUnderglow;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -273,6 +274,9 @@ public class RobotContainer {
       Trigger singleSubstationTrigger = new Trigger(m_OI :: getOperatorDPadRight);
       singleSubstationTrigger.onTrue(singleSubstation(m_OI));
 
+      Trigger alignToGamePiece = new Trigger(m_OI:: getRightBumper);
+      alignToGamePiece.whileTrue(alignToGamePiece(m_OI));
+
       // Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
       // alternateStowTrigger.onTrue(alternateArmStowCommand());
       
@@ -363,6 +367,13 @@ public class RobotContainer {
     return new SequentialCommandGroup(
 
         new ArmSplinePosition(m_arm, waypoints, velocity, 0));
+  }
+
+  public Command alignToGamePiece(OI oi) {
+    return new ConditionalCommand(
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.3, true),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.3, false),
+      oi::isCubeMode);
   }
 
   // public Command alternateArmStowCommand(){
@@ -872,6 +883,7 @@ public class RobotContainer {
    */
   public void setStartupLighting() {
     // Pick intensity based on driver station connection.
+    
     double intensity = 0.3; // Default to dim.
     if (DriverStation.isDSAttached()) {
       intensity = 1.0; // Bright if attached.

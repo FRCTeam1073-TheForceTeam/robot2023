@@ -26,7 +26,7 @@ public class GamePieceFinder extends SubsystemBase {
   private NetworkTable networkTable;
   private NetworkTableEntry cubePieceEntry;
   private NetworkTableEntry conePieceEntry;
-  private String tableName;
+  public String tableName;
   private int closestCube;
   public double closestCubeArea;
   private int closestCone;
@@ -175,3 +175,5 @@ public class GamePieceFinder extends SubsystemBase {
     return closestCone;
   }
 }
+
+
