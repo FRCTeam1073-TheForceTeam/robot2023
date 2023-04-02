@@ -375,12 +375,12 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     // cubeWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-1.19, 5.38, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-1.05, 5.38, -1.21, 4.0));
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
     coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     // coneWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, 0.0, 2.0));
-    coneWaypoints.add(m_arm.new JointWaypoints(-1.73, 4.59, 0.67, 4.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.63, 4.66, 0.61, 4.0));
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
     return new ConditionalCommand(
@@ -473,7 +473,7 @@ public class RobotContainer {
         //coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.21, 4.549, -1.209, 3.0));
 
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.6, 1.6, 1.6);
 
     return new ConditionalCommand(
         new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
