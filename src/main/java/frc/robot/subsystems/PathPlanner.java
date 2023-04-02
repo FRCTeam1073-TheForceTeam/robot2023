@@ -13,86 +13,60 @@ public class PathPlanner {
 
 	public PathPlanner(){
 		graph = new Graph();
+		// All ends
 		graph.addNode(new Node(-3.87, 2.9, -1.21)); //STOW 0
-		graph.addNode(new Node(-2.6, 2.8, -1.2)); //STOW_INTERMEDIATE 1
-		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 2
-		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 3
-		graph.addNode(new Node(-2.0, 3.19, -0.77)); //CUBE_TOP_INTERMEDIATE 4
-		graph.addNode(new Node(-1.209, 3.224, 1.137)); //CONE_TOP 5
-		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 6
-		graph.addNode(new Node(-2.0, 3.0, 0.0)); //CONE_TOP_INTERMEDIATE 7
-		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 8  
-		graph.addNode(new Node(-2.11, 3.1, 1.41)); //DOUBLE_SUB_CONE 9
-		graph.addNode(new Node(-2.6, 2.8, -1.2)); //DOUBLE_SUB_CONE_INTERMEDIATE 10
-		graph.addNode(new Node(-2.6, 3.2, -0.6)); //DOUBLE_SUB_CUBE_INTERMEDIATE 11
-		graph.addNode(new Node(-1.19, 5.38, -1.21)); //GROUND_CUBE 12
-		graph.addNode(new Node(-1.73, 4.59, 0.67)); //GROUND_CONE 13
-		graph.addNode(new Node(-1.78, 3.98, -1.19)); //GROUND_INTERMEDIATE 14
-		graph.addNode(new Node(-1.458, 3.3565, 0.3665)); //CONE_TOP to CUBE_TOP INTERMEDIATE 15
-		graph.addNode(new Node(-2.0719, 4.7582, 0.8069)); //STOW_ALT 16
-		graph.addNode(new Node(-1.63095, 5.0691, -0.20155)); // CUBE_GROUND to STOW_ALT INTERMEDIATE 17
-		graph.addNode(new Node(-1.77745, 3.7791, -1.00345)); // CUBE_TOP to STOW_ALT INTERMEDIATE 18
-		graph.addNode(new Node(-2.26095, 4.1141, -0.56845)); // DOUBLE_SUB_CUBE to STOW_ALT INTERMEDIATE 19
-		graph.addNode(new Node(-1.815, 3.5105, 0.436)); //CUBE_MID to INTERMEDIATE_MID 20
-		graph.addNode(new Node(-3.85, 2.89, 0.25)); //SINGLESUB_CUBE 21
+		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 1
+		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 2
+		graph.addNode(new Node(-1.207, 3.105, 1.361)); //CONE_TOP 3
+		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 4
+		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 5
+		graph.addNode(new Node(-2.11, 3.1, 1.41)); //DOUBLE_SUB_CONE 6
+		graph.addNode(new Node(-1.05, 5.38, -1.21)); //GROUND_CUBE 7
+		graph.addNode(new Node(-1.63, 4.66, 0.61)); //GROUND_CONE 8
+		graph.addNode(new Node(-2.0719, 4.7582, 0.8069)); //STOW_ALT 9
+		graph.addNode(new Node(-3.85, 2.89, 0.25)); //SINGLESUB_CUBE 10
+		graph.addNode(new Node(-2.21, 4.549, -1.209)); // SINGLESUB_CONE 11
+
+		// All intermediates
+		graph.addNode(new Node(-3.23, 3.375, -1.2)); //STOW_INTERMEDIATE 12
+		// GROUND_INTERMEDIATE 13
+		// SINGLE_SUB_INTERMEDIATES 14
+		// TOP_INTERMEDIATE 15
+		// MID_INTERMEDIATE 16
+		// DOUBLE_SUB_INTERMEDIATE 17
+
+		//Main connections (connecting stow intermediate to all ends)
+		graph.addEdge(12, 0);
+		graph.addEdge(12, 1);
+		graph.addEdge(12, 2);
+		graph.addEdge(12, 3);
+		graph.addEdge(12, 4);
+		graph.addEdge(12, 5);
+		graph.addEdge(12, 6);
+		graph.addEdge(12, 7);
+		graph.addEdge(12, 8);
+		graph.addEdge(12, 9);
+		graph.addEdge(12, 10);
+		graph.addEdge(12, 11);
 		
-		//previous connections
-		graph.addEdge(4, 2);
-		graph.addEdge(0, 4);
-		graph.addEdge(10, 0);
-		graph.addEdge(10, 9);
-		graph.addEdge(7, 5);
-		graph.addEdge(0,7);
-		graph.addEdge(0,11);
-		graph.addEdge(11, 8);
-		graph.addEdge(0,1);
-		graph.addEdge(1, 3);
-		graph.addEdge(1, 6);
-		graph.addEdge(1, 14);
-		graph.addEdge(14, 12);
-		graph.addEdge(14, 13);
-
-		//new connections
-		graph.addEdge(4, 7);
-		graph.addEdge(4, 1);
-		graph.addEdge(7, 1);
-		graph.addEdge(10, 11);
-		graph.addEdge(11, 1);
-		graph.addEdge(10, 1);
-		graph.addEdge(4, 10);
-
-		graph.addEdge(2,15);
-		graph.addEdge(15,5);
-		graph.addEdge(3,20);
-		graph.addEdge(6,20);
-		graph.addEdge(1,16);
-		graph.addEdge(4,11);
-		graph.addEdge(7,10);
-		graph.addEdge(7,11);
-		graph.addEdge(1,16);
-		graph.addEdge(12,17);
-		graph.addEdge(13,17);
-		graph.addEdge(17,16);
-		graph.addEdge(9,19);
-		graph.addEdge(8,19);
-		graph.addEdge(19,16);
-		graph.addEdge(2,18);
-		graph.addEdge(5,18);
-		graph.addEdge(18,16);
-		graph.addEdge(20,18);
-	
-
-
-
-
-
-
-
-
-
-		
-
-
+		//Other Connections
+		graph.addEdge(13, 7);
+		graph.addEdge(13, 8);
+		graph.addEdge(14, 10);
+		graph.addEdge(14, 11);
+		graph.addEdge(15, 1);
+		graph.addEdge(15, 3);
+		graph.addEdge(16, 2);
+		graph.addEdge(16, 4);
+		graph.addEdge(17, 5);
+		graph.addEdge(17, 6);
+		graph.addEdge(13, 14);
+		graph.addEdge(9, 15);
+		graph.addEdge(9, 16);
+		graph.addEdge(9, 17);
+		graph.addEdge(17, 15);
+		graph.addEdge(17, 16);
+		graph.addEdge(16, 15);
 	}
 
 	public class Node{

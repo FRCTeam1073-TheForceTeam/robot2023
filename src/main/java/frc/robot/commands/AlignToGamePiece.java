@@ -8,10 +8,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Bling;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GamePieceFinder;
+import frc.robot.subsystems.OI;
 
 public class AlignToGamePiece extends CommandBase {
   /** Creates a new AlignToGamePiece. */
@@ -19,18 +21,18 @@ public class AlignToGamePiece extends CommandBase {
   private Bling bling;
   private GamePieceFinder finder;
   private double maxVelocity;
-  private double maxAnguarVelocity;
   private double YTolerance;
   private double XTolerance;
-  private double rotationalTolerance;
-  private double coneX;
-  private double coneY;
-  private double cubeX;
-  private double cubeY;
-  private double rotationSpeed;
-  private double targetX;
-  private double targetY;
-  private boolean coneMode;
+  private double targetConeX;
+  private double targetConeY;
+  private double targetCubeX;
+  private double targetCubeY;
+  private double targetX;// current targetX
+  private double targetY;//current target Y
+  private double gamePieceX;//current game piece position
+  private double gamePieceY;// current game piece position
+  private boolean cubeMode;
+  private OI oi;
 
 
 
@@ -42,93 +44,121 @@ public class AlignToGamePiece extends CommandBase {
   double yOffset;
 
 
-  public AlignToGamePiece(DriveSubsystem drivetrain, Bling bling, GamePieceFinder finder, double maxVelosity, boolean coneMode) {
+  public AlignToGamePiece(DriveSubsystem drivetrain, Bling bling, GamePieceFinder finder, double maxVelocity, boolean cubeMode) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
     this.finder = finder;
-    this.maxAnguarVelocity = 0.2;
-    this.YTolerance = 0.05;
-    this.XTolerance = 0.05;
-    this.rotationalTolerance = 0.05;
+    this.YTolerance = 5;
+    this.XTolerance = 8;
+    this.cubeMode = cubeMode;
+    this.maxVelocity = maxVelocity;
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-    this.coneMode = coneMode;
+    targetCubeX = 434;
+    targetCubeY = 320;
+    targetConeX = 460;
+    targetConeY = 324.5;
     addRequirements(drivetrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
     bling.clearLEDs();
+    bling.setColorRGBAll(50, 100, 50);
+
+
+    if (cubeMode == true) {
+      targetX = targetCubeX;
+      targetY = targetCubeY;
+    }else{
+      targetX = targetConeX;
+      targetY = targetConeY;
+    }
+    System.out.println("Align To Game Piece Started");
     
-    
-    
-    //outdated
-    // if(finder.closestGamePiece != false){
-    //   System.out.println(String.format("AlignToGamePiece Initialized to %s", finder.closestGamePiece));
-    //   targetGamePiece = finder.closestGamePiece;
-    // } 
-    // else {
-    //   targetGamePiece = false;
-    //   System.out.println("AlignToGamePiece Initialize Failed: No Game Piece in Signt!");
-    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    bling.setColorRGBAll(255, 255, 255);
-    double gamePieceX;
-    double gamePieceY;
-
-
-    double currentHeading = drivetrain.getWrappedHeading();
-
-    if (coneMode == true) {
-      gamePieceX = finder.closestConeX;
-      gamePieceY = finder.closestConeY;
-      gamePieceX = MathUtil.clamp(gamePieceX, 0, 10000);
-      gamePieceY = MathUtil.clamp(gamePieceY, 0, 10000);
+    
+    if (cubeMode) {
+     if (finder.getClosestCube() == -1) {
+       return;
+     }
     }else{
+      if (finder.getClosestCone() == -1){
+        return;
+      }
+    }
+
+    if (cubeMode == true) {
       gamePieceX = finder.closestCubeX;
       gamePieceY = finder.closestCubeY;
       gamePieceX = MathUtil.clamp(gamePieceX, 0, 10000);
       gamePieceY = MathUtil.clamp(gamePieceY, 0, 10000);
+    }else{
+      gamePieceX = finder.closestConeX;
+      gamePieceY = finder.closestConeY;
+      gamePieceX = MathUtil.clamp(gamePieceX, 0, 10000);
+      gamePieceY = MathUtil.clamp(gamePieceY, 0, 10000);
     }
+
+    double deltaX = targetX - gamePieceX;
+    double deltaY = targetY - gamePieceY;
 
     //ends command if game piece is close (x,y) to robot
-    if (gamePieceY > YTolerance && gamePieceX > XTolerance) {
-      chassisSpeeds.vxMetersPerSecond = (targetY - gamePieceY) * 0.5;
-      chassisSpeeds.vyMetersPerSecond = (targetX - gamePieceX) * 0.5;
-      chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -1, 1);
-      chassisSpeeds.vxMetersPerSecond = MathUtil.clamp(chassisSpeeds.vxMetersPerSecond, 0, 1);
-      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0, 
-        Rotation2d.fromDegrees(drivetrain.getHeading()));
-    }else if (gamePieceY < YTolerance && gamePieceX < XTolerance) {
-      chassisSpeeds.vxMetersPerSecond = (targetY - -gamePieceY) * 0.5;
-      chassisSpeeds.vyMetersPerSecond = (targetX - -gamePieceX) * 0.5;
-      chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -1, 1);
-      chassisSpeeds.vxMetersPerSecond = MathUtil.clamp(chassisSpeeds.vxMetersPerSecond, 0, 1);
-      ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0, 
-        Rotation2d.fromDegrees(drivetrain.getHeading()));
-    }
 
-   // outdates
-   // int closestCube = finder.getClosestCube();
-   // int closestCone = finder.getClosestCone();
-   // TODO:Pose3d targetPose = finder.getClosestPose();
+    chassisSpeeds.vyMetersPerSecond = (deltaX) * 0.0025;
+    chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
+
+    chassisSpeeds.vxMetersPerSecond = (deltaY) * 0.0025;
+    chassisSpeeds.vxMetersPerSecond = MathUtil.clamp(chassisSpeeds.vxMetersPerSecond, 0, maxVelocity);
+
+    chassisSpeeds.omegaRadiansPerSecond = 0;
+
+    drivetrain.setChassisSpeeds(chassisSpeeds);
+
+
+    SmartDashboard.putNumber("VY Meters pre second", chassisSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("VX Meters pre second", chassisSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("Game Piece Max Velocity", maxVelocity);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    chassisSpeeds.vyMetersPerSecond = 0;
+    chassisSpeeds.vxMetersPerSecond = 0;
+    chassisSpeeds.omegaRadiansPerSecond = 0;
+    drivetrain.setChassisSpeeds(chassisSpeeds);
+
+    bling.clearLEDs();
+    System.out.println("Align To Game Piece Ended");
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (cubeMode) {
+      if (finder.getClosestCube() == -1) {
+        System.out.println("No Game Piece To Be Found");
+        return true;
+      }
+     }else{
+       if (finder.getClosestCone() == -1){
+        System.out.println("No Game Piece To Be Found");
+         return true;
+       }
+     }
+
+    if (Math.abs(targetX - gamePieceX) < XTolerance && Math.abs(targetY - gamePieceY) < YTolerance) {
+      System.out.println("Aligned to Game Piece Finished");
+      return true;
+    }else{
+      return false;
+    }
+
   }
 }
