@@ -281,8 +281,8 @@ public class RobotContainer {
       Trigger alignToGamePiece = new Trigger(m_OI:: getRightBumper);
       alignToGamePiece.whileTrue(alignToGamePiece(m_OI));
 
-      // Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
-      // alternateStowTrigger.onTrue(alternateArmStowCommand());
+      Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
+      alternateStowTrigger.onTrue(alternateArmStowCommand());
       
     }
 
@@ -374,7 +374,7 @@ public class RobotContainer {
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
     return new SequentialCommandGroup(
 
-        new ArmSplinePosition(m_arm, waypoints, velocity, 0));
+    new PlannedArmPath(m_arm, m_pathPlanner, 0, velocity));
   }
 
   public Command alignToGamePiece(OI oi) {
@@ -384,11 +384,10 @@ public class RobotContainer {
       oi::isCubeMode);
   }
 
-  // public Command alternateArmStowCommand(){
-  // Arm.JointVelocities velocity = m_arm.new JointVelocities(0.6, 0.6, 0.6);
-  // return new PlannedArmPath(m_arm, m_pathPlanner, 16, velocity);
-
-  // }
+  public Command alternateArmStowCommand(){
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+    return new PlannedArmPath(m_arm, m_pathPlanner, 9, velocity);
+  }
 
   public Command groundPickupCommand(OI oi) {
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
@@ -402,9 +401,14 @@ public class RobotContainer {
     coneWaypoints.add(m_arm.new JointWaypoints(-1.63, 4.66, 0.61, 4.0));
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
+    // return new ConditionalCommand(
+    //     new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+    //     new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+    //     oi::isCubeMode);
+
     return new ConditionalCommand(
-        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
-        new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+        new PlannedArmPath(m_arm, m_pathPlanner, 7, velocity),
+        new PlannedArmPath(m_arm, m_pathPlanner, 8, velocity),
         oi::isCubeMode);
   }
 
@@ -427,9 +431,14 @@ public class RobotContainer {
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
+    // return new ConditionalCommand(
+    //     new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+    //     new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+    //     oi::isCubeMode);
+
     return new ConditionalCommand(
-        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
-        new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+        new PlannedArmPath(m_arm, m_pathPlanner, 5, velocity),
+        new PlannedArmPath(m_arm, m_pathPlanner, 6, velocity),
         oi::isCubeMode);
   }
 
@@ -451,9 +460,14 @@ public class RobotContainer {
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
+    // return new ConditionalCommand(
+    //     new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+    //     new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+    //     oi::isCubeMode);
+
     return new ConditionalCommand(
-        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
-        new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+        new PlannedArmPath(m_arm, m_pathPlanner, 2, velocity),
+        new PlannedArmPath(m_arm, m_pathPlanner, 4, velocity),
         oi::isCubeMode);
   }
 
@@ -475,10 +489,15 @@ public class RobotContainer {
 
         Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
+    // return new ConditionalCommand(
+    //   new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+    //   new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+    //   oi :: isCubeMode);
+
     return new ConditionalCommand(
-      new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
-      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
-      oi :: isCubeMode);
+        new PlannedArmPath(m_arm, m_pathPlanner, 1, velocity),
+        new PlannedArmPath(m_arm, m_pathPlanner, 3, velocity),
+        oi::isCubeMode);
   }
 
   public Command singleSubstation(OI oi){
@@ -492,11 +511,16 @@ public class RobotContainer {
         //coneWaypoints.add(m_arm.new JointWaypoints(-2.0, 3.0, 0.0, 2.25));
         coneWaypoints.add(m_arm.new JointWaypoints(-2.21, 4.549, -1.209, 3.0));
 
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.6, 1.6, 1.6);
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+
+    // return new ConditionalCommand(
+    //     new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
+    //     new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+    //     oi::isCubeMode);
 
     return new ConditionalCommand(
-        new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0),
-        new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0),
+        new PlannedArmPath(m_arm, m_pathPlanner, 10, velocity),
+        new PlannedArmPath(m_arm, m_pathPlanner, 11, velocity),
         oi::isCubeMode);
   }
 
