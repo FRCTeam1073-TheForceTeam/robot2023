@@ -8,12 +8,14 @@ public class ParkingBrake extends CommandBase
 {
     DriveSubsystem drivetrain;
     Bling bling;
+    boolean releaseOnEnd;
 
 
-    public ParkingBrake(DriveSubsystem ds, Bling bling)
+    public ParkingBrake(DriveSubsystem ds, Bling bling, boolean releaseOnEnd)
     {
         this.drivetrain = ds;
         this.bling = bling;
+        this.releaseOnEnd = releaseOnEnd;
         addRequirements(ds);
     }
 
@@ -21,11 +23,6 @@ public class ParkingBrake extends CommandBase
     public void initialize()
     {
         drivetrain.parkingBrake(true); // turns on the parking brake
-    }
-
-    @Override
-    public void execute()
-    {
         bling.clearLEDs();
         bling.setSlot(1, 255, 0, 0); // sets the LEDs
         bling.setSlot(2, 255, 160, 0);  
@@ -37,10 +34,18 @@ public class ParkingBrake extends CommandBase
     }
 
     @Override
+    public void execute()
+    {
+    
+    }
+
+    @Override
     public void end(boolean interrupted)
     {
+        if (releaseOnEnd == true){
         drivetrain.parkingBrake(false); // turns off the parking brake
         bling.clearLEDs(); // turns off the LEDs
+        }
     }
 
     @Override

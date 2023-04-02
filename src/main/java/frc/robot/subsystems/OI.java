@@ -30,7 +30,7 @@ public class OI extends SubsystemBase
     public Debouncer aOperatorButtonDebouncer = new Debouncer(0.05);
     public Debouncer bOperatorButtonDebouncer = new Debouncer(0.05);
     public Debouncer menuOperatorButtonDebouncer = new Debouncer(0.05);
-    public Debouncer viewOperatorButtonDebouncer = new Debouncer(0.5);
+    public Debouncer viewOperatorButtonDebouncer = new Debouncer(0.05);
     public Debouncer fieldCentricDebouncer = new Debouncer(.05);
 
     /** Setting up which controllor is which
