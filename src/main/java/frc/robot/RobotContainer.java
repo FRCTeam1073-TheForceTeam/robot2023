@@ -758,6 +758,8 @@ public class RobotContainer {
     // Pick intensity based on driver station connection.
     
     double intensity = 0.3; // Default to dim.
+    new WaitCommand(30);
+
     if (DriverStation.isDSAttached()) {
       intensity = 1.0; // Bright if attached.
     }
