@@ -746,7 +746,7 @@ public class RobotContainer {
    * @return A command that moves the robot to the correct alignment
    */
   public Command alignToAprilTag(double yOffset, double xOffset) {
-    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, 0.52, yOffset, xOffset);
+    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, m_claw, 0.52, yOffset, xOffset, m_OI.isCubeMode());
   }
 
   /**

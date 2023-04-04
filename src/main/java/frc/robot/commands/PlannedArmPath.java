@@ -24,9 +24,9 @@ public class PlannedArmPath extends CommandBase {
   double endTime;
   int endIdx;
   Arm.JointPositions endPose;
-  final double shoulderTolerance = 0.01;
-  final double elbowTolerance = 0.01;
-  final double wristTolerance = 0.01; 
+  final double shoulderTolerance = 0.005;
+  final double elbowTolerance = 0.005;
+  final double wristTolerance = 0.005; 
   
   public PlannedArmPath(Arm arm, PathPlanner planner, int endIdx, Arm.JointVelocities maxVelocities) {
     // Use addRequirements() here to declare subsystem dependencies.

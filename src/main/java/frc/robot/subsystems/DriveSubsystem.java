@@ -175,7 +175,7 @@ public class DriveSubsystem extends SubsystemBase
 
     else
     {
-      return -heading;
+      return 360 + heading;
     }
   }
 

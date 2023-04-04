@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.Bling;
+import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -31,10 +32,12 @@ public class AlignToAprilTag extends CommandBase {
   private DriveSubsystem drivetrain;
   private Bling bling;
   private AprilTagFinder finder;
+  private Claw claw;
   private double maxVelocity;
   private double maxAngularVelocity;
   private double linearTolerance;
   private double rotationalTolerance;
+  private boolean isCube;
 
 
 
@@ -45,11 +48,13 @@ public class AlignToAprilTag extends CommandBase {
   int glitchCounter;
   double yOffset;
   double xOffset = 0.8;
+  double tofOffset;
 
-  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, double maxVelocity, double yOffset, double xOffset) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, Claw claw, double maxVelocity, double yOffset, double xOffset, boolean isCube) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
+    this.claw = claw;
     this.maxVelocity = maxVelocity;
     this.finder = finder;
     this.maxAngularVelocity = 0.5;
@@ -57,6 +62,7 @@ public class AlignToAprilTag extends CommandBase {
     this.rotationalTolerance = 0.05;
     this.yOffset = yOffset;
     this.xOffset = xOffset;
+    this.isCube = isCube;
     // Create these just once and reuse them in execute loops.
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     addRequirements(drivetrain);
@@ -82,6 +88,8 @@ public class AlignToAprilTag extends CommandBase {
       targetTagID = -1;
       System.out.println("AlingToAprilTag Initialize Failed: No Tag In Sight!");
     }
+
+    tofOffset = (claw.getRange1() - 3.5) / 600.0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -107,7 +115,12 @@ public class AlignToAprilTag extends CommandBase {
     double currentHeading = drivetrain.getWrappedHeading() * (Math.PI / 180.0);
     //apply offset to target pose
     if (targetPose != null){
-      targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() - yOffset, targetPose.getZ()), targetPose.getRotation());
+      if(isCube == false){
+        targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() - yOffset - tofOffset, targetPose.getZ()), targetPose.getRotation());
+      }
+      else{
+        targetPose = new Pose3d(new Translation3d(targetPose.getX(), targetPose.getY() - yOffset, targetPose.getZ()), targetPose.getRotation());
+      }
     }
 
     
@@ -134,7 +147,7 @@ public class AlignToAprilTag extends CommandBase {
         Rotation2d.fromDegrees(drivetrain.getHeading()));
       drivetrain.setChassisSpeeds(speeds);
       
-      if(Math.abs(targetPose.getTranslation().getY()) < linearTolerance && Math.abs(Math.PI - currentHeading) < rotationalTolerance){
+      if(Math.abs(targetPose.getTranslation().getY()) < linearTolerance && targetPose.getTranslation().getX() < linearTolerance && Math.abs(Math.PI - currentHeading) < rotationalTolerance){
         targetTagID = -1;  // Stop tracking when we're close enough.
       }
       //resets glitch counter

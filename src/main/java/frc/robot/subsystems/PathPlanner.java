@@ -17,12 +17,12 @@ public class PathPlanner {
 		graph.addNode(new Node(-3.87, 2.9, -1.21)); //STOW 0
 		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 1
 		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 2
-		graph.addNode(new Node(-1.207, 3.105, 1.361)); //CONE_TOP 3
+		graph.addNode(new Node(-1.129, 3.029, 1.399)); //CONE_TOP 3
 		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 4
 		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 5
-		graph.addNode(new Node(-2.11, 3.1, 1.41)); //DOUBLE_SUB_CONE 6
+		graph.addNode(new Node(-2.111, 3.176, 1.447)); //DOUBLE_SUB_CONE 6
 		graph.addNode(new Node(-1.05, 5.38, -1.21)); //GROUND_CUBE 7
-		graph.addNode(new Node(-1.63, 4.66, 0.61)); //GROUND_CONE 8
+		graph.addNode(new Node(-1.439, 4.765, 0.573)); //GROUND_CONE 8
 		graph.addNode(new Node(-2.0719, 4.7582, 0.8069)); //STOW_ALT 9
 		graph.addNode(new Node(-3.85, 2.89, 0.25)); //SINGLESUB_CUBE 10
 		graph.addNode(new Node(-2.21, 4.549, -1.209)); // SINGLESUB_CONE 11
