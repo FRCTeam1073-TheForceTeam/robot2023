@@ -20,7 +20,7 @@ public class PathPlanner {
 		graph.addNode(new Node(-1.129, 3.029, 1.399)); //CONE_TOP 3
 		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 4
 		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 5
-		graph.addNode(new Node(-2.111, 3.176, 1.447)); //DOUBLE_SUB_CONE 6
+		graph.addNode(new Node(-2.111, 3.065, 1.484)); //DOUBLE_SUB_CONE 6
 		graph.addNode(new Node(-1.05, 5.38, -1.21)); //GROUND_CUBE 7
 		graph.addNode(new Node(-1.439, 4.765, 0.573)); //GROUND_CONE 8
 		graph.addNode(new Node(-2.0719, 4.7582, 0.8069)); //STOW_ALT 9

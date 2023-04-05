@@ -136,9 +136,9 @@ public String getDiagnostics(){
     if(tof1DutyCycleInput.getFrequency()< 2){
       result += String.format("tof1 not working");
     }
-    if(tof2DutyCycleInput.getFrequency()< 2){
-      result += String.format("tof2 not working");
-    }
+    // if(tof2DutyCycleInput.getFrequency()< 2){
+    //   result += String.format("tof2 not working");
+    // }
         
     return result;
 }
