@@ -676,8 +676,9 @@ public class Arm extends SubsystemBase{
       ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
       ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
       System.out.println("Encoders Ok"); 
+
       }
-      if (errorShoulder != ErrorCode.OK) {
+      if (errorShoulder != ErrorCode. OK) {
         System.out.println("Shoulder: set selected sensor position failed.");
         
       }

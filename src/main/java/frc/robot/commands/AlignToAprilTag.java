@@ -49,8 +49,9 @@ public class AlignToAprilTag extends CommandBase {
   double yOffset;
   double xOffset = 0.8;
   double tofOffset;
+  double maxLockDistance;
 
-  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, Claw claw, double maxVelocity, double yOffset, double xOffset, boolean isCube) {
+  public AlignToAprilTag(DriveSubsystem drivetrain, Bling bling, AprilTagFinder finder, Claw claw, double maxVelocity, double yOffset, double xOffset, boolean isCube, double maxLockDistance) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
@@ -63,6 +64,7 @@ public class AlignToAprilTag extends CommandBase {
     this.yOffset = yOffset;
     this.xOffset = xOffset;
     this.isCube = isCube;
+    this.maxLockDistance = maxLockDistance;
     // Create these just once and reuse them in execute loops.
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     addRequirements(drivetrain);
@@ -76,7 +78,8 @@ public class AlignToAprilTag extends CommandBase {
   @Override
   public void initialize() {
     int closestID = finder.getClosestID(); // Get the closest tag ID, will be -1 if there is no tracked tag.
-    if (closestID >=0 && finder.getClosestPose().getTranslation().getNorm() > 1.7) {
+    // 1.7 last maxLockDistance
+    if (closestID >=0 && finder.getClosestPose().getTranslation().getNorm() > maxLockDistance) {
       closestID = -1;
     }
 

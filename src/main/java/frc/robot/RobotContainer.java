@@ -107,8 +107,11 @@ public class RobotContainer {
   //private static final String kCenterArmCubeLeave = "Score Cube and Leave Community";
   private static final String kCenterShootCubeLeaveEngage = "CenterShootCubeLeaveEngage";
   private static final String kBarrierShootCubeLeaveCollectCube = "BarrierShootCubeLeaveCollectCube";
+  private static final String kBarrierShootCubeLeaveCollectCubeAlign = "Barrier Shoot Cube Leave Collect Cube(Align)";
   private static final String kProtectorShootCubeLeaveCollectCube = "ProtectorShootCubeLeaveCollectCube";
+  private static final String kProtectorShootCubeLeaveCollectCubeAlign = "ProtectorShootCubeLeaveCollectCube(Align)";
   private static final String kCenterShootCubeLeaveCollectEngage = "CenterShootCubeLeaveCollectEngage";
+  private static final String kCenterShootCubeLeaveCollectEngageAlign = "CenterShootCubeLeaveCollectEngage(Align)";
 
   private static final String kArmTest = "ArmTest";
   private static final String kTrajectoryTest = "DriveTrajectoryTest";
@@ -130,8 +133,11 @@ public class RobotContainer {
     m_chooser.addOption("Center Arm Cube Leave Engage", kCenterArmCubeLeaveEngage);
     m_chooser.addOption("Center Shoot Cube Leave Engage", kCenterShootCubeLeaveEngage);
     m_chooser.addOption("Barrier Shoot Cube Leave Collect Cube", kBarrierShootCubeLeaveCollectCube);
+    m_chooser.addOption("Barrier Shoot Cube Leave Collect Cube(Align)", kBarrierShootCubeLeaveCollectCubeAlign);
     m_chooser.addOption("Protector Shoot Cube Leave Collect Cube", kProtectorShootCubeLeaveCollectCube);
+    m_chooser.addOption("Protector Shoot Cube Leave Collect Cube(Align)", kProtectorShootCubeLeaveCollectCubeAlign);
     m_chooser.addOption("Center Shoot Cube Leave Collect Engage", kCenterShootCubeLeaveCollectEngage);
+    m_chooser.addOption("CenterShootCubeLeaveCollectEngage(Align)", kCenterShootCubeLeaveCollectEngageAlign);
     m_chooser.addOption("Arm test", kArmTest);
     m_chooser.addOption("Drive Trajectory Test", kTrajectoryTest);
 
@@ -255,7 +261,13 @@ public class RobotContainer {
 
       Trigger alternateStowTrigger = new Trigger(m_OI :: getOperatorDPadUp);
       alternateStowTrigger.onTrue(alternateArmStowCommand());
-      
+
+      Trigger armZeroCommand = new Trigger(m_OI::getOperatorDPadLeft);
+      armZeroCommand.onTrue(zeroArm()); 
+    }
+
+    public Command zeroArm() {
+      return new UpdateMotorEncoders(m_arm);
     }
 
   // Trigger updateMotorEncodersTrigger = new Trigger(m_OI ::
@@ -301,10 +313,16 @@ public class RobotContainer {
         return centerShootCubeLeaveEngageCommand();
       case kBarrierShootCubeLeaveCollectCube:
         return barrierShootCubeLeaveCollectCube();
+      case kBarrierShootCubeLeaveCollectCubeAlign:
+        return barrierShootCubeLeaveCollectCubeAlign();
       case kProtectorShootCubeLeaveCollectCube:
         return protectorShootCubeLeaveCollectCube();
+      case kProtectorShootCubeLeaveCollectCubeAlign:
+        return protectorShootCubeLeaveCollectCubeAlign();
       case kCenterShootCubeLeaveCollectEngage:
         return centerShootCubeLeaveCollectEngage();
+      case kCenterShootCubeLeaveCollectEngageAlign:
+        return centerShootCubeLeaveCollectEngageAlign();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -331,8 +349,8 @@ public class RobotContainer {
 
   public Command alignToGamePiece(OI oi) {
     return new ConditionalCommand(
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.3, true),
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.3, false),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, false, 10, 8),
       oi::isCubeMode);
   }
 
@@ -346,6 +364,7 @@ public class RobotContainer {
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     // cubeWaypoints.add(m_arm.new JointWaypoints(-1.78, 3.98, -1.19, 2.0));
     cubeWaypoints.add(m_arm.new JointWaypoints(-1.05, 5.38, -1.21, 4.0));
+
 
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
     coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
@@ -513,7 +532,12 @@ public class RobotContainer {
    */
   public Command centerShootCubeLeaveEngageCommand() {
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
-    communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
+    }
+    else{
+      communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
+    }
 
     return new SequentialCommandGroup(
         new CollectCommand(m_claw, true, 0.5),
@@ -531,17 +555,68 @@ public class RobotContainer {
     ArrayList<Pose2d> leaveWaypoints = new ArrayList<Pose2d>();
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       leaveWaypoints.add(new Pose2d(1.3, -.3, new Rotation2d(Math.PI)));
-      leaveWaypoints.add(new Pose2d(2, -0.1, new Rotation2d(0)));
-      leaveWaypoints.add(new Pose2d(2.58, 0, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(1.5, -0.1, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.58, -0.05, new Rotation2d(0)));
     } else {
       leaveWaypoints.add(new Pose2d(1.3, .3, new Rotation2d(Math.PI)));
-      leaveWaypoints.add(new Pose2d(2, 0.1, new Rotation2d(0)));
-      leaveWaypoints.add(new Pose2d(2.58, 0, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(1.5, 0.1, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.58, 0.07, new Rotation2d(0)));
     }
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-1.05, 5.38, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+
+
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.9, 0.9, 0.9);
+
+    ArrayList<Pose2d> returnWaypoints = new ArrayList<Pose2d>();
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      returnWaypoints.add(new Pose2d(2, -0.1, new Rotation2d(0)));
+      returnWaypoints.add(new Pose2d(1.3, -.2, new Rotation2d(Math.PI)));
+      returnWaypoints.add(new Pose2d(0, 0, new Rotation2d(Math.PI)));  
+    } else {
+        returnWaypoints.add(new Pose2d(2, 0.1, new Rotation2d(0)));
+        returnWaypoints.add(new Pose2d(1.3, .3, new Rotation2d(Math.PI)));
+        returnWaypoints.add(new Pose2d(0, 0, new Rotation2d(Math.PI)));  
+    }
+
+
+    return new SequentialCommandGroup(
+        new CollectCommand(m_claw, true, 0.5),
+        new DepositCommand(m_claw, true, 0.5),
+        new ParallelDeadlineGroup(
+          new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 1.5, 1.2, 0.5, 0.7),
+          new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
+          new CollectCommand(m_claw, true, 12)),
+        new ParallelDeadlineGroup(
+            new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 1.5
+            , 1.2, 0.5, 0.7),
+            armStowCommand(m_OI)),
+        new ParallelDeadlineGroup(
+          midScoreCommand(m_OI),
+          alignToAprilTag(-0.04, 0.6)),
+        //new CollectCommand(m_claw, true, 0.5),
+        new DepositCommand(m_claw, true, 0.5),
+        armStowCommand(m_OI));
+  }
+
+  public Command barrierShootCubeLeaveCollectCubeAlign() {
+    ArrayList<Pose2d> leaveWaypoints = new ArrayList<Pose2d>();
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      leaveWaypoints.add(new Pose2d(1.3, -.3, new Rotation2d(Math.PI)));
+      leaveWaypoints.add(new Pose2d(1.5, -0.1, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.4, -.25, new Rotation2d(0)));
+    } else {
+      leaveWaypoints.add(new Pose2d(1.3, .3, new Rotation2d(Math.PI)));
+      leaveWaypoints.add(new Pose2d(1.5, 0.1, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.4, 0.25, new Rotation2d(0)));
+    }
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(0.9, 0.9, 0.9);
 
@@ -560,9 +635,12 @@ public class RobotContainer {
     return new SequentialCommandGroup(
         new CollectCommand(m_claw, true, 0.5),
         new DepositCommand(m_claw, true, 0.5),
+        new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 1.5, 1.5, 0.5, 0.7),
         new ParallelDeadlineGroup(
-          new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 1.5, 1.2, 0.5, 0.7),
-          new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5),
+          new SequentialCommandGroup(
+            new WaitCommand(1),
+            new ArmSplinePosition(m_arm, cubeWaypoints, velocity, 0.5)),
+          new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
           new CollectCommand(m_claw, true, 12)),
         new ParallelDeadlineGroup(
             new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 1.5, 1.2, 0.5, 0.7),
@@ -579,17 +657,18 @@ public class RobotContainer {
     ArrayList<Pose2d> leaveWaypoints = new ArrayList<Pose2d>();
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       leaveWaypoints.add(new Pose2d(1.986, 0.2137, new Rotation2d(Math.PI)));
-      leaveWaypoints.add(new Pose2d(2.29, 0.149, new Rotation2d(0)));
-      leaveWaypoints.add(new Pose2d(2.666, 0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.22, 0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.7, 0.15, new Rotation2d(0)));
     } else {
       leaveWaypoints.add(new Pose2d(1.986, -0.2137, new Rotation2d(Math.PI)));
-      leaveWaypoints.add(new Pose2d(2.29, -0.149, new Rotation2d(0)));
-      leaveWaypoints.add(new Pose2d(2.666, -0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.22, -0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.7, -0.15, new Rotation2d(0)));
     }
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-1.05, 5.38, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
@@ -610,14 +689,67 @@ public class RobotContainer {
         new CollectCommand(m_claw, true, 0.5),
         new DepositCommand(m_claw, true, 0.5),
         new ParallelDeadlineGroup(
-          new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 1, 1.2, 0.5, 0.7),
+          new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 2, 2, 0.5, 0.7),
           new SequentialCommandGroup(
-            new WaitCommand(3),
+            new WaitCommand(2.0),
             new ArmSplinePosition(m_arm, cubeWaypoints, velocity, .5))),
         new CollectCommand(m_claw, true, 1),
         new SequentialCommandGroup(
           armStowCommand(m_OI),
-          new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 1, 1.2, 0.5, 0.7)),
+          new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 2, 2, 0.5, 0.7)),
+        new ParallelDeadlineGroup(
+          midScoreCommand(m_OI),
+          alignToAprilTag(-0.04, 0.6)),
+        new DepositCommand(m_claw, true, 0.5),
+        armStowCommand(m_OI));
+        //TODO: need to speed up so can fit in 15 sec
+  }
+
+  public Command protectorShootCubeLeaveCollectCubeAlign(){
+    ArrayList<Pose2d> leaveWaypoints = new ArrayList<Pose2d>();
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      leaveWaypoints.add(new Pose2d(1.986, 0.2137, new Rotation2d(Math.PI/2)));
+      leaveWaypoints.add(new Pose2d(2.22, 0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.6, 0.15, new Rotation2d(0)));
+    } else {
+      leaveWaypoints.add(new Pose2d(1.986, -0.2137, new Rotation2d(Math.PI/2)));
+      leaveWaypoints.add(new Pose2d(2.22, -0.15, new Rotation2d(0)));
+      leaveWaypoints.add(new Pose2d(2.6, -0.15, new Rotation2d(0)));
+    }
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+
+
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+
+    ArrayList<Pose2d> returnWaypoints = new ArrayList<Pose2d>();
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+      returnWaypoints.add(new Pose2d(2, 0.1, new Rotation2d(Math.PI/2)));
+      returnWaypoints.add(new Pose2d(1.986, 0.2137, new Rotation2d(Math.PI/2)));
+      returnWaypoints.add(new Pose2d(0, 0, new Rotation2d(Math.PI)));
+
+    } else {
+      returnWaypoints.add(new Pose2d(2, -0.1, new Rotation2d(Math.PI/2)));
+      returnWaypoints.add(new Pose2d(1.986, -0.2137, new Rotation2d(Math.PI/2)));
+      returnWaypoints.add(new Pose2d(0, 0, new Rotation2d(Math.PI)));
+    }
+
+
+    return new SequentialCommandGroup(
+        new CollectCommand(m_claw, true, 0.5),
+        new DepositCommand(m_claw, true, 0.5),
+        new DriveThroughTrajectory(m_driveSubsystem, leaveWaypoints, 1.5, 1.5, 0.5, 0.7),
+        new ParallelDeadlineGroup(
+            new SequentialCommandGroup(
+              new ArmSplinePosition(m_arm, cubeWaypoints, velocity, .5),
+              new WaitCommand(1.0)),
+            new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
+            new CollectCommand(m_claw, true, 12)),
+        new SequentialCommandGroup(
+          armStowCommand(m_OI),
+          new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 1.5, 1.5, 0.5, 0.7)),
         new ParallelDeadlineGroup(
           midScoreCommand(m_OI),
           alignToAprilTag(-0.04, 0.6)),
@@ -631,18 +763,94 @@ public class RobotContainer {
     chargeStationWaypoints.add(new Pose2d(1.7579, 0.0116, new Rotation2d(Math.PI)));
 
     ArrayList<Pose2d>  collectWaypoints = new ArrayList<Pose2d>();
-    collectWaypoints.add(new Pose2d(1.95,-0.096, new Rotation2d(Math.PI)));
-    collectWaypoints.add(new Pose2d(2.48,0.269, new Rotation2d(0)));
-    collectWaypoints.add(new Pose2d(2.6, 0.50, new Rotation2d(0)));
-    collectWaypoints.add(new Pose2d(2.9,0.50, new Rotation2d(0)));
-
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      collectWaypoints.add(new Pose2d(1.95,-0.096, new Rotation2d(Math.PI)));
+      //collectWaypoints.add(new Pose2d(2.48,0.269, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.5, 0.50, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.9,0.50, new Rotation2d(0)));  
+    }
+    else{
+      collectWaypoints.add(new Pose2d(1.95,0.096, new Rotation2d(Math.PI)));
+      //collectWaypoints.add(new Pose2d(2.48,-0.269, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.5, -0.50, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.9,-0.50, new Rotation2d(0)));  
+    }
+   
     ArrayList<Pose2d> returnWaypoints = new ArrayList<Pose2d>();
-    returnWaypoints.add(new Pose2d(2.0, 0, new Rotation2d(Math.PI)));
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red)
+    {
+      returnWaypoints.add(new Pose2d(2.4, -0.4, new Rotation2d(Math.PI / 2)));
+      returnWaypoints.add(new Pose2d(2.0,-0.4, new Rotation2d(Math.PI)));
+    }
+    else{
+      returnWaypoints.add(new Pose2d(2.4, 0.4, new Rotation2d(Math.PI / 2)));
+      returnWaypoints.add(new Pose2d(2.0, 0.4, new Rotation2d(Math.PI)));
+    }
 
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-1, 5.38, -1.21, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.92, 5.348, -1.19, 4.0));
+
+
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+
+    return new SequentialCommandGroup(
+        new CollectCommand(m_claw, true, 0.5),
+        new DepositCommand(m_claw, true, 0.5),
+        new SequentialCommandGroup(
+            new DriveThroughTrajectory(m_driveSubsystem, chargeStationWaypoints, 2.4,2.0, 0.5, 0.5),
+            new WaitCommand(0.1),
+            new ParallelDeadlineGroup(
+              new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 2.4, 2.0, 0.5, 0.5),
+              new ArmSplinePosition(m_arm, cubeWaypoints, velocity, .5),
+              new CollectCommand(m_claw, true, 5.25)),
+            new WaitCommand(0.25),
+            new ParallelDeadlineGroup(
+              armStowCommand(m_OI),
+              new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 2.2, 2.0, 0.5, 0.5),
+              new CollectCommand(m_claw, true, 2.0)),
+            new EngageDriveUp(m_driveSubsystem, 0.3, true),
+            new EngageForward(m_driveSubsystem, 0.2, true),
+            new CollectCommand(m_claw, true, 0.25),
+            new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
+            new ParkingBrake(m_driveSubsystem, m_bling, false)));
+  }
+
+  public Command centerShootCubeLeaveCollectEngageAlign(){
+    ArrayList<Pose2d> chargeStationWaypoints = new ArrayList<Pose2d>();
+    chargeStationWaypoints.add(new Pose2d(1.7579, 0.0116, new Rotation2d(Math.PI)));
+
+    ArrayList<Pose2d>  collectWaypoints = new ArrayList<Pose2d>();
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
+      collectWaypoints.add(new Pose2d(1.95,-0.096, new Rotation2d(Math.PI)));
+      collectWaypoints.add(new Pose2d(2.48,0.269, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.5, 0.50, new Rotation2d(0)));
+      //collectWaypoints.add(new Pose2d(2.9,0.50, new Rotation2d(0)));  
+    }
+    else{
+      collectWaypoints.add(new Pose2d(1.95,0.096, new Rotation2d(Math.PI)));
+      collectWaypoints.add(new Pose2d(2.48,-0.269, new Rotation2d(0)));
+      collectWaypoints.add(new Pose2d(2.5, -0.50, new Rotation2d(0)));
+      //collectWaypoints.add(new Pose2d(2.9,-0.50, new Rotation2d(0)));  
+    }
+   
+    ArrayList<Pose2d> returnWaypoints = new ArrayList<Pose2d>();
+    if(DriverStation.getAlliance() == DriverStation.Alliance.Red)
+    {
+      returnWaypoints.add(new Pose2d(2.4, -0.4, new Rotation2d((Math.PI / 2))));
+      returnWaypoints.add(new Pose2d(2.0,-0.4, new Rotation2d(3 *Math.PI /  4)));
+    }
+    else{
+      returnWaypoints.add(new Pose2d(2.4, 0.4, new Rotation2d((Math.PI) / 2)));
+      returnWaypoints.add(new Pose2d(2.0, 0.4, new Rotation2d(3 * Math.PI / 4)));
+    }
+
+
+    ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
@@ -652,16 +860,19 @@ public class RobotContainer {
         new SequentialCommandGroup(
             new DriveThroughTrajectory(m_driveSubsystem, chargeStationWaypoints, 2.0,2.0, 0.5, 0.5),
             new WaitCommand(0.1),
+            new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 2.0, 2.0, 0.5, 0.5),
             new ParallelDeadlineGroup(
-              new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 2.0, 2.0, 0.5, 0.5),
               new ArmSplinePosition(m_arm, cubeWaypoints, velocity, .5),
-              new CollectCommand(m_claw, true, 5.25)),
+              new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
+              new CollectCommand(m_claw, true, 6)),
             new WaitCommand(0.25),
             new ParallelDeadlineGroup(
               armStowCommand(m_OI),
-              new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 2.0, 2.0, 0.5, 0.5)),
+              new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 2.0, 2.0, 0.5, 0.5),
+              new CollectCommand(m_claw, true, 2.0)),
             new EngageDriveUp(m_driveSubsystem, Preferences.getDouble("EngageDriveUp.maxSpeed", 0.9), true),
             new EngageForward(m_driveSubsystem, Preferences.getDouble("EngageForward.maxSpeed", 0.7), true),
+            new CollectCommand(m_claw, true, 0.25),
             new EngageBalance(m_driveSubsystem, Preferences.getDouble("EngageBalance.maxSpeed", 0.7), true),
             new ParkingBrake(m_driveSubsystem, m_bling, false)));
   }
@@ -673,7 +884,6 @@ public class RobotContainer {
    * @return Command to do the autonomous outlined above
    */
   public Command centerArmCubeLeaveEngageCommand() {
-
     ArrayList<Pose2d> communityWaypoints = new ArrayList<Pose2d>();
     communityWaypoints.add(new Pose2d(2.5, 0, new Rotation2d(3.14)));
 
@@ -746,7 +956,7 @@ public class RobotContainer {
    * @return A command that moves the robot to the correct alignment
    */
   public Command alignToAprilTag(double yOffset, double xOffset) {
-    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, m_claw, 0.52, yOffset, xOffset, m_OI.isCubeMode());
+    return new AlignToAprilTag(m_driveSubsystem, m_bling, m_frontCamera, m_claw, 0.52, yOffset, xOffset, m_OI.isCubeMode(), 1.7);
   }
 
   /**

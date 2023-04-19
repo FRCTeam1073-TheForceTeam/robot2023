@@ -15,14 +15,14 @@ public class PathPlanner {
 		graph = new Graph();
 		// All ends
 		graph.addNode(new Node(-3.87, 2.9, -1.21)); //STOW 0
-		graph.addNode(new Node(-1.483, 3.570, -0.337)); //CUBE_TOP 1
+		graph.addNode(new Node(-1.294, 3.565, -0.42)); //CUBE_TOP 1
 		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 2
-		graph.addNode(new Node(-1.129, 3.029, 1.399)); //CONE_TOP 3
-		graph.addNode(new Node(-1.72, 3.545, 1.189)); //CONE_MID 4
+		graph.addNode(new Node(-1.118, 3.151, 1.37)); //CONE_TOP 3
+		graph.addNode(new Node(-1.759, 3.614, 1.287)); //CONE_MID 4
 		graph.addNode(new Node(-2.45, 3.47, -0.33)); //DOUBLE_SUB_CUBE 5
-		graph.addNode(new Node(-2.111, 3.065, 1.484)); //DOUBLE_SUB_CONE 6
-		graph.addNode(new Node(-1.05, 5.38, -1.21)); //GROUND_CUBE 7
-		graph.addNode(new Node(-1.439, 4.765, 0.573)); //GROUND_CONE 8
+		graph.addNode(new Node(-2.125, 3.11, 1.496)); //DOUBLE_SUB_CONE 6
+		graph.addNode(new Node(-0.87, 5.348, -1.19)); //GROUND_CUBE 7
+		graph.addNode(new Node(-1.446, 4.795, 0.565)); //GROUND_CONE 8
 		graph.addNode(new Node(-2.0719, 4.7582, 0.8069)); //STOW_ALT 9
 		graph.addNode(new Node(-3.85, 2.89, 0.25)); //SINGLESUB_CUBE 10
 		graph.addNode(new Node(-2.21, 4.549, -1.209)); // SINGLESUB_CONE 11

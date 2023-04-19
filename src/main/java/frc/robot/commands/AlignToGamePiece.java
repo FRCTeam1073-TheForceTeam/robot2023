@@ -44,18 +44,18 @@ public class AlignToGamePiece extends CommandBase {
   double yOffset;
 
 
-  public AlignToGamePiece(DriveSubsystem drivetrain, Bling bling, GamePieceFinder finder, double maxVelocity, boolean cubeMode) {
+  public AlignToGamePiece(DriveSubsystem drivetrain, Bling bling, GamePieceFinder finder, double maxVelocity, boolean cubeMode, double XTolerance, double YTolerance) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.bling = bling;
     this.finder = finder;
-    this.YTolerance = 5;
-    this.XTolerance = 8;
+    this.XTolerance = XTolerance;
+    this.YTolerance = YTolerance;
     this.cubeMode = cubeMode;
     this.maxVelocity = maxVelocity;
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     targetCubeX = 434;
-    targetCubeY = 320;
+    targetCubeY = 345;
     targetConeX = 460;
     targetConeY = 324.5;
     addRequirements(drivetrain);
