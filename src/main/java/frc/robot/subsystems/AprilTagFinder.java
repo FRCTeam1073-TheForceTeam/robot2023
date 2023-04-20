@@ -35,6 +35,7 @@ public class AprilTagFinder extends SubsystemBase {
   private int closestID; // ID of closest tag or -1.
   private double closestDistance;
   private Pose3d closestPose; // Pose of closest tag or null;
+  private double cameraOffset;
 
   /** Creates a new AprilTag. */
   public AprilTagFinder(DriveSubsystem ds, String tableName, Transform3d cameraTransform) {
@@ -148,8 +149,8 @@ public class AprilTagFinder extends SubsystemBase {
       tagPose = tagPose.plus(cameraTransform);
 
       //Keep track of the closest tag while we're running through the list.
-      if (transform.getTranslation().getNorm() < closestDistance) {
-        closestDistance = transform.getTranslation().getNorm();
+      if (tagPose.getTranslation().getNorm() < closestDistance) {
+        closestDistance = tagPose.getTranslation().getNorm();
         
         //took out transform to test rotation
         //closestPose = new Pose3d(transform.getTranslation(), transform.getRotation());
@@ -247,5 +248,10 @@ public class AprilTagFinder extends SubsystemBase {
   {
     return detections;
   }
+
+
+public String getDiagnostics() {
+    return "";
+}
   
 }

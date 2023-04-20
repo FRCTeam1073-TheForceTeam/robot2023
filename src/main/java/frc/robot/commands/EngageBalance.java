@@ -77,7 +77,7 @@ public class EngageBalance extends CommandBase
     @Override
     public boolean isFinished()
     {
-        if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitch()) < 9.0)
+        if (Timer.getFPGATimestamp() > startTime + 0.5 && Math.abs(drivetrain.getPitch()) < 8.0)
         { // triggers once the robot drives up to the halfway point again
             return true;
         }

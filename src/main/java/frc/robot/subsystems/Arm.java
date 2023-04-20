@@ -5,13 +5,15 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.Set;
 
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.interpolation.HermiteInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -22,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -57,14 +60,18 @@ public class Arm extends SubsystemBase{
   private final double gravityCompensationWristGain = 0.05;      // 1/20 gear ratio
 
 
-  private final double shoulderOffset = 0.0;
-  private final double shoulderAbsoluteOffset = 4.3828;
-  private final double elbowOffset = 0.0;
-  private final double elbowAbsoluteOffset = 3.25;
-  private final double wristOffset = 0.0;
+  //private final double shoulderOffset = 0.0;
+  //private final double shoulderAbsoluteOffset = 4.3828;
+  //private final double elbowOffset = 0.0;
+  //private final double elbowAbsoluteOffset = 3.25;
+  private final double shoulderAbsoluteOffset = -1.62295;
+  private final double elbowAbsoluteOffset = -7.2741;
   private final double wristAbsoluteOffset = -1.21;
-  private final double shoulderTicksPerRadian = -26931.24;
-  private final double elbowTicksPerRadian = 13465.62;
+  public final double elbowDifferenceOffset = 0.0;
+  //private final double shoulderTicksPerRadian = -26931.24;
+  //private final double elbowTicksPerRadian = 13465.62;
+  private final double shoulderTicksPerRadian = -20.656*4*2048/(2*Math.PI);
+  private final double elbowTicksPerRadian = 20.656*4*2048/(2*Math.PI);
   private final double wristTicksPerRadian = -6518.5; // New 20:1 ratio.
   private final JointVelocities maxVelocities = new JointVelocities(1.5, 2.1, 1);
   private final double maxShoulderAcc = 1.5;
@@ -82,7 +89,10 @@ public class Arm extends SubsystemBase{
   private double profileStartTime;
   private Mode mode = Mode.DISABLED;
   
-  private Bling bling;
+  private int encoderPeriodicCounter;
+  private ErrorCode errorShoulder;
+  private ErrorCode errorElbow;
+  private double elbowDifference = 0;
 
 
   public class JointPositions{
@@ -203,9 +213,9 @@ public class Arm extends SubsystemBase{
 
   public class ArmTrajectory {
 
-    private PolynomialSplineFunction elbowSplines;
-    private PolynomialSplineFunction shoulderSplines;
-    private PolynomialSplineFunction wristSplines;
+    private InterpolatingTreeMap<Double,Double> shoulderSplines;
+    private InterpolatingTreeMap<Double,Double> elbowSplines;
+    private InterpolatingTreeMap<Double,Double> wristSplines;
     double[] elbowPositions;
     double[] shoulderPositions;
     double[] wristPositions;
@@ -215,7 +225,12 @@ public class Arm extends SubsystemBase{
 
 
     public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration) {
-      var interpolator = new SplineInterpolator();
+      shoulderSplines = new InterpolatingTreeMap<Double, Double>();
+      elbowSplines = new InterpolatingTreeMap<Double, Double>();
+      wristSplines = new InterpolatingTreeMap<Double, Double>();
+      //splines = new HermiteInterpolator();
+      // elbowSplines = new HermiteInterpolator();
+      // wristSplines = new HermiteInterpolator();
       elbowPositions = new double[waypoints.size() + 1];
       shoulderPositions = new double[waypoints.size() + 1];
       wristPositions = new double[waypoints.size() + 1];
@@ -228,11 +243,23 @@ public class Arm extends SubsystemBase{
       shoulderPositions[0] = pos.shoulder;
       wristPositions[0] = pos.wrist;
       times[0] = 0;
+      //double[] speedBasedTimes = new double[times.length];
+
       for(int i = 0; i < waypoints.size(); i++){
         elbowPositions[i + 1] = waypoints.get(i).elbow;
         shoulderPositions[i + 1] = waypoints.get(i).shoulder;
         wristPositions[i + 1] = waypoints.get(i).wrist;
-        times[i + 1] = waypoints.get(i).time;
+        //times[i + 1] = waypoints.get(i).time;
+      }
+      double totalMovementTime = 0;
+      for(int s = 1; s < times.length; s++){
+        double sTime = Math.abs((shoulderPositions[s - 1] - shoulderPositions[s])) / maxVelocity.shoulder;
+        double eTime = Math.abs((elbowPositions[s - 1] - elbowPositions[s])) / maxVelocity.elbow;
+        double wTime = Math.abs((wristPositions[s - 1] - wristPositions[s])) / maxVelocity.wrist;
+
+        double movementTime = Math.max(Math.max(sTime, eTime), wTime);
+        totalMovementTime += movementTime + 0.01;
+        times[s] = totalMovementTime;
       }
 
       if (times.length > 1)
@@ -244,9 +271,75 @@ public class Arm extends SubsystemBase{
       System.out.println("Trajectory start time: " + startTime);
       System.out.println("Trajectory end time: " + finalTime);
 
-      elbowSplines = interpolator.interpolate(times, elbowPositions);
-      shoulderSplines = interpolator.interpolate(times, shoulderPositions);
-      wristSplines = interpolator.interpolate(times, wristPositions);
+      shoulderSplines.clear();
+      elbowSplines.clear();
+      wristSplines.clear();
+
+      for(int i = 0; i < times.length; i++){
+        shoulderSplines.put(times[i], shoulderPositions[i]);
+        elbowSplines.put(times[i], elbowPositions[i]);
+        wristSplines.put(times[i], wristPositions[i]);
+      }
+
+      // for(int i = 0; i < times.length; i++){
+      //   if(i == 0 || i == times.length - 1){
+      //     double[] value = new double[3];
+      //     value[0] = shoulderPositions[i];
+      //     value[1] = elbowPositions[i];
+      //     value[2] = wristPositions[i];
+
+      //     double[] derivative = new double[3];
+      //     derivative[0] = 0;
+      //     derivative[1] = 0;
+      //     derivative[2] = 0;
+      //     splines.addSamplePoint(times[i], value, derivative);
+      //   }
+      //   else{
+      //     double[] value = new double[3];
+      //     value[0] = shoulderPositions[i];
+      //     value[1] = elbowPositions[i];
+      //     value[2] = wristPositions[i];
+
+      //     double[] derivative = new double[3];
+      //     double shoulderSlope = (shoulderPositions[i] - shoulderPositions[i - 1]) / (times[i] - times[i - 1]);
+      //     double elbowSlope = (elbowPositions[i] - elbowPositions[i - 1]) / (times[i] - times[i - 1]);
+      //     double wristSlope = (wristPositions[i] - wristPositions[i - 1]) / (times[i] - times[i - 1]);
+
+      //     double nexShoulderSlope = (shoulderPositions[i + 1] - shoulderPositions[i]) / (times[i + 1] - times[i]);
+      //     double nextElbowSlope = (elbowPositions[i + 1] - elbowPositions[i]) / (times[i + 1] - times[i]);
+      //     double nextWristSlope = (wristPositions[i + 1] - wristPositions[i]) / (times[i + 1] - times[i]);
+
+      //     double nextShoulderDifference = shoulderPositions[i + 1] - shoulderPositions[i];
+      //     if(nexShoulderSlope * shoulderSlope < 0){
+      //       derivative[0] = 0;
+      //     }
+      //     else{
+      //       derivative[0] = (shoulderSlope + nexShoulderSlope) / 2;
+      //     }
+
+      //     double nextElbowDifference = elbowPositions[i + 1] - elbowPositions[i];
+      //     if(nextElbowSlope * elbowSlope < 0){
+      //       derivative[1] = 0;
+      //     }
+      //     else{
+      //       derivative[1] = (elbowSlope + nextElbowSlope) / 2;
+      //     }
+
+      //     double nextWristDifference = wristPositions[i + 1] - wristPositions[i];
+      //     if(nextWristSlope * wristSlope < 0){
+      //       derivative[2] = 0;
+      //     }
+      //     else{
+      //       derivative[2] = (wristSlope + nextWristSlope) / 2;
+      //     }
+
+      //     splines.addSamplePoint(times[i], value, derivative);
+      //   }
+      // }
+
+      // elbowSplines = interpolator.interpolate(times, elbowPositions);
+      // shoulderSplines = interpolator.interpolate(times, shoulderPositions);
+      // wristSplines = interpolator.interpolate(times, wristPositions);
     }
  
     public double getFinalTime(){
@@ -261,9 +354,9 @@ public class Arm extends SubsystemBase{
     public void getVelocitiesAtTime(double time, JointVelocities velocities) {
       double t = time - startTime;
       if (time <= finalTime) {
-        velocities.shoulder = shoulderSplines.derivative().value(t);
-        velocities.elbow = elbowSplines.derivative().value(t);
-        velocities.wrist = wristSplines.derivative().value(t);
+        // velocities.shoulder = splines.value(t)[0];
+        // velocities.elbow = splines.value(t)[1];
+        // velocities.wrist = splines.value(t)[2];
       } else {
         velocities.shoulder = 0.0;
         velocities.elbow = 0.0;
@@ -276,9 +369,9 @@ public class Arm extends SubsystemBase{
       double t = time - startTime;
       if (time <= finalTime) {
         // Placeholder for joint angles
-        positions.shoulder = shoulderSplines.value(t);
-        positions.elbow = elbowSplines.value(t);
-        positions.wrist = wristSplines.value(t);
+        positions.shoulder = shoulderSplines.get(t);
+        positions.elbow = elbowSplines.get(t);
+        positions.wrist = wristSplines.get(t);
       } else {
         positions.shoulder = shoulderPositions[shoulderPositions.length - 1];
         positions.elbow = elbowPositions[elbowPositions.length - 1];
@@ -290,12 +383,12 @@ public class Arm extends SubsystemBase{
   /** Creates a new Arm. */
   //Set height limiter
   public Arm() {
-
     shoulderMotor = new TalonFX(16);
     elbowMotor = new TalonFX(18);
     wristMotor = new TalonFX(20); 
     shoulderEncoder = new CANCoder(15);
     elbowEncoder = new CANCoder(17);
+    encoderPeriodicCounter = 0;
 
     // Called to set up motors:
     setUpMotors();
@@ -323,10 +416,11 @@ public class Arm extends SubsystemBase{
 
   // Runs in periodic:
   private void updateAbsolutePositions() {
-    absoluteJointPositions.shoulder = (shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset);
-    absoluteJointPositions.elbow = elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
+    absoluteJointPositions.shoulder = -shoulderEncoder.getPosition() * Math.PI / 180 - shoulderAbsoluteOffset;
+    absoluteJointPositions.elbow = -elbowEncoder.getPosition() * Math.PI / 180 - elbowAbsoluteOffset;
     // No separate absolute sensor for wrist:
-    absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian - wristAbsoluteOffset;
+    absoluteJointPositions.wrist = wristMotor.getSelectedSensorPosition()/wristTicksPerRadian;
+    elbowDifference = absoluteJointPositions.shoulder - absoluteJointPositions.elbow + elbowDifferenceOffset;
   }
 
   private void updatePositionLimits() {
@@ -411,7 +505,6 @@ public class Arm extends SubsystemBase{
       wristMotor.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, gravityCompensation[2]); 
     }
 
-
     // Output angles:
     SmartDashboard.putNumber("Arm.Shoulder", currentJointPositions.shoulder);
     SmartDashboard.putNumber("Arm.Elbow", currentJointPositions.elbow);
@@ -424,8 +517,12 @@ public class Arm extends SubsystemBase{
     SmartDashboard.putNumber("Arm.ElbowAbs", absoluteJointPositions.elbow);
     SmartDashboard.putNumber("Arm.WristAbs", absoluteJointPositions.wrist);
 
+    SmartDashboard.putNumber("Arm.Elbow.Difference", elbowDifference);
+
     // Update health signals for absolute encoder magnets.
     updateMagnetHealth();
+
+    
 
     SmartDashboard.putBoolean("Arm.ElbowMagnetOk", isElbowMagnetOk);
     SmartDashboard.putBoolean("Arm.ShoulderMagnetOk", isShoulderMagnetOk);
@@ -475,11 +572,6 @@ public class Arm extends SubsystemBase{
     shoulderMotor.setIntegralAccumulator(0, 0, 100);
     isShoulderInitialized = false;
 
-    //ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, 400);
-    ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(-3.95 * shoulderTicksPerRadian, 0, 400);
-    if (errorShoulder != ErrorCode.OK) {
-      System.out.println("Shoulder: set selected sensor position failed.");
-    }
 
     // Elbow Motor Setup:
     elbowMotor.setNeutralMode(NeutralMode.Brake);
@@ -492,12 +584,6 @@ public class Arm extends SubsystemBase{
     elbowMotor.config_kF(0, 0, 100);
     elbowMotor.configMaxIntegralAccumulator(0, 500, 100);
     elbowMotor.setIntegralAccumulator(0);
-
-    //ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, 400);
-    ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(2.95 * elbowTicksPerRadian, 0, 400);    
-    if (errorElbow != ErrorCode.OK) {
-      System.out.println("Elbow: set selected sensor position failed,");
-    }
 
 
     // Wrist Motor Setup:
@@ -539,11 +625,29 @@ public class Arm extends SubsystemBase{
 
     SmartDashboard.putBoolean("ArmInit/ElbowMagnetOk", isElbowMagnetOk);
     SmartDashboard.putBoolean("ArmInit/ShoulderMagnetOk", isShoulderMagnetOk);
+
+    //this sets the motor encoders to match the absolute sensor positions during initialization
+    updateMotorEncoders(200);
   }
   
   public String getDiagnostics() {
-    ErrorCode error;
     String result = new String();
+    Faults faults = new Faults();
+    shoulderMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+
+    elbowMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+
+    wristMotor.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+        
     //Check errors for all hardware
     return result;
   }
@@ -554,6 +658,7 @@ public class Arm extends SubsystemBase{
     return new JointPositions(currentJointPositions);
   }
 
+  /* 
   public boolean initializeShoulder() {
     ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(getAbsoluteAngles().shoulder * shoulderTicksPerRadian, 0, 200);
     if (errorShoulder != ErrorCode.OK) {
@@ -562,6 +667,26 @@ public class Arm extends SubsystemBase{
       return true;
     }
   }
+  */
+
+  public void updateMotorEncoders(int timeout){
+    //encoder health is already checked in periodic using updateMagnateHealth
+
+    if (isShoulderMagnetOk && isElbowMagnetOk) {
+      ErrorCode errorShoulder = shoulderMotor.setSelectedSensorPosition(absoluteJointPositions.shoulder * shoulderTicksPerRadian, 0, timeout);
+      ErrorCode errorElbow = elbowMotor.setSelectedSensorPosition(absoluteJointPositions.elbow * elbowTicksPerRadian, 0, timeout);
+      System.out.println("Encoders Ok"); 
+
+      }
+      if (errorShoulder != ErrorCode. OK) {
+        System.out.println("Shoulder: set selected sensor position failed.");
+        
+      }
+      if(errorElbow != ErrorCode.OK){
+        System.out.println("Elbow: set selected sensor position failed.");
+    }
+  }
+
 
   public JointPositions getAbsoluteAngles(){
     return new JointPositions(absoluteJointPositions);

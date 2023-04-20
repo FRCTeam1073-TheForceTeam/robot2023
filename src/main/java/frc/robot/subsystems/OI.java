@@ -16,10 +16,22 @@ public class OI extends SubsystemBase
 
     public Joystick driverController;
     public Joystick operatorController;
-    Debouncer parkingBrakeDebouncer = new Debouncer(0.05);
-    //private BooleanSupplier isCube;
     private boolean isCubeMode;
 
+    public Debouncer parkingBrakeDebouncer = new Debouncer(0.05);
+    public Debouncer xDriverButtonDebouncer = new Debouncer(0.05);
+    public Debouncer yDriverButtonDebouncer = new Debouncer(0.05);
+    public Debouncer aDriverButtonDebouncer = new Debouncer(0.05);
+    public Debouncer bDriverButtonDebouncer = new Debouncer(0.05);
+    public Debouncer menuDriverButtonDebouncer = new Debouncer(0.05);
+    public Debouncer viewDriverButtonDebouncer = new Debouncer(0.5);
+    public Debouncer xOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer yOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer aOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer bOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer menuOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer viewOperatorButtonDebouncer = new Debouncer(0.05);
+    public Debouncer fieldCentricDebouncer = new Debouncer(.05);
 
     /** Setting up which controllor is which
      * Drive Controller is controllor 0
@@ -192,6 +204,10 @@ public class OI extends SubsystemBase
         return driverController.getRawAxis(2);
     }
 
+    // public double getOperatorLeftTrigger(){
+    //     return operatorController.getRawAxis(2);
+    // }
+
         /**
      * @return The Value of the driver controller's left bumper
      * @param input - The current value of the input stream.
@@ -210,6 +226,7 @@ public class OI extends SubsystemBase
     {
         return driverController.getRawButton(6);
     }
+    
 
      /**
      * @return The Value of the driver controller's 2 square button
@@ -218,7 +235,7 @@ public class OI extends SubsystemBase
      */
     public boolean getFieldCentricToggle()
     {
-        return driverController.getRawButtonPressed(7);
+        return fieldCentricDebouncer.calculate(driverController.getRawButton(7));
     }
     
      /**
@@ -228,7 +245,7 @@ public class OI extends SubsystemBase
      */
     public boolean getMenuButton()
     {
-        return driverController.getRawButton(8);
+        return menuDriverButtonDebouncer.calculate(driverController.getRawButton(8));
     }
     
      /**
@@ -238,7 +255,7 @@ public class OI extends SubsystemBase
      */
     public boolean getXButton()
     {
-        return driverController.getRawButtonPressed(3);
+        return xDriverButtonDebouncer.calculate(driverController.getRawButton(3));
     }
 
      /**
@@ -248,7 +265,7 @@ public class OI extends SubsystemBase
      */
     public boolean getAButton()
     {
-        return driverController.getRawButton(1);
+        return aDriverButtonDebouncer.calculate(driverController.getRawButton(1));
     }
 
      /**
@@ -258,7 +275,7 @@ public class OI extends SubsystemBase
      */
     public boolean getYButton()
     {
-        return driverController.getRawButton(4);
+        return yDriverButtonDebouncer.calculate(driverController.getRawButton(4));
     }
 
      /**
@@ -268,13 +285,14 @@ public class OI extends SubsystemBase
      */
     public boolean getBButton()
     {
-        return driverController.getRawButton(2);
+        return bDriverButtonDebouncer.calculate(driverController.getRawButton(2));
     }
 
      /**
      * @return The Value of the driver controller's DPad button
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
+
     public int getDPad(){
         return driverController.getPOV();
     }
@@ -288,7 +306,7 @@ public class OI extends SubsystemBase
      * @return The value of the axis.
      */
     public double getOperatorRightTrigger(){
-        return driverController.getRawAxis(3);
+        return operatorController.getRawAxis(3);
     }
 
     /**
@@ -297,7 +315,11 @@ public class OI extends SubsystemBase
      * @return The value of the axis.
      */
     public double getOperatorLeftTrigger(){
-        return driverController.getRawAxis(2);
+        return operatorController.getRawAxis(2);
+    }
+
+    public boolean getOperatorLeftTriggerButton(){
+        return operatorController.getRawAxis(2) >= 0.5;
     }
 
     /**
@@ -327,7 +349,7 @@ public class OI extends SubsystemBase
      */
     public boolean getOperatorViewButton()
     {
-        return operatorController.getRawButton(7);
+        return viewOperatorButtonDebouncer.calculate(operatorController.getRawButton(7));
     }
     
     /**
@@ -337,7 +359,7 @@ public class OI extends SubsystemBase
      */
     public boolean getOperatorMenuButton()
     {
-        return operatorController.getRawButton(8);
+        return menuOperatorButtonDebouncer.calculate(operatorController.getRawButton(8));
     }
     
     /**
@@ -347,7 +369,7 @@ public class OI extends SubsystemBase
      */
     public boolean getOperatorXButton()
     {
-        return operatorController.getRawButton(3);
+        return xOperatorButtonDebouncer.calculate(operatorController.getRawButton(3));
     }
 
     /**
@@ -357,7 +379,7 @@ public class OI extends SubsystemBase
      */
     public boolean getOperatorAButton()
     {
-        return operatorController.getRawButton(1);
+        return aOperatorButtonDebouncer.calculate(operatorController.getRawButton(1));
     }
 
     /**
@@ -366,7 +388,7 @@ public class OI extends SubsystemBase
      * @return The state of the button.
      */
     public boolean getOperatorYButton(){
-        return operatorController.getRawButton(4);
+        return yOperatorButtonDebouncer.calculate(operatorController.getRawButton(4));
     }
 
 
@@ -376,7 +398,7 @@ public class OI extends SubsystemBase
      * @return The state of the button.
      */
     public boolean getOperatorBButton(){
-        return operatorController.getRawButton(2);
+        return bOperatorButtonDebouncer.calculate(operatorController.getRawButton(2));
     }
 
 
@@ -451,6 +473,10 @@ public class OI extends SubsystemBase
      */
     public boolean getOperatorDPadUp(){
         return (operatorController.getPOV() == 0);
+    }
+
+    public String getDiagnostics() {
+        return "";
     }
 
     // public void setRumble(double val){

@@ -5,7 +5,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2_Faults;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -135,6 +137,17 @@ public class DriveSubsystem extends SubsystemBase
     result += modules[1].getDiagnostics();
     result += modules[2].getDiagnostics();
     result += modules[3].getDiagnostics();
+
+    Pigeon2_Faults faults = new Pigeon2_Faults();
+    pigeon2.getFaults(faults);
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+    ErrorCode error = pigeon2.clearStickyFaults(500);
+    if (error != ErrorCode.OK) {
+        result += String.format(" Cannot contact the pigeon.");
+    }
+    
     //Check errors for all hardware
     return result;
   }
@@ -162,7 +175,7 @@ public class DriveSubsystem extends SubsystemBase
 
     else
     {
-      return -heading;
+      return 360 + heading;
     }
   }
 

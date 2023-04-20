@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.Faults;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -35,13 +38,13 @@ public class Claw extends SubsystemBase {
   private double tof2Range;
   private final double tof1ScaleFactor = 100000;
   private final double tof2ScaleFactor = 100000;
-  private final double collectorScaleFactor = 21000;
+  private final double collectorTicksPerMeter = 2048/0.32;
   //private final boolean debug = true;
 
   /** Creates a new Claw. */
   public Claw() {
     collectorMotor = new TalonFX(19);
-    collectorRateLimiter = new SlewRateLimiter(13000.0); //ticks per second per second
+    //collectorRateLimiter = new SlewRateLimiter(400000.0); //ticks per second per second
     targetCollectorSpeed = 0;
     tof1 = new DigitalInput(0);
     tof2 = new DigitalInput(1);
@@ -51,14 +54,14 @@ public class Claw extends SubsystemBase {
     tof2Freq = 0;
     tof1Range = 0;
     tof2Range = 0;
+    setUpMotors();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //SmartDashboard.putNumber("Actuator 1 Position", getActuatorPosition(1));
-    //SmartDashboard.putNumber("Actuator 2 Position", getActuatorPosition(2));
-    double collectorSpeed = collectorRateLimiter.calculate(targetCollectorSpeed);
+    //double collectorSpeed = collectorRateLimiter.calculate(targetCollectorSpeed);
+    double collectorSpeed = targetCollectorSpeed;
     collectorMotor.set(ControlMode.Velocity, collectorSpeed/10);
     tof1Freq = tof1DutyCycleInput.getFrequency();
     tof2Freq = tof2DutyCycleInput.getFrequency();
@@ -83,8 +86,8 @@ public class Claw extends SubsystemBase {
   }
 
   public void setCollectorSpeed(double speed){
-    targetCollectorSpeed = speed * collectorScaleFactor; //converted to ticks per meter
-    collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
+    targetCollectorSpeed = speed * collectorTicksPerMeter; //converted to ticks per meter
+    // collectorMotor.set(ControlMode.Velocity, targetCollectorSpeed);
   }
 
   // Initialize preferences for this class:
@@ -103,18 +106,41 @@ public class Claw extends SubsystemBase {
 
   public void setUpMotors(){
     collectorMotor.configFactoryDefault();
-    //vacuumMotor.setNeutralMode(NeutralMode.Brake);
+    collectorMotor.setNeutralMode(NeutralMode.Brake);
     // motor.configRemoteFeedbackFilter(encoder, 0);
     // motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
     // motor.setSensorPhase(true);
     collectorMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 12, 0.1));
 
-    collectorMotor.config_kP(0, 0.2);
+    collectorMotor.config_kP(0, 0.1);
     collectorMotor.config_kI(0, 0);
     collectorMotor.config_kD(0, 0.02);
-    collectorMotor.config_kF(0, 0);
+    collectorMotor.config_kF(0, 0.05);
     collectorMotor.configMaxIntegralAccumulator(0, 0);
     collectorMotor.setIntegralAccumulator(0);
   }
+
+public String getDiagnostics(){
+    String result = "";
+    Faults faults = new Faults();
+    collectorMotor.getFaults(faults);
+
+    if(faults.hasAnyFault()){
+      result += faults.toString();
+    }
+    ErrorCode error = collectorMotor.clearStickyFaults(500);
+    if (error != ErrorCode.OK) {
+      result += String.format("can't clear collectorMotor faults");
+    }
+
+    if(tof1DutyCycleInput.getFrequency()< 2){
+      result += String.format("tof1 not working");
+    }
+    // if(tof2DutyCycleInput.getFrequency()< 2){
+    //   result += String.format("tof2 not working");
+    // }
+        
+    return result;
+}
 
 }
