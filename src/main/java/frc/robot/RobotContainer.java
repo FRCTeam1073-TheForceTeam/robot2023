@@ -47,6 +47,7 @@ import frc.robot.commands.UnderglowSetCommand;
 import frc.robot.commands.UpdateMotorEncoders;
 import frc.robot.commands.CollectCommand;
 import frc.robot.commands.DepositCommand;
+import frc.robot.commands.DriveForward;
 import frc.robot.commands.EngageDriveUp;
 import frc.robot.commands.EngageForward;
 import frc.robot.commands.ParkingBrake;
@@ -112,6 +113,7 @@ public class RobotContainer {
   private static final String kProtectorShootCubeLeaveCollectCubeAlign = "ProtectorShootCubeLeaveCollectCube(Align)";
   private static final String kCenterShootCubeLeaveCollectEngage = "CenterShootCubeLeaveCollectEngage";
   private static final String kCenterShootCubeLeaveCollectEngageAlign = "CenterShootCubeLeaveCollectEngage(Align)";
+  private static final String kBarrierArmLinkConeCubeConeAlign = "BarrierArmLinkConeCubeCone(Align)";
 
   private static final String kArmTest = "ArmTest";
   private static final String kTrajectoryTest = "DriveTrajectoryTest";
@@ -140,6 +142,7 @@ public class RobotContainer {
     m_chooser.addOption("CenterShootCubeLeaveCollectEngage(Align)", kCenterShootCubeLeaveCollectEngageAlign);
     m_chooser.addOption("Arm test", kArmTest);
     m_chooser.addOption("Drive Trajectory Test", kTrajectoryTest);
+    m_chooser.addOption("Barrier Arm Link (Cone, Cube, Cone)(Align)", kBarrierArmLinkConeCubeConeAlign);
 
     SmartDashboard.putData("Auto Chooser", m_chooser);
 
@@ -323,6 +326,8 @@ public class RobotContainer {
         return centerShootCubeLeaveCollectEngage();
       case kCenterShootCubeLeaveCollectEngageAlign:
         return centerShootCubeLeaveCollectEngageAlign();
+      case kBarrierArmLinkConeCubeConeAlign:
+        return barrierArmLinkConeCubeCone();
       default:
         System.out.println("No Auto Selected -_-");
         return null;
@@ -651,6 +656,22 @@ public class RobotContainer {
         //new CollectCommand(m_claw, true, 0.5),
         new DepositCommand(m_claw, true, 0.5),
         armStowCommand(m_OI));
+  }
+
+  public Command barrierArmLinkConeCubeCone(){
+    ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.151, 1.25, 1.0));
+
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(0.5, 0.5, 0.5);
+
+    return new SequentialCommandGroup(
+      alignToAprilTag(-0.62, 1.0),
+      new DriveForward(m_driveSubsystem, 0.5),
+      new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0.5),
+      new WaitCommand(2),
+      new DepositCommand(m_claw, false, 1),
+      armStowCommand(m_OI)
+    );
   }
 
   public Command protectorShootCubeLeaveCollectCube(){
