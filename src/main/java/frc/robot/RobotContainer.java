@@ -662,17 +662,30 @@ public class RobotContainer {
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
     coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.151, 1.25, 1.0));
 
+
+    ArrayList<Arm.JointWaypoints> cubePickupWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
+
+    ArrayList<Pose2d> collectWaypoints = new ArrayList<Pose2d>();
+    collectWaypoints.add(new Pose2d(0.222, 0.324, new Rotation2d(Math.PI)));
+    collectWaypoints.add(new Pose2d(0.522, 0.324, new Rotation2d(Math.PI)));
+
+
     Arm.JointVelocities velocity = m_arm.new JointVelocities(0.5, 0.5, 0.5);
 
     return new SequentialCommandGroup(
-      alignToAprilTag(-0.62, 1.0),
-      new DriveForward(m_driveSubsystem, 0.5),
       new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0.5),
       new WaitCommand(2),
       new DepositCommand(m_claw, false, 1),
+      armStowCommand(m_OI), 
+      new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 0.5, 0.5, 0.5, 0.7),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
+      new ArmSplinePosition(m_arm, cubePickupWaypoints, velocity, 0.5),
+      new CollectCommand(m_claw, true, 1),
       armStowCommand(m_OI)
-    );
+    );  
   }
+
 
   public Command protectorShootCubeLeaveCollectCube(){
     ArrayList<Pose2d> leaveWaypoints = new ArrayList<Pose2d>();
