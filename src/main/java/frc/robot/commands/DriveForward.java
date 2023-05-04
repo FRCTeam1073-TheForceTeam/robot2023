@@ -14,10 +14,12 @@ public class DriveForward extends CommandBase {
   DriveSubsystem driveSubsystem;
   double startTime;
   double time;
+  boolean inverted;
   /** Creates a new DriveForward. */
-  public DriveForward(DriveSubsystem driveSubsystem, double time){
+  public DriveForward(DriveSubsystem driveSubsystem, double time, boolean inverted){
     this.driveSubsystem = driveSubsystem;
     this.time = time;
+    this.inverted = inverted;
     addRequirements(driveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -26,11 +28,18 @@ public class DriveForward extends CommandBase {
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-      new ChassisSpeeds(-0.25, 0.0, 0.0), new Rotation2d(driveSubsystem.getWrappedHeading()));
-
+    ChassisSpeeds speeds;
+    if (!inverted){
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(-0.25, 0.0, 0.0), new Rotation2d(driveSubsystem.getWrappedHeading()));
+    }else{
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(0.25, 0.0, 0.0), new Rotation2d(driveSubsystem.getWrappedHeading()));
+    }
+    
     driveSubsystem.setChassisSpeeds(speeds);
   }
+
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

@@ -668,8 +668,10 @@ public class RobotContainer {
 
     ArrayList<Pose2d> collectWaypoints = new ArrayList<Pose2d>();
     collectWaypoints.add(new Pose2d(0.222, 0.324, new Rotation2d(Math.PI)));
-    collectWaypoints.add(new Pose2d(0.522, 0.324, new Rotation2d(Math.PI)));
+    collectWaypoints.add(new Pose2d(0.522, 0.324, new Rotation2d(0)));
 
+    ArrayList<Pose2d> scoreCubeWaypoints = new ArrayList<Pose2d>();
+    scoreCubeWaypoints.add(new Pose2d(0.05, 0.324, new Rotation2d(Math.PI)));
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(0.5, 0.5, 0.5);
 
@@ -679,10 +681,18 @@ public class RobotContainer {
       new DepositCommand(m_claw, false, 1),
       armStowCommand(m_OI), 
       new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 0.5, 0.5, 0.5, 0.7),
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 9, 7),
       new ArmSplinePosition(m_arm, cubePickupWaypoints, velocity, 0.5),
-      new CollectCommand(m_claw, true, 1),
-      armStowCommand(m_OI)
+      new ParallelCommandGroup(
+        new DriveForward(m_driveSubsystem, 0.1, false),
+        new CollectCommand(m_claw, true, 1)),
+      armStowCommand(m_OI),
+      new DriveThroughTrajectory(m_driveSubsystem, scoreCubeWaypoints, 0.5, 0.5, 0.5, 0.7),
+      new ParallelDeadlineGroup(
+        new WaitCommand(0.8),
+        alignToAprilTag(-0.09, 0.8)),
+      highScoreCommand(m_OI),
+      new DepositCommand(m_claw, true, 0.5)
     );  
   }
 
