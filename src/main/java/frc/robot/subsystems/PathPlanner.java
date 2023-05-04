@@ -14,7 +14,7 @@ public class PathPlanner {
 	public PathPlanner(){
 		graph = new Graph();
 		// All ends
-		graph.addNode(new Node(-3.87, 2.9, -1.21)); //STOW 0
+		graph.addNode(new Node(-3.85, 2.9, -1.21)); //STOW 0
 		graph.addNode(new Node(-1.294, 3.565, -0.42)); //CUBE_TOP 1
 		graph.addNode(new Node(-1.72, 3.8, -0.26)); //CUBE_MID 2
 		graph.addNode(new Node(-1.118, 3.151, 1.37)); //CONE_TOP 3
@@ -232,7 +232,11 @@ public class PathPlanner {
 	}
 
 	public ArrayList<Node> getPathFromClosest(double shoulder, double elbow, double wrist, int endIdx){
-		return getPath(graph.findClosestNode(shoulder, elbow, wrist), endIdx);
+		ArrayList<Node> path = getPath(graph.findClosestNode(shoulder, elbow, wrist), endIdx);
+		while(path.size() < 3){
+			path.add(1, path.get(0));
+		}
+		return path;
 	}
 
 	
