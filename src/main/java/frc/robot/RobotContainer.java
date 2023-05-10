@@ -660,7 +660,7 @@ public class RobotContainer {
 
   public Command barrierArmLinkConeCubeCone(){
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.151, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
 
 
     ArrayList<Arm.JointWaypoints> cubePickupWaypoints = new ArrayList<Arm.JointWaypoints>();
@@ -672,6 +672,13 @@ public class RobotContainer {
 
     ArrayList<Pose2d> scoreCubeWaypoints = new ArrayList<Pose2d>();
     scoreCubeWaypoints.add(new Pose2d(0.05, 0.324, new Rotation2d(Math.PI)));
+    
+    ArrayList<Pose2d> conePickupWaypoints = new ArrayList<Pose2d>();
+    conePickupWaypoints.add(new Pose2d(0.244, -0.1277, new Rotation2d(Math.PI)));
+    conePickupWaypoints.add(new Pose2d(0.7250, -0.1277, new Rotation2d(0)));
+
+    ArrayList<Arm.JointWaypoints> coneArmPickupWaypoints = new ArrayList<Arm.JointWaypoints>();
+    coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.5859, 4.5584, 0.5278, 1.0));
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(0.5, 0.5, 0.5);
 
@@ -681,18 +688,24 @@ public class RobotContainer {
       new DepositCommand(m_claw, false, 1),
       armStowCommand(m_OI), 
       new DriveThroughTrajectory(m_driveSubsystem, collectWaypoints, 0.5, 0.5, 0.5, 0.7),
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 9, 7),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 9, 9),
       new ArmSplinePosition(m_arm, cubePickupWaypoints, velocity, 0.5),
       new ParallelCommandGroup(
         new DriveForward(m_driveSubsystem, 0.1, false),
-        new CollectCommand(m_claw, true, 1)),
+        new CollectCommand(m_claw, true, 1.5)),
       armStowCommand(m_OI),
       new DriveThroughTrajectory(m_driveSubsystem, scoreCubeWaypoints, 0.5, 0.5, 0.5, 0.7),
       new ParallelDeadlineGroup(
         new WaitCommand(0.8),
         alignToAprilTag(-0.09, 0.8)),
       highScoreCommand(m_OI),
-      new DepositCommand(m_claw, true, 0.5)
+      new DepositCommand(m_claw, true, 0.5),
+      armStowCommand(m_OI),
+      new WaitCommand(0.5),
+      new DriveThroughTrajectory(m_driveSubsystem, conePickupWaypoints, 0.5, 0.5, 0.5, 0.7),
+      new ArmSplinePosition(m_arm, coneArmPickupWaypoints, velocity, 0.5),
+      new CollectCommand(m_claw, false, 1.5),
+      armStowCommand(m_OI)
     );  
   }
 
