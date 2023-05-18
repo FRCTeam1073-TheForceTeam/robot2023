@@ -653,7 +653,8 @@ public class Arm extends SubsystemBase{
   }
 
   // This methods returns the angle of each joint
-  public JointPositions getJointAngles() {
+  public JointPositions getJointAngles() 
+  {
     //return new JointPositions(shoulderRawAngle + shoulderOffset, elbowRawAngle + elbowOffset - shoulderRawAngle);
     return new JointPositions(currentJointPositions);
   }

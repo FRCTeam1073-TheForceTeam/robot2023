@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AlignToAprilTag;
 import frc.robot.commands.AlignToGamePiece;
 import frc.robot.commands.AllianceUnderglow;
+import frc.robot.commands.ArmCorrection;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmSetPosition;
@@ -89,6 +90,7 @@ public class RobotContainer {
   private final Claw m_claw = new Claw();
   private final TeleopClaw m_clawCommand = new TeleopClaw(m_claw, m_OI);
   private final AllianceUnderglow m_allianceUnderglow = new AllianceUnderglow(m_underglow);
+  private final ArmCorrection m_armCorrectionCommand = new ArmCorrection(m_arm);
 
   // private final OpenMV m_openMV = new OpenMV(SerialPort.Port.kUSB);
 
@@ -124,9 +126,11 @@ public class RobotContainer {
     CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_teleopCommand);
     // CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armSetCommand);
+    CommandScheduler.getInstance().setDefaultCommand(m_arm, m_armCorrectionCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_claw, m_clawCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_bling, m_blingTeleopCommand);
     CommandScheduler.getInstance().setDefaultCommand(m_underglow, m_allianceUnderglow);
+    CommandScheduler.getInstance().setDefaultCommand(m_driveSubsystem, m_allianceUnderglow);
 
     m_chooser.setDefaultOption("No Autonomous", kNoAuto);
     m_chooser.addOption("Center Arm Cube Engage", kCenterArmCubeEngage);
@@ -197,7 +201,7 @@ public class RobotContainer {
     SmartDashboard.putString("Diag/Drive Subsystem", driveSubDiagnostics);
     SmartDashboard.putString("Diag/OI", oiDiagnostics);
     SmartDashboard.putString("Diag/AprilTag", aprilTagDiagnostics);
-
+    
     if (armDiagnostics.isEmpty() && blingDiagnostics.isEmpty() && clawDiagnostics.isEmpty()
         && driveSubDiagnostics.isEmpty() && oiDiagnostics.isEmpty() && aprilTagDiagnostics.isEmpty()) {
       allGood = true;
@@ -344,7 +348,8 @@ public class RobotContainer {
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
     return new SequentialCommandGroup(
 
-    new PlannedArmPath(m_arm, m_pathPlanner, 0, velocity));
+    new PlannedArmPath(m_arm, m_pathPlanner, 0, velocity),
+    new ArmCorrection(m_arm));
   }
 
   public Command alignToGamePiece(OI oi) {
