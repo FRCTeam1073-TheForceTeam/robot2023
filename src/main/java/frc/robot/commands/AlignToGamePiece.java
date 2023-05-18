@@ -57,7 +57,7 @@ public class AlignToGamePiece extends CommandBase {
     targetCubeX = 434;
     targetCubeY = 345;
     targetConeX = 460;
-    targetConeY = 324.5;
+    targetConeY = 310.5;
     addRequirements(drivetrain);
   }
 
