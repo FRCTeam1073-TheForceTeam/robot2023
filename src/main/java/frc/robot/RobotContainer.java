@@ -701,13 +701,13 @@ public class RobotContainer {
 
   public Command barrierArmLinkConeCubeCone(){
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
-    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
     coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
 
 
     ArrayList<Arm.JointWaypoints> cubePickupWaypoints = new ArrayList<Arm.JointWaypoints>();
-    cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
+    cubePickupWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
     cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
 
@@ -725,7 +725,7 @@ public class RobotContainer {
     conePickupWaypoints.add(new Pose2d(2.4597, -0.32, new Rotation2d(0)));
 
     ArrayList<Arm.JointWaypoints> coneArmPickupWaypoints = new ArrayList<Arm.JointWaypoints>();
-    coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
+    coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
     coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
     coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
 
