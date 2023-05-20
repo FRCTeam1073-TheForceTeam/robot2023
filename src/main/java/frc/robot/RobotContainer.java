@@ -702,9 +702,13 @@ public class RobotContainer {
   public Command barrierArmLinkConeCubeCone(){
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
     coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
 
 
     ArrayList<Arm.JointWaypoints> cubePickupWaypoints = new ArrayList<Arm.JointWaypoints>();
+    cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
+    cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
     cubePickupWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 1.0));
 
     ArrayList<Pose2d> cubeCollectWaypoints = new ArrayList<Pose2d>();
@@ -713,14 +717,16 @@ public class RobotContainer {
 
 
     ArrayList<Pose2d> scoreCubeWaypoints = new ArrayList<Pose2d>();
-    scoreCubeWaypoints.add(new Pose2d(0.15, 0.53, new Rotation2d(Math.PI)));
+    scoreCubeWaypoints.add(new Pose2d(0.15, 0.55, new Rotation2d(Math.PI)));
 
     ArrayList<Pose2d> conePickupWaypoints = new ArrayList<Pose2d>();
     conePickupWaypoints.add(new Pose2d(0.4653, 0.4615, new Rotation2d(Math.PI)));
-    conePickupWaypoints.add(new Pose2d(2.3174, 0.53, new Rotation2d(0)));
+    conePickupWaypoints.add(new Pose2d(2.3174, 0.55, new Rotation2d(0)));
     conePickupWaypoints.add(new Pose2d(2.4597, -0.32, new Rotation2d(0)));
 
     ArrayList<Arm.JointWaypoints> coneArmPickupWaypoints = new ArrayList<Arm.JointWaypoints>();
+    coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
+    coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
     coneArmPickupWaypoints.add(m_arm.new JointWaypoints(-1.4359, 4.7084, 0.5078, 1.0));
 
     ArrayList<Pose2d> coneDriveCollect = new ArrayList<Pose2d>();
@@ -728,7 +734,7 @@ public class RobotContainer {
 
     ArrayList<Pose2d> coneBackWaypoint = new ArrayList<Pose2d>();
     coneBackWaypoint.add(new Pose2d(2.5454, 0.477, new Rotation2d(0)));
-    coneBackWaypoint.add(new Pose2d(0.15, 0.53, new Rotation2d(Math.PI)));
+    coneBackWaypoint.add(new Pose2d(0.15, 0.55, new Rotation2d(Math.PI)));
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
 
