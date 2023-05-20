@@ -69,10 +69,6 @@ public class AlignToGamePiece extends CommandBase {
     return MathUtil.clamp(scaleY, 0, 0.01);
   }
 
-  private double speedScaleX(double targetX){
-    double scaleX = (360 - targetX) * 4.2e-5;
-    return MathUtil.clamp(scaleX, 0, 0.01);
-  }
 
   // Called when the command is initially scheduled.
   @Override
@@ -121,14 +117,13 @@ public class AlignToGamePiece extends CommandBase {
     double deltaX = targetX - gamePieceX;
     double deltaY = targetY - gamePieceY;
     double commandScaleY = speedScaleY(gamePieceY);
-    double commandScaleX = speedScaleX(gamePieceX);
 
     //ends command if game piece is close (x,y) to robot
 
     chassisSpeeds.vyMetersPerSecond = (deltaX) * commandScaleY;
     chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
 
-    chassisSpeeds.vxMetersPerSecond = (deltaY) * commandScaleX;
+    chassisSpeeds.vxMetersPerSecond = (deltaY) * commandScaleY;
     chassisSpeeds.vxMetersPerSecond = MathUtil.clamp(chassisSpeeds.vxMetersPerSecond, 0, maxVelocity);
 
     chassisSpeeds.omegaRadiansPerSecond = 0;

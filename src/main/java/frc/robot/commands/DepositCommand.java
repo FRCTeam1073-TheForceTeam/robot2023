@@ -29,10 +29,10 @@ public class DepositCommand extends CommandBase {
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
     if(isCube){
-      claw.setCollectorSpeed(-55);
+      claw.setCollectorSpeed(-85);
     }
     else{
-      claw.setCollectorSpeed(55);
+      claw.setCollectorSpeed(85);
     }
   }
   

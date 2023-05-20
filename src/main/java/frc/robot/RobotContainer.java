@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 
+import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
+
 import com.ctre.phoenix.ErrorCode;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -702,8 +704,8 @@ public class RobotContainer {
   public Command barrierArmLinkConeCubeCone(){
     ArrayList<Arm.JointWaypoints> coneWaypoints = new ArrayList<Arm.JointWaypoints>();
     coneWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
-    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
-    coneWaypoints.add(m_arm.new JointWaypoints(-1.118, 3.101, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.218, 3.131, 1.25, 1.0));
+    coneWaypoints.add(m_arm.new JointWaypoints(-1.218, 3.131, 1.25, 1.0));
 
 
     ArrayList<Arm.JointWaypoints> cubePickupWaypoints = new ArrayList<Arm.JointWaypoints>();
@@ -717,11 +719,12 @@ public class RobotContainer {
 
 
     ArrayList<Pose2d> scoreCubeWaypoints = new ArrayList<Pose2d>();
-    scoreCubeWaypoints.add(new Pose2d(0.15, 0.55, new Rotation2d(Math.PI)));
+    scoreCubeWaypoints.add(new Pose2d(2.4, 0.577, new Rotation2d(0)));
+    scoreCubeWaypoints.add(new Pose2d(0.15, 0.6, new Rotation2d(Math.PI)));
 
     ArrayList<Pose2d> conePickupWaypoints = new ArrayList<Pose2d>();
-    conePickupWaypoints.add(new Pose2d(0.4653, 0.4615, new Rotation2d(Math.PI)));
-    conePickupWaypoints.add(new Pose2d(2.3174, 0.55, new Rotation2d(0)));
+    conePickupWaypoints.add(new Pose2d(0.4653, 0.577, new Rotation2d(Math.PI)));
+    conePickupWaypoints.add(new Pose2d(2.3174, 0.607, new Rotation2d(0)));
     conePickupWaypoints.add(new Pose2d(2.4597, -0.32, new Rotation2d(0)));
 
     ArrayList<Arm.JointWaypoints> coneArmPickupWaypoints = new ArrayList<Arm.JointWaypoints>();
@@ -733,47 +736,52 @@ public class RobotContainer {
     coneDriveCollect.add(new Pose2d(2.9, -0.2294, new Rotation2d(0)));
 
     ArrayList<Pose2d> coneBackWaypoint = new ArrayList<Pose2d>();
-    coneBackWaypoint.add(new Pose2d(2.5454, 0.477, new Rotation2d(0)));
-    coneBackWaypoint.add(new Pose2d(0.15, 0.55, new Rotation2d(Math.PI)));
+    coneBackWaypoint.add(new Pose2d(2.64, 0.67, new Rotation2d(0)));
+    coneBackWaypoint.add(new Pose2d(0.1, 0.65, new Rotation2d(Math.PI)));
 
-    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.4, 1.4, 1.4);
+    Arm.JointVelocities velocity = m_arm.new JointVelocities(1.5, 1.5, 1.5);
 
     return new SequentialCommandGroup(
       new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0.5),
       new WaitCommand(0.25),
-      new DepositCommand(m_claw, false, 0.5),
+      new DepositCommand(m_claw, false, 0.3),
       new ParallelDeadlineGroup(
-        new DriveThroughTrajectory(m_driveSubsystem, cubeCollectWaypoints, 1.8, 1.8, 0.5, 0.7),
+        new DriveThroughTrajectory(m_driveSubsystem, cubeCollectWaypoints, 2.2, 2.2, 0.5, 0.8),
         armStowCommand(m_OI)), 
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 10),
+      new ParallelDeadlineGroup(
+        new WaitCommand(0.6),
+        new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.6, true, 8, 8)),
       new ArmSplinePosition(m_arm, cubePickupWaypoints, velocity, 0.5),
       new ParallelCommandGroup(
         new DriveForward(m_driveSubsystem, 0.1, false),
         new CollectCommand(m_claw, true, 1)),
       new ParallelDeadlineGroup(
-        new DriveThroughTrajectory(m_driveSubsystem, scoreCubeWaypoints, 1.8, 1.8, 0.5, 0.7),
+        new DriveThroughTrajectory(m_driveSubsystem, scoreCubeWaypoints, 2.2, 2.2, 0.5, 0.8),
         armStowCommand(m_OI)),
       new ParallelDeadlineGroup(
-        new WaitCommand(1),
+        new WaitCommand(1.0),
         alignToAprilTag(-0.09, 0.8)),
       new CollectCommand(m_claw, true, 1),
-      highScoreCommand(m_OI),
+      //highScoreCommand(m_OI),
       new DepositCommand(m_claw, true, 0.5),
       new ParallelDeadlineGroup(
-        new DriveThroughTrajectory(m_driveSubsystem, conePickupWaypoints, 1.8, 1.8, 0.5, 0.7),
-        armStowCommand(m_OI)),
-      new ArmSplinePosition(m_arm, coneArmPickupWaypoints, velocity, 0.5),
+        new DriveThroughTrajectory(m_driveSubsystem, conePickupWaypoints, 2.2, 2.2, 0.5, 0.8)),
+        //armStowCommand(m_OI)),
       new ParallelDeadlineGroup(
-        new DriveThroughTrajectory(m_driveSubsystem, coneDriveCollect, 1.8, 1.8, 0.5, 0.7),
+        new WaitCommand(0.6),
+        new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.6, false, 8, 8)),
+      new ArmSplinePosition(m_arm, coneArmPickupWaypoints, velocity, 0.5),
+        new ParallelDeadlineGroup(
+        new DriveThroughTrajectory(m_driveSubsystem, coneDriveCollect, 2.2, 2.2, 0.5, 0.8),
         new CollectCommand(m_claw, false, 4)),
       armStowCommand(m_OI),
-      new DriveThroughTrajectory(m_driveSubsystem, coneBackWaypoint, 1.8, 1.8, 0.5, 0.7),
+      new DriveThroughTrajectory(m_driveSubsystem, coneBackWaypoint, 2.2, 2.5, 0.5, 0.8),
       new ParallelDeadlineGroup(
-        new WaitCommand(1),
-        alignToAprilTag(0.6, 0.85)),
+        new WaitCommand(1.5),
+        alignToAprilTag(0.62, 0.85)),
       new ArmSplinePosition(m_arm, coneWaypoints, velocity, 0.5),
       new WaitCommand(0.25),
-      new DepositCommand(m_claw, false, 0.5),
+      new DepositCommand(m_claw, false, 0.3),
       armStowCommand(m_OI)
       );  
   }
