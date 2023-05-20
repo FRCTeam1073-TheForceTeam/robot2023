@@ -354,8 +354,8 @@ public class RobotContainer {
 
   public Command alignToGamePiece(OI oi) {
     return new ConditionalCommand(
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, true, 10, 8),
-      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.2, false, 10, 8),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.6, true, 10, 8),
+      new AlignToGamePiece(m_driveSubsystem, m_bling, m_gamePieceFinder, 0.6, false, 10, 8),
       oi::isCubeMode);
   }
 
