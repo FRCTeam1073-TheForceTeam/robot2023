@@ -43,6 +43,9 @@ public class AlignToGamePiece extends CommandBase {
   int glitchCounter;
   double yOffset;
 
+  
+  
+
 
   public AlignToGamePiece(DriveSubsystem drivetrain, Bling bling, GamePieceFinder finder, double maxVelocity, boolean cubeMode, double XTolerance, double YTolerance) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -55,10 +58,20 @@ public class AlignToGamePiece extends CommandBase {
     this.maxVelocity = maxVelocity;
     this.chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
     targetCubeX = 434;
-    targetCubeY = 345;
-    targetConeX = 460;
-    targetConeY = 310.5;
+    targetCubeY = 360;
+    targetConeX = 439;
+    targetConeY = 360;
     addRequirements(drivetrain);
+  }
+
+  private double speedScaleY(double targetY){
+    double scaleY = (360 - targetY) * 4.2e-5;
+    return MathUtil.clamp(scaleY, 0, 0.01);
+  }
+
+  private double speedScaleX(double targetX){
+    double scaleX = (360 - targetX) * 4.2e-5;
+    return MathUtil.clamp(scaleX, 0, 0.01);
   }
 
   // Called when the command is initially scheduled.
@@ -107,13 +120,15 @@ public class AlignToGamePiece extends CommandBase {
 
     double deltaX = targetX - gamePieceX;
     double deltaY = targetY - gamePieceY;
+    double commandScaleY = speedScaleY(gamePieceY);
+    double commandScaleX = speedScaleX(gamePieceX);
 
     //ends command if game piece is close (x,y) to robot
 
-    chassisSpeeds.vyMetersPerSecond = (deltaX) * 0.0025;
+    chassisSpeeds.vyMetersPerSecond = (deltaX) * commandScaleY;
     chassisSpeeds.vyMetersPerSecond = MathUtil.clamp(chassisSpeeds.vyMetersPerSecond, -maxVelocity, maxVelocity);
 
-    chassisSpeeds.vxMetersPerSecond = (deltaY) * 0.0025;
+    chassisSpeeds.vxMetersPerSecond = (deltaY) * commandScaleX;
     chassisSpeeds.vxMetersPerSecond = MathUtil.clamp(chassisSpeeds.vxMetersPerSecond, 0, maxVelocity);
 
     chassisSpeeds.omegaRadiansPerSecond = 0;
