@@ -486,8 +486,8 @@ public class Arm extends SubsystemBase{
     updateGravityCompensation(); // Must be called every time after updates of positions.
     updatePositionLimits(); // Must be called every time after updates of positions.
 
-    shoulderDerivative = (absoluteJointPositions.shoulder - prevJointPoses.shoulder) / 2;
-    elbowDerivative = (absoluteJointPositions.elbow - prevJointPoses.elbow) / 2;
+    shoulderDerivative = (absoluteJointPositions.shoulder - prevJointPoses.shoulder) / 0.02;
+    elbowDerivative = (absoluteJointPositions.elbow - prevJointPoses.elbow) / 0.02;
   
     // If we have a trajectory, then get references from the trajectory:
     if (mode == Mode.TRAJECTORY) {
@@ -704,6 +704,11 @@ public class Arm extends SubsystemBase{
     }
   }
 
+  public void continuousUpdate(){
+    double difference = shoulderDerivative - elbowDerivative;
+
+
+  }
 
   public JointPositions getAbsoluteAngles(){
     return new JointPositions(absoluteJointPositions);
