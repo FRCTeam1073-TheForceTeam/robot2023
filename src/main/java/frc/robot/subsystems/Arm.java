@@ -86,7 +86,10 @@ public class Arm extends SubsystemBase{
   private JointPositions absoluteJointPositions = new JointPositions();
   private JointPositions referencePositions = new JointPositions();
   private JointVelocities referenceVelocities = new JointVelocities();
+  private JointPositions prevJointPoses = new JointPositions();
   private ArmTrajectory armTrajectory;
+  private double shoulderDerivative;
+  private double elbowDerivative;
   private double profileStartTime;
   private Mode mode = Mode.DISABLED;
   
@@ -402,6 +405,9 @@ public class Arm extends SubsystemBase{
     // Called to set up motors:
     setUpMotors();
 
+    // Sets past value as the absolute angles
+    prevJointPoses = absoluteJointPositions;
+
     // Set our physical angle Limits:
     maxAngles = new JointPositions(3.37, 0.08, 1.5);
     minAngles = new JointPositions(-3.37, 2.98, -1.21);
@@ -479,7 +485,9 @@ public class Arm extends SubsystemBase{
     updateAbsolutePositions();
     updateGravityCompensation(); // Must be called every time after updates of positions.
     updatePositionLimits(); // Must be called every time after updates of positions.
-    
+
+    shoulderDerivative = (absoluteJointPositions.shoulder - prevJointPoses.shoulder) / 2;
+    elbowDerivative = (absoluteJointPositions.elbow - prevJointPoses.elbow) / 2;
   
     // If we have a trajectory, then get references from the trajectory:
     if (mode == Mode.TRAJECTORY) {
