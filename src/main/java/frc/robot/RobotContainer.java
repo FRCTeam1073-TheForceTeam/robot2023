@@ -613,7 +613,7 @@ public class RobotContainer {
 
     ArrayList<Arm.JointWaypoints> cubeWaypoints = new ArrayList<Arm.JointWaypoints>();
     cubeWaypoints.add(m_arm.new JointWaypoints(-3.23, 3.375, -1.2, 1.0));
-    cubeWaypoints.add(m_arm.new JointWaypoints(-0.87, 5.348, -1.19, 4.0));
+    cubeWaypoints.add(m_arm.new JointWaypoints(-1.116, 5.233, -1.16, 4.0));
 
 
     Arm.JointVelocities velocity = m_arm.new JointVelocities(0.9, 0.9, 0.9);
@@ -640,7 +640,8 @@ public class RobotContainer {
         new ParallelDeadlineGroup(
             new DriveThroughTrajectory(m_driveSubsystem, returnWaypoints, 1.5
             , 1.2, 0.5, 0.7),
-            armStowCommand(m_OI)),
+            armStowCommand(m_OI),
+            new CollectCommand(m_claw, true, 1.0)),
         new ParallelDeadlineGroup(
           midScoreCommand(m_OI),
           alignToAprilTag(-0.04, 0.6)),
