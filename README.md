@@ -1,5 +1,5 @@
 !!!IMPORTANT!!!
-This isn't competition code, this is purely for testing April Tag navigation.
+This is no longer competition code, this is purely for testing April Tag navigation.
 
 
 
