@@ -1,3 +1,8 @@
+!!!IMPORTANT!!!
+This isn't competition code, this is purely for testing April Tag navigation.
+
+
+
 # Robot 2023
 
 Team 1073's robot code for the 2023 FRC Season: Charged Up
