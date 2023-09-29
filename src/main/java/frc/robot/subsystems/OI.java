@@ -293,8 +293,24 @@ public class OI extends SubsystemBase
      * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
      */
 
-    public int getDPad(){
+    public int getDriverDPad(){
         return driverController.getPOV();
+    }
+
+    public boolean getDriverDPadTop(){
+        return (driverController.getPOV() == 0);
+    }
+
+    public boolean getDriverDPadRight(){
+        return (driverController.getPOV() == 90);
+    }
+
+    public boolean getDriverDPadDown(){
+        return (driverController.getPOV() == 180);
+    }
+
+    public boolean getDriverDPadLeft(){
+        return (driverController.getPOV() == 270);
     }
 
 

@@ -94,7 +94,14 @@ public class TeleopDrive extends CommandBase
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
-    double rightX = m_OI.getDriverRightX();
+    double rightX;
+    if(m_OI.getDriverDPad() != -1){
+      rightX = snapToHeading();
+    }
+    else{
+      rightX = m_OI.getDriverRightX();
+    }
+    
     //sets deadzones on the controller to extend to .05:
     if(Math.abs(leftY) < .05) {leftY = 0;}
     if(Math.abs(leftX) < .05) {leftX = 0;}
@@ -182,7 +189,7 @@ public class TeleopDrive extends CommandBase
     }
     else if (fieldCentric){
       //Snap to cardinal directions
-      double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
+      //double currentAngle = m_driveSubsystem.getOdometry().getRotation().getDegrees();
       //desiredAngle += rightX;
       //rightX = snapToHeading(currentAngle, 360 - m_OI.getDPad(), desiredAngle);
 
@@ -222,33 +229,51 @@ public class TeleopDrive extends CommandBase
     }
   }
 
-  public double snapToHeading(double currentAngle, double targetAngle, double joystickDesired){
-    if(targetAngle == 361){
-      targetAngle = joystickDesired;
+  // public double snapToHeading(double currentAngle, double targetAngle, double joystickDesired){
+  //   if(targetAngle == 361){
+  //     targetAngle = joystickDesired;
+  //   }
+  //   double error = currentAngle - targetAngle;
+  //   while(error < -180){error += 360;}
+  //   while(error > 180){error -= 360;}
+  //   SmartDashboard.putNumber("Angle Error", error);
+  //   //if(Math.abs(error) < STOP_THRESHOLD){
+  //   //  return 0;
+  //   //}
+
+  //   //snapPidProfile.setTolerance(STOP_THRESHOLD);
+  //   //snapPidProfile.enableContinuousInput(-180, 180);
+  //   //return MathUtil.clamp(snapPidProfile.calculate(currentAngle, targetAngle), -1.0, 1.0);
+  //   //calculate derivative
+    
+  //   error = error * Math.PI / 180;
+  //   double new_error = error;
+  //   double current_time = System.currentTimeMillis();
+  //   double derivative = (new_error - last_error)/(current_time - last_time);
+  //   last_time = current_time;
+  //   last_error = error;
+  //   error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
+
+  //   return MathUtil.clamp(error * .7 + derivative * .1, -maximumRotationVelocity, maximumRotationVelocity) / maximumRotationVelocity;
+    
+  // }
+
+  public double snapToHeading(){
+    double currentAngle = m_driveSubsystem.getWrappedHeading();
+    double desiredAngle = m_OI.getDriverDPad();
+
+    if(desiredAngle == 0){
+      desiredAngle = 360;
     }
-    double error = currentAngle - targetAngle;
-    while(error < -180){error += 360;}
-    while(error > 180){error -= 360;}
-    SmartDashboard.putNumber("Angle Error", error);
-    //if(Math.abs(error) < STOP_THRESHOLD){
-    //  return 0;
-    //}
-
-    //snapPidProfile.setTolerance(STOP_THRESHOLD);
-    //snapPidProfile.enableContinuousInput(-180, 180);
-    //return MathUtil.clamp(snapPidProfile.calculate(currentAngle, targetAngle), -1.0, 1.0);
-    //calculate derivative
-    
-    error = error * Math.PI / 180;
-    double new_error = error;
-    double current_time = System.currentTimeMillis();
-    double derivative = (new_error - last_error)/(current_time - last_time);
-    last_time = current_time;
-    last_error = error;
-    error = MathUtil.clamp(error, -maximumRotationVelocity, maximumRotationVelocity);
-
-    return MathUtil.clamp(error * .7 + derivative * .1, -maximumRotationVelocity, maximumRotationVelocity) / maximumRotationVelocity;
-    
+    double rotationalVelocityLimit = 0.75;
+    double difference = 0.75 * (currentAngle - desiredAngle);
+    if(Math.abs(difference) < 2.5){
+      return 0.0;
+    }
+    else{
+      return MathUtil.clamp(difference, -rotationalVelocityLimit, rotationalVelocityLimit);
+    }
+      
   }
 
   // Called once the command ends or is interrupted.
