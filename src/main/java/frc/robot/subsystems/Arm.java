@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.apache.commons.math3.analysis.interpolation.HermiteInterpolator;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import com.ctre.phoenix.ErrorCode;
@@ -213,9 +214,12 @@ public class Arm extends SubsystemBase{
 
   public class ArmTrajectory {
 
-    private InterpolatingTreeMap<Double,Double> shoulderSplines;
-    private InterpolatingTreeMap<Double,Double> elbowSplines;
-    private InterpolatingTreeMap<Double,Double> wristSplines;
+    // private InterpolatingTreeMap<Double,Double> shoulderSplines;
+    // private InterpolatingTreeMap<Double,Double> elbowSplines;
+    // private InterpolatingTreeMap<Double,Double> wristSplines;
+    private PolynomialSplineFunction shoulderSplines;
+    private PolynomialSplineFunction elbowSplines;
+    private PolynomialSplineFunction wristSplines;
     double[] elbowPositions;
     double[] shoulderPositions;
     double[] wristPositions;
@@ -225,12 +229,13 @@ public class Arm extends SubsystemBase{
 
 
     public ArmTrajectory(ArrayList<JointWaypoints> waypoints, JointVelocities maxVelocity, double maxAcceleration) {
-      shoulderSplines = new InterpolatingTreeMap<Double, Double>();
-      elbowSplines = new InterpolatingTreeMap<Double, Double>();
-      wristSplines = new InterpolatingTreeMap<Double, Double>();
+      // shoulderSplines = new InterpolatingTreeMap<Double, Double>();
+      // elbowSplines = new InterpolatingTreeMap<Double, Double>();
+      // wristSplines = new InterpolatingTreeMap<Double, Double>();
       //splines = new HermiteInterpolator();
       // elbowSplines = new HermiteInterpolator();
       // wristSplines = new HermiteInterpolator();
+      var interPolator = new SplineInterpolator();
       elbowPositions = new double[waypoints.size() + 1];
       shoulderPositions = new double[waypoints.size() + 1];
       wristPositions = new double[waypoints.size() + 1];
@@ -271,15 +276,19 @@ public class Arm extends SubsystemBase{
       System.out.println("Trajectory start time: " + startTime);
       System.out.println("Trajectory end time: " + finalTime);
 
-      shoulderSplines.clear();
-      elbowSplines.clear();
-      wristSplines.clear();
+      elbowSplines = interPolator.interpolate(times, elbowPositions);
+      shoulderSplines = interPolator.interpolate(times, shoulderPositions);
+      wristSplines = interPolator.interpolate(times, wristPositions);
 
-      for(int i = 0; i < times.length; i++){
-        shoulderSplines.put(times[i], shoulderPositions[i]);
-        elbowSplines.put(times[i], elbowPositions[i]);
-        wristSplines.put(times[i], wristPositions[i]);
-      }
+      // shoulderSplines.clear();
+      // elbowSplines.clear();
+      // wristSplines.clear();
+
+      // for(int i = 0; i < times.length; i++){
+      //   shoulderSplines.put(times[i], shoulderPositions[i]);
+      //   elbowSplines.put(times[i], elbowPositions[i]);
+      //   wristSplines.put(times[i], wristPositions[i]);
+      // }
 
       // for(int i = 0; i < times.length; i++){
       //   if(i == 0 || i == times.length - 1){
@@ -369,9 +378,9 @@ public class Arm extends SubsystemBase{
       double t = time - startTime;
       if (time <= finalTime) {
         // Placeholder for joint angles
-        positions.shoulder = shoulderSplines.get(t);
-        positions.elbow = elbowSplines.get(t);
-        positions.wrist = wristSplines.get(t);
+        positions.shoulder = shoulderSplines.value(t);
+        positions.elbow = elbowSplines.value(t);
+        positions.wrist = wristSplines.value(t);
       } else {
         positions.shoulder = shoulderPositions[shoulderPositions.length - 1];
         positions.elbow = elbowPositions[elbowPositions.length - 1];
