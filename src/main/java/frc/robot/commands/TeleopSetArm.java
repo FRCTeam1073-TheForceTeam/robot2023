@@ -36,14 +36,14 @@ public class TeleopSetArm extends CommandBase {
     double leftY = oi.getOperatorLeftY();
     double rightY = oi.getOperatorRightY();
     double rightX = oi.getOperatorRightX();
-      if(leftY > 0.5){leftY = 0.25;}
-      else if(leftY < -0.5){leftY = -0.25;}
+      if(leftY > 0.5){leftY = 0.40;}
+      else if(leftY < -0.5){leftY = -0.40;}
       else{leftY = 0;}
-      if(rightY > 0.5){rightY = 0.25;}
-      else if(rightY < -0.5){rightY = -0.25;}
+      if(rightY > 0.5){rightY = 0.40;}
+      else if(rightY < -0.5){rightY = -0.40;}
       else{rightY = 0;}
-      if(rightX > 0.5){rightX = 0.25;}
-      else if(rightX < -0.5){rightX = -0.25;}
+      if(rightX > 0.5){rightX = 0.40;}
+      else if(rightX < -0.5){rightX = -0.40;}
       else{rightX = 0;}
 
     if(Math.abs(leftY) > 0.1|| Math.abs(rightY) > 0.1 || Math.abs(rightX) > 0.1){
