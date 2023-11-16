@@ -89,8 +89,8 @@ public class TeleopDrive extends CommandBase
   @Override
   public void execute(){
     //multiples the angle by a number from 1 to the square root of 30:
-    double mult1 = 1.0 + (m_OI.getDriverLeftTrigger() * ((Math.sqrt(25)) - 1));
-    double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * ((Math.sqrt(25)) - 1));
+    double mult1 = 1.0 + (-m_OI.getRangedLeftTrigger() * (25 - 1));
+    //double mult2 = 1.0 + (m_OI.getDriverRightTrigger() * ((Math.sqrt(25)) - 1));
 
     double leftY = m_OI.getDriverLeftY();
     double leftX = m_OI.getDriverLeftX();
@@ -190,9 +190,9 @@ public class TeleopDrive extends CommandBase
       //double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 + (leftX > 0 ? -add1 : add1) + (leftX > 0 ? -add2 : add2)), -maximumLinearVelocity, maximumLinearVelocity);
       //double w = MathUtil.clamp((rightX * maximumRotationVelocity / 25 + (rightX > 0 ? -add1 : add1) + (rightX > 0 ? -add2 : add2)), -maximumRotationVelocity, maximumRotationVelocity);
 
-      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
-      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 ) * mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity);
-      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25) * mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
+      double vx = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1, -maximumLinearVelocity, maximumLinearVelocity);
+      double vy = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25 ) * mult1, -maximumLinearVelocity, maximumLinearVelocity);
+      double w = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25) * mult1, -maximumRotationVelocity, maximumRotationVelocity);
 
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         vx,
@@ -204,9 +204,9 @@ public class TeleopDrive extends CommandBase
     else{
       // Robot centric driving.
       speeds = new ChassisSpeeds();
-      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25)* mult1 * mult2, -maximumLinearVelocity, maximumLinearVelocity); 
-      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25)* mult1 * mult2, -maximumRotationVelocity, maximumRotationVelocity);
+      speeds.vxMetersPerSecond = MathUtil.clamp(-(leftY * maximumLinearVelocity / 25 )* mult1, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.vyMetersPerSecond = MathUtil.clamp(-(leftX * maximumLinearVelocity / 25)* mult1, -maximumLinearVelocity, maximumLinearVelocity); 
+      speeds.omegaRadiansPerSecond = MathUtil.clamp(-(rightX * maximumRotationVelocity / 25)* mult1, -maximumRotationVelocity, maximumRotationVelocity);
       m_driveSubsystem.setChassisSpeeds(speeds); 
     }
     

@@ -124,7 +124,7 @@ public class OI extends SubsystemBase
     private final double RIGHT_X_MAX = 1;
     private double RIGHT_X_ZERO = 0;
     public double getDriverRightX() {
-        return MathUtil.clamp(2.0 * (driverController.getRawAxis(4) - (RIGHT_X_MAX + RIGHT_X_MIN) * 0.5) / (RIGHT_X_MAX - RIGHT_X_MIN) - RIGHT_X_ZERO, -1, 1);
+        return MathUtil.clamp(2.0 * (driverController.getRawAxis(3) - (RIGHT_X_MAX + RIGHT_X_MIN) * 0.5) / (RIGHT_X_MAX - RIGHT_X_MIN) - RIGHT_X_ZERO, -1, 1);
     }
     private final double RIGHT_Y_MIN = -1;
     private final double RIGHT_Y_MAX = 1;
@@ -200,8 +200,13 @@ public class OI extends SubsystemBase
      * @param axis - The axis to read, starting at 0.
      * @return The value of the axis.
      */
+    //throttle on new joysticks
     public double getDriverLeftTrigger(){
         return driverController.getRawAxis(2);
+    }
+
+    public double getRangedLeftTrigger(){
+        return (getDriverLeftTrigger() - 1) / 2;
     }
 
     // public double getOperatorLeftTrigger(){
@@ -213,9 +218,10 @@ public class OI extends SubsystemBase
      * @param input - The current value of the input stream.
      * @return The debounced value of the input stream.     
      */
+    //R1 on the new joysticks
     public boolean getLeftBumper()
     {
-        return parkingBrakeDebouncer.calculate(driverController.getRawButton(5));
+        return parkingBrakeDebouncer.calculate(driverController.getRawButton(1));
     }
      /**
      * @return The Value of the driver controller's menu button
@@ -233,9 +239,10 @@ public class OI extends SubsystemBase
      * @param button - The button index, beginning at 1.
      * @return Whether the button was pressed since the last check.
      */
+    //Button 8 on the new joysticks
     public boolean getFieldCentricToggle()
     {
-        return fieldCentricDebouncer.calculate(driverController.getRawButton(7));
+        return fieldCentricDebouncer.calculate(driverController.getRawButton(8));
     }
     
      /**
@@ -243,9 +250,10 @@ public class OI extends SubsystemBase
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
      */
+    //L1 on the new joysticks
     public boolean getMenuButton()
     {
-        return menuDriverButtonDebouncer.calculate(driverController.getRawButton(8));
+        return menuDriverButtonDebouncer.calculate(driverController.getRawButton(2));
     }
     
      /**
@@ -263,9 +271,10 @@ public class OI extends SubsystemBase
      * @param Button - The button number to be read (starting at 1)
      * @return The state of the button.
      */
+    //L3 on new joysticks
     public boolean getAButton()
     {
-        return aDriverButtonDebouncer.calculate(driverController.getRawButton(1));
+        return aDriverButtonDebouncer.calculate(driverController.getRawButton(4));
     }
 
      /**
