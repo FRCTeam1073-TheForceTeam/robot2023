@@ -195,6 +195,16 @@ public class DriveSubsystem extends SubsystemBase
     return rates[1];
   }
 
+  public Rotation2d getGyroAngle()
+  {
+    return Rotation2d.fromDegrees(getHeading());
+  }
+
+  public SwerveModulePosition[] getModulePositions()
+  {
+    return modulePositions;
+  }
+
   // Reset IMU heading to zero degrees
   public void zeroHeading() 
   {
