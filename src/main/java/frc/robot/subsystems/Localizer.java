@@ -74,12 +74,17 @@ public class Localizer extends SubsystemBase
             }
             lastUpdateTime = now;
         }
-        
     }
 
     public Pose2d getOdometry()
     {
         // TODO: actually implement this
+        return new Pose2d();
+    }
+
+    public Pose2d additionalSensorMeasurement(Pose2d targetPosition)
+    {
+        // TODO: do stuff
         return new Pose2d();
     }
 
