@@ -64,7 +64,7 @@ public class AprilTagFinder extends SubsystemBase {
     Number[] tagData = apriltagEntry.getNumberArray(new Number[0]);
     detections.clear();
     tags.clear();
-    int numTags = tagData.length/23;
+    int numTags = tagData.length/13;
     // Reset search variables for closest to empty:
     closestID = -1;
     closestDistance = 9999.0;
@@ -75,10 +75,11 @@ public class AprilTagFinder extends SubsystemBase {
       // Checks to see if the tag ID is between 1-8 (by excluding 0 and 9) to reduce false positives.
       // If not, it won't send information to the tagData array.
 
-      if(tagData[i*23].intValue() > 0 && tagData[i*23].intValue() < 9){
+      if(tagData[i*13].intValue() > 0 && tagData[i*13].intValue() < 9){
 
       double[] homography = new double[9];
       double[] corners = new double[8];
+      //Doesn't use homography anymore
       homography[0] = 1.0;
       homography[1] = 0.0;
       homography[2] = 0.0;
@@ -88,17 +89,17 @@ public class AprilTagFinder extends SubsystemBase {
       homography[6] = 0.0;
       homography[7] = 0.0;
       homography[8] = 1.0;
-      corners[0] = tagData[i*23 + 15].doubleValue();
-      corners[1] = tagData[i*23 + 16].doubleValue();
-      corners[2] = tagData[i*23 + 17].doubleValue();
-      corners[3] = tagData[i*23 + 18].doubleValue();
-      corners[4] = tagData[i*23 + 19].doubleValue();
-      corners[5] = tagData[i*23 + 20].doubleValue();
-      corners[6] = tagData[i*23 + 21].doubleValue();
-      corners[7] = tagData[i*23 + 22].doubleValue();
-      AprilTagDetection detection = new AprilTagDetection("16h5", tagData[i*23 + 0].intValue(),
-      tagData[i*23 + 1].intValue(), tagData[i*23 + 2].floatValue(), homography, 
-      tagData[i*23 + 13].doubleValue(), tagData[i*23 + 14].doubleValue(), corners);
+      corners[0] = tagData[i*13 + 5].doubleValue();
+      corners[1] = tagData[i*13 + 6].doubleValue();
+      corners[2] = tagData[i*13 + 7].doubleValue();
+      corners[3] = tagData[i*13 + 8].doubleValue();
+      corners[4] = tagData[i*13 + 9].doubleValue();
+      corners[5] = tagData[i*13 + 10].doubleValue();
+      corners[6] = tagData[i*13 + 11].doubleValue();
+      corners[7] = tagData[i*13 + 12].doubleValue();
+      AprilTagDetection detection = new AprilTagDetection("16h5", tagData[i*13 + 0].intValue(),
+      tagData[i*13 + 1].intValue(), tagData[i*13 + 2].floatValue(), homography, 
+      tagData[i*13 + 3].doubleValue(), tagData[i*13 + 4].doubleValue(), corners);
       detections.add(detection);
       //Transform3d transform = poseEstimator.estimate(detection);
       //AprilTagPoseEstimate poseEstimate = poseEstimator.estimateOrthogonalIteration(detection, 50);
