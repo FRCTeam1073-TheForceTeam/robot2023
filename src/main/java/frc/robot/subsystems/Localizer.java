@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -56,6 +60,17 @@ public class Localizer extends SubsystemBase
                 *      }
                 * }
                 */
+                Pose3d landMarkPose = map.getLandmark(tags.get(i).ID);
+                if (landMarkPose != null)
+                {
+                    Transform3d transform = new Transform3d(new Pose3d(), tags.get(i).pose);
+                    Pose3d measurement = landMarkPose.transformBy(null);
+                    Pose2d measurement2d = new Pose2d(
+                        new Translation2d(measurement.getX(), measurement.getY()), 
+                        new Rotation2d(measurement.getRotation().getAngle())
+                    );
+                    estimator.addVisionMeasurement(measurement2d, now);
+                }
             }
             lastUpdateTime = now;
         }
