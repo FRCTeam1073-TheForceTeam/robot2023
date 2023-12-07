@@ -60,11 +60,11 @@ public class Localizer extends SubsystemBase
                 *      }
                 * }
                 */
-                Pose3d landMarkPose = map.getLandmark(tags.get(i).ID);
-                if (landMarkPose != null)
+                Pose3d apriltagPose = map.getApriltagLandmark(tags.get(i).ID);
+                if (apriltagPose != null)
                 {
                     Transform3d transform = new Transform3d(new Pose3d(), tags.get(i).pose);
-                    Pose3d measurement = landMarkPose.transformBy(null);
+                    Pose3d measurement = apriltagPose.transformBy(null);
                     Pose2d measurement2d = new Pose2d(
                         new Translation2d(measurement.getX(), measurement.getY()), 
                         new Rotation2d(measurement.getRotation().getAngle())
@@ -82,10 +82,18 @@ public class Localizer extends SubsystemBase
         return new Pose2d();
     }
 
-    public Pose2d additionalSensorMeasurement(Pose2d targetPosition)
+    public void additionalSensorMeasurement(int id, Transform3d sensorTransform)
     {
-        // TODO: do stuff
-        return new Pose2d();
+        // TODO:
+        Pose3d landmarkPose = map.getLandmark(id); 
+        // null needs to be the sensor input on the line below
+        Transform3d transform3d = new Transform3d(new Pose3d(), null); 
+        Pose3d measurement = landmarkPose.transformBy(sensorTransform); 
+        Pose2d measurement2d = new Pose2d(
+            new Translation2d(measurement.getX(), measurement.getY()),
+            new Rotation2d(measurement.getRotation().getAngle()) 
+        );
+        estimator.addVisionMeasurement(measurement2d, Timer.getFPGATimestamp());
     }
 
 }
