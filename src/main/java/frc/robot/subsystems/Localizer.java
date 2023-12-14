@@ -20,6 +20,9 @@ public class Localizer extends SubsystemBase
     private AprilTagFinder finder;
     private double lastUpdateTime;
 
+    //added a set transform from sensor to center of the robot to the sensor and can have multiple as needed
+    private final Transform3d sensorTransform = new Transform3d();
+
     public Localizer(DriveSubsystem driveTrain, MapInterface map, AprilTagFinder finder)
     {
         this.driveTrain = driveTrain;
@@ -63,8 +66,9 @@ public class Localizer extends SubsystemBase
                 Pose3d apriltagPose = map.getApriltagLandmark(tags.get(i).ID);
                 if (apriltagPose != null)
                 {
+                    //transform of the tag to robot
                     Transform3d transform = new Transform3d(new Pose3d(), tags.get(i).pose);
-                    Pose3d measurement = apriltagPose.transformBy(null);
+                    Pose3d measurement = apriltagPose.transformBy(transform);
                     Pose2d measurement2d = new Pose2d(
                         new Translation2d(measurement.getX(), measurement.getY()), 
                         new Rotation2d(measurement.getRotation().getAngle())
@@ -82,13 +86,15 @@ public class Localizer extends SubsystemBase
         return new Pose2d();
     }
 
-    public void additionalSensorMeasurement(int id, Transform3d sensorTransform)
+    public void additionalSensorMeasurement(int id)
     {
         // TODO:
         Pose3d landmarkPose = map.getLandmark(id); 
         // null needs to be the sensor input on the line below
         Transform3d transform3d = new Transform3d(new Pose3d(), null); 
-        Pose3d measurement = landmarkPose.transformBy(sensorTransform); 
+        //transforms the position of the landmark by the transform 
+        Pose3d measurement = landmarkPose.transformBy(transform3d); 
+        measurement = measurement.transformBy(sensorTransform);
         Pose2d measurement2d = new Pose2d(
             new Translation2d(measurement.getX(), measurement.getY()),
             new Rotation2d(measurement.getRotation().getAngle()) 
