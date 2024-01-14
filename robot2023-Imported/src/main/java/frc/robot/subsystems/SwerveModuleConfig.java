@@ -13,9 +13,9 @@ public class SwerveModuleConfig
 {
     public int moduleNumber = -1;
     public Translation2d position = new Translation2d(0,0);
-    public double tickPerMeter = 1000;
+    //public double tickPerMeter = 1000;
     public double metersPerRotation = 0.1016 * Math.PI;
-    public double tickPerRadian = 1000;
+    //public double tickPerRadian = 1000;
     public double steerAngleOffset = 0;
     public double steerCurrentLimit = 20;
     public double driveCurrentLimit = 35;
@@ -39,7 +39,7 @@ public class SwerveModuleConfig
      */
     public SwerveModuleConfig()
     {
-        tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 86670.8);
+        //tickPerMeter = Preferences.getDouble("Drive.Drive.TicksPerMeter", 86670.8);
         driveP = Preferences.getDouble("Drive.Drive.Kp", 0.1); 
         driveI = Preferences.getDouble("Drive.Drive.Ki", 0.0);
         driveD = Preferences.getDouble("Drive.Drive.Kd", 0.0);
@@ -49,7 +49,7 @@ public class SwerveModuleConfig
         driveCurrentThreshold = Preferences.getDouble("Drive.Drive.CurrentThreshold", 22);
 
 
-        tickPerRadian = Preferences.getDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI)); // 4,096 ticks per rotation, converted to radians
+        //tickPerRadian = Preferences.getDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI)); // 4,096 ticks per rotation, converted to radians
         steerP = Preferences.getDouble("Drive.Steer.Kp", 0.8); 
         steerI = Preferences.getDouble("Drive.Steer.Ki", 0.0);
         steerD = Preferences.getDouble("Drive.Steer.Kd", 0.0);
@@ -61,7 +61,7 @@ public class SwerveModuleConfig
 
     //Initializes preferences for PIDF values for both drive and steer motors, current limits and current threshold
     public static void initPreferences() {
-        Preferences.initDouble("Drive.Drive.TickPerMeter", 86670.8);
+        //Preferences.initDouble("Drive.Drive.TickPerMeter", 86670.8);
         Preferences.initDouble("Drive.Drive.Kp", 0.1);
         Preferences.initDouble("Drive.Drive.Ki", 0.0);
         Preferences.initDouble("Drive.Drive.Kd", 0.0);
@@ -70,7 +70,7 @@ public class SwerveModuleConfig
         Preferences.initDouble("Drive.Drive.CurrentLimit", 20);
         Preferences.initDouble("Drive.Drive.CurrentThreshold", 22);
     
-        Preferences.initDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI));
+        //Preferences.initDouble("Drive.Steer.TicksPerRadian", 4096.0/(2*Math.PI));
         Preferences.initDouble("Drive.Steer.Kp", 0.8);
         Preferences.initDouble("Drive.Steer.Ki", 0.0);
         Preferences.initDouble("Drive.Steer.Kd", 0.0);

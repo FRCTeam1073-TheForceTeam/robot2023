@@ -92,13 +92,15 @@ public class SwerveModule
     // Return steering sensor angle in radians. 0 = dead ahead on robot.
     public double getSteeringAngle()
     {
-        return (steerEncoder.getPosition().getValue() / (Math.PI * (2.0))) - cfg.steerAngleOffset;
+        // TODO:Check 
+        return (steerEncoder.getPosition().getValue() * (Math.PI * (2.0))) - (cfg.steerAngleOffset / (Math.PI * 2.0));
     }
 
     // Return drive encoder in meters.
     public double getDriveEncoder()
     {
-        return -driveMotor.getRotorPosition().getValue() / cfg.tickPerMeter;
+        // TODO:Check 
+        return -driveMotor.getRotorPosition().getValue() * cfg.metersPerRotation;
     }
 
     // Return drive velocity in meters/second.
@@ -108,7 +110,7 @@ public class SwerveModule
         return -driveMotor.getRotorVelocity().getValue() * cfg.metersPerRotation;
     }
 
-    // Returns the velocity from the motor itself
+    // Returns the velocity from the motor itself in rotations
     public double getDriveRawVelocity() { // TODO: Same thing
         return driveMotor.getRotorVelocity().getValue();
     }
@@ -168,6 +170,7 @@ public class SwerveModule
     {
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
         //TODO: cvt driveVelocity to units specified above
+        // TODO:Check ^^
         driveMotor.setControl(new VelocityDutyCycle(-driveVelocity * cfg.metersPerRotation));
     }
 
@@ -175,8 +178,9 @@ public class SwerveModule
     public void setSteerAngle(double steeringAngle)
     {
         //TODO: fix steering angle units and add offset
+        // TODO:Check ^^
         //(steeringAngle + cfg.steerAngleOffset) * cfg.tickPerRadian
-        steerMotor.setControl(new PositionDutyCycle(steeringAngle));
+        steerMotor.setControl(new PositionDutyCycle((steeringAngle +  cfg.steerAngleOffset) / (Math.PI * 2.0)));
     }
 
     /**Sets motors in the module to brake or coast mode
@@ -231,13 +235,13 @@ public class SwerveModule
         driveMotor.getConfigurator().apply(new CurrentLimitsConfigs().withSupplyTimeThreshold(cfg.driveCurrentThresholdTime));
 
         //Set up talon for CAN encoder
-        // error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
+        //error = steerMotor.configRemoteFeedbackFilter(steerEncoder, 0);
         // if(error != StatusCode.OK)
         // {
         //     System.out.println(String.format("Module %d configRemoteFeedbackFilter failed: %s ", cfg.moduleNumber, error));
         // }
         
-        error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder));
+        error = steerMotor.getConfigurator().apply(new TalonFXConfiguration().Feedback.withFeedbackRemoteSensorID(idcfg.steerEncoderID));
         if(error != StatusCode.OK)
         {
             System.out.println(String.format("Module %d configSelectedFeedbackSensor failed: %s ", cfg.moduleNumber, error));
