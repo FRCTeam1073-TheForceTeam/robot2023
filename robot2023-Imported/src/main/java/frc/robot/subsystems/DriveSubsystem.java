@@ -299,7 +299,7 @@ public class DriveSubsystem extends SubsystemBase
     }
     else if(!parkingBrakeOn)
     { //in debug mode
-      SmartDashboard.putNumber("Module 0 Velocity in ticks", modules[0].getDriveRawVelocity());
+      SmartDashboard.putNumber("Module 0 Velocity in Rotations per Second", modules[0].getDriveRawVelocity());
     }
     updateOdometry();
     SmartDashboard.putNumber("Odometry.X", odometry.getPoseMeters().getX());

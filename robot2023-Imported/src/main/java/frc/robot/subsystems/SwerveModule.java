@@ -102,8 +102,10 @@ public class SwerveModule
     }
 
     // Return drive velocity in meters/second.
-    public double getDriveVelocity(){ // TODO: Find out meters per second
-        return -driveMotor.getRotorVelocity().getValue() / cfg.tickPerMeter*10.0;
+    public double getDriveVelocity(){ 
+        // TODO: Find out meters per second
+        // TODO:Check ^^
+        return -driveMotor.getRotorVelocity().getValue() * cfg.metersPerRotation;
     }
 
     // Returns the velocity from the motor itself
@@ -166,7 +168,7 @@ public class SwerveModule
     {
         // Velocity commands are ticks per meter in 0.1 seconds... so 1/10th the ticks/second.
         //TODO: cvt driveVelocity to units specified above
-        driveMotor.setControl(new VelocityDutyCycle(-driveVelocity));
+        driveMotor.setControl(new VelocityDutyCycle(-driveVelocity * cfg.metersPerRotation));
     }
 
     //setSteerAngle in radians
